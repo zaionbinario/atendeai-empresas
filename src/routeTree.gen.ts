@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtendenteRouteImport } from './routes/atendente'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as HorariosRouteImport } from './routes/horarios'
+import { Route as PerguntasRouteImport } from './routes/perguntas'
+import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as SimuladorRouteImport } from './routes/simulador'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtendenteRoute = AtendenteRouteImport.update({
+  id: '/atendente',
+  path: '/atendente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HorariosRoute = HorariosRouteImport.update({
+  id: '/horarios',
+  path: '/horarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerguntasRoute = PerguntasRouteImport.update({
+  id: '/perguntas',
+  path: '/perguntas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutosRoute = ProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SimuladorRoute = SimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atendente': typeof AtendenteRoute
+  '/empresas': typeof EmpresasRoute
+  '/horarios': typeof HorariosRoute
+  '/perguntas': typeof PerguntasRoute
+  '/produtos': typeof ProdutosRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atendente': typeof AtendenteRoute
+  '/empresas': typeof EmpresasRoute
+  '/horarios': typeof HorariosRoute
+  '/perguntas': typeof PerguntasRoute
+  '/produtos': typeof ProdutosRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atendente': typeof AtendenteRoute
+  '/empresas': typeof EmpresasRoute
+  '/horarios': typeof HorariosRoute
+  '/perguntas': typeof PerguntasRoute
+  '/produtos': typeof ProdutosRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/atendente'
+    | '/empresas'
+    | '/horarios'
+    | '/perguntas'
+    | '/produtos'
+    | '/simulador'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/atendente'
+    | '/empresas'
+    | '/horarios'
+    | '/perguntas'
+    | '/produtos'
+    | '/simulador'
+  id:
+    | '__root__'
+    | '/'
+    | '/atendente'
+    | '/empresas'
+    | '/horarios'
+    | '/perguntas'
+    | '/produtos'
+    | '/simulador'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtendenteRoute: typeof AtendenteRoute
+  EmpresasRoute: typeof EmpresasRoute
+  HorariosRoute: typeof HorariosRoute
+  PerguntasRoute: typeof PerguntasRoute
+  ProdutosRoute: typeof ProdutosRoute
+  SimuladorRoute: typeof SimuladorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atendente': {
+      id: '/atendente'
+      path: '/atendente'
+      fullPath: '/atendente'
+      preLoaderRoute: typeof AtendenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/horarios': {
+      id: '/horarios'
+      path: '/horarios'
+      fullPath: '/horarios'
+      preLoaderRoute: typeof HorariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perguntas': {
+      id: '/perguntas'
+      path: '/perguntas'
+      fullPath: '/perguntas'
+      preLoaderRoute: typeof PerguntasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produtos': {
+      id: '/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/simulador': {
+      id: '/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof SimuladorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtendenteRoute: AtendenteRoute,
+  EmpresasRoute: EmpresasRoute,
+  HorariosRoute: HorariosRoute,
+  PerguntasRoute: PerguntasRoute,
+  ProdutosRoute: ProdutosRoute,
+  SimuladorRoute: SimuladorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
