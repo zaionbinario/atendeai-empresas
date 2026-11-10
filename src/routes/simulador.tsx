@@ -20,8 +20,8 @@ function Simulador() {
   const [texto, setTexto] = useState("");
   const [digitando, setDigitando] = useState(false);
   const fim = useRef<HTMLDivElement>(null);
-  useEffect(() => setMsgs(inicial()), []);
-  useEffect(() => fim.current?.scrollIntoView({ behavior: "smooth" }), [msgs, digitando]);
+  useEffect(() => { setMsgs(inicial()); }, []);
+  useEffect(() => { fim.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, digitando]);
   const enviar = (t: string) => { if (!t.trim()) return;
     setMsgs((m) => [...m, { id: novoId(), de: "cliente", texto: t, hora: agora() }]); setTexto(""); setDigitando(true);
     setTimeout(() => { setDigitando(false); setMsgs((m) => [...m, { id: novoId(), de: "bot", texto: responder(t, store), hora: agora() }]); }, 900); };
