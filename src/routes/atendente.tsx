@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import type { Instrucoes } from "@/lib/types";
 
 export const Route = createFileRoute("/atendente")({
-  head: () => ({ meta: [{ title: "Atendente virtual — AtendeAI" }, { name: "description", content: "Configure o nome, o tom de voz e as instruções do atendente com IA." }, { property: "og:title", content: "Atendente virtual — AtendeAI" }, { property: "og:description", content: "Configure o nome, o tom de voz e as instruções do atendente com IA." }] }),
+  head: () => ({ meta: [{ title: "Atendente virtual — Zyon Chat" }, { name: "description", content: "Configure o nome, o tom de voz e as instruções do atendente com IA." }, { property: "og:title", content: "Atendente virtual — Zyon Chat" }, { property: "og:description", content: "Configure o nome, o tom de voz e as instruções do atendente com IA." }] }),
   component: Atendente,
 });
 const tons: { v: Instrucoes["tom"]; l: string; d: string }[] = [
