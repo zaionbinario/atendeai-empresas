@@ -15,6 +15,7 @@ const agora = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", mi
 const sugestoes = ["Qual o horário?", "Vocês fazem entrega?", "Quanto custa o bolo?", "Ver produtos"];
 function Simulador() {
   const store = useStore();
+  const { conversas, setConversas, botAtivo } = store;
   const inicial = (): Mensagem[] => [{ id: "0", de: "bot", texto: store.instrucoes.boasVindas, hora: agora() }];
   const [msgs, setMsgs] = useState<Mensagem[]>([]);
   const [texto, setTexto] = useState("");
@@ -23,8 +24,22 @@ function Simulador() {
   useEffect(() => { setMsgs(inicial()); }, []);
   useEffect(() => { fim.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, digitando]);
   const enviar = (t: string) => { if (!t.trim()) return;
-    setMsgs((m) => [...m, { id: novoId(), de: "cliente", texto: t, hora: agora() }]); setTexto(""); setDigitando(true);
-    setTimeout(() => { setDigitando(false); setMsgs((m) => [...m, { id: novoId(), de: "bot", texto: responder(t, store, msgs.slice(-8).map((m) => m.texto)), hora: agora() }]); }, 900); };
+    const clienteMsg: Mensagem = { id: novoId(), de: "cliente", texto: t, hora: agora() };
+    const historico = [...msgs, clienteMsg];
+    setMsgs(historico); setTexto("");
+    if (!botAtivo) {
+      const aviso: Mensagem = { id: novoId(), de: "bot", texto: "Nosso atendimento automático está pausado no momento. Um atendente humano poderá continuar por aqui. 🙋", hora: agora() };
+      const final = [...historico, aviso]; setMsgs(final);
+      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), status: "humano", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
+      return;
+    }
+    setDigitando(true);
+    setTimeout(() => {
+      const resposta: Mensagem = { id: novoId(), de: "bot", texto: responder(t, store, historico.slice(-8).map((m) => m.texto)), hora: agora() };
+      const final = [...historico, resposta]; setDigitando(false); setMsgs(final);
+      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), status: "ia", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
+    }, 900);
+  };
   return (<>
     <PageHeader title="Simulador de conversa" desc="Converse como se fosse um cliente e veja as respostas do atendente." action={<Btn variant="ghost" onClick={() => setMsgs(inicial())}><RotateCcw className="h-4 w-4" />Reiniciar</Btn>} />
     <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-xl">
