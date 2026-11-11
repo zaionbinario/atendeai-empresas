@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Search, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Search, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
@@ -9,6 +9,7 @@ const nav = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
   { to: "/simulador", label: "Simulador", icon: MessageCircle },
   { to: "/conversas", label: "Histórico de conversas", icon: MessageCircle },
+  { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/respostas-rapidas", label: "Respostas rápidas", icon: MessageSquareText },
   { to: "/empresas", label: "Empresas", icon: Building2 },
   { to: "/produtos", label: "Produtos", icon: Package },
