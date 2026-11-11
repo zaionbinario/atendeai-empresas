@@ -15,7 +15,7 @@ export const CHAVE_CREDENCIAL_ADMIN = "zyon-admin-credencial-local-v1";
 const ITERACOES = 250_000;
 
 export function senhaAdminValida(senha: string): boolean {
-  return senha.length >= 12 && senha.trim().length >= 12;
+  return senha.length >= 6 && senha.trim().length >= 6;
 }
 
 export function credencialAdminValida(dado: unknown): dado is CredencialAdmin {
@@ -59,7 +59,7 @@ async function criarHash(senha: string, salt: Uint8Array, iteracoes: number): Pr
 }
 
 export async function criarCredencialAdmin(senha: string): Promise<CredencialAdmin> {
-  if (!senhaAdminValida(senha)) throw new Error("Use uma senha com pelo menos 12 caracteres.");
+  if (!senhaAdminValida(senha)) throw new Error("Use uma senha com pelo menos 6 caracteres.");
   if (!crypto?.getRandomValues) throw new Error("Este navegador não permite gerar uma senha segura.");
   const salt = crypto.getRandomValues(new Uint8Array(16));
   return {

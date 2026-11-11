@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { credencialAdminValida, senhaAdminValida } from "@/lib/admin-password";
 
 describe("validação da senha administrativa local", () => {
-  it("exige ao menos 12 caracteres que não sejam apenas espaços", () => {
-    expect(senhaAdminValida("12345678901")).toBe(false);
-    expect(senhaAdminValida("            ")).toBe(false);
+  it("exige ao menos 6 caracteres que não sejam apenas espaços", () => {
+    expect(senhaAdminValida("12345")).toBe(false);
+    expect(senhaAdminValida("     ")).toBe(false);
+    expect(senhaAdminValida("123456")).toBe(true);
     expect(senhaAdminValida("MinhaSenhaSuperForte123!")).toBe(true);
   });
   it("rejeita estruturas de credenciais incompletas", () => {

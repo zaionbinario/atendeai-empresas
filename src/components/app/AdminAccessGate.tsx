@@ -50,7 +50,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
     try {
       if (!credencial) {
         if (!senhaAdminValida(senha)) {
-          setErro("Escolha uma senha com pelo menos 12 caracteres.");
+          setErro("Escolha uma senha com pelo menos 6 caracteres.");
           return;
         }
         if (senha !== confirmacao) {
@@ -88,7 +88,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
         return;
       }
       if (!senhaAdminValida(novaSenha)) {
-        setErroAlterar("A nova senha precisa ter pelo menos 12 caracteres.");
+        setErroAlterar("A nova senha precisa ter pelo menos 6 caracteres.");
         return;
       }
       if (novaSenha !== confirmarNova) {
@@ -130,7 +130,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
               <h2 className="font-semibold">{configurar ? "Definir senha administrativa" : "Acesso com senha"}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {configurar
-                  ? "Escolha uma senha de pelo menos 12 caracteres. Não envie sua senha no chat."
+                  ? "Escolha uma senha de pelo menos 6 caracteres. Não envie sua senha no chat."
                   : "A administração fica bloqueada sempre que você sai desta página ou recarrega o site."}
               </p>
             </div>
@@ -141,7 +141,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
                 type="password"
                 value={senha}
                 onChange={(event) => { setSenha(event.target.value); setErro(""); }}
-                minLength={configurar ? 12 : undefined}
+                minLength={configurar ? 6 : undefined}
                 autoComplete={configurar ? "new-password" : "current-password"}
                 required
               />
@@ -150,7 +150,7 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
               <Field label="Confirmar senha">
                 <Input type="password" value={confirmacao}
                   onChange={(event) => { setConfirmacao(event.target.value); setErro(""); }}
-                  minLength={12} autoComplete="new-password" required />
+                  minLength={6} autoComplete="new-password" required />
               </Field>
             )}
             {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
@@ -191,11 +191,11 @@ export function AdminAccessGate({ children }: { children: ReactNode }) {
                 onChange={(event) => setSenhaAtual(event.target.value)} />
             </Field>
             <Field label="Nova senha">
-              <Input type="password" value={novaSenha} autoComplete="new-password" minLength={12} required
+              <Input type="password" value={novaSenha} autoComplete="new-password" minLength={6} required
                 onChange={(event) => setNovaSenha(event.target.value)} />
             </Field>
             <Field label="Confirmar nova senha">
-              <Input type="password" value={confirmarNova} autoComplete="new-password" minLength={12} required
+              <Input type="password" value={confirmarNova} autoComplete="new-password" minLength={6} required
                 onChange={(event) => setConfirmarNova(event.target.value)} />
             </Field>
             {erroAlterar && <p role="alert" className="text-sm text-destructive">{erroAlterar}</p>}
