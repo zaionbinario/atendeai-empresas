@@ -4,6 +4,7 @@ import { Building2, CheckCircle2, CirclePause, Pencil, Plus, Search, ShieldAlert
 import { toast } from "sonner";
 import { Btn, Card, Field, Input, Modal, PageHeader, Toggle } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
+import { AdminAccessGate } from "@/components/app/AdminAccessGate";
 import { dadosEmpresaValidos, filtrarEmpresas, resumoEmpresas, type FiltroStatusEmpresa } from "@/lib/gestao-empresas";
 import type { Empresa } from "@/lib/types";
 import {
@@ -19,6 +20,14 @@ export const Route = createFileRoute("/administracao")({
 const novaEmpresa = (): Empresa => ({ id: "", nome: "", segmento: "", telefone: "", cidade: "", ativa: true });
 
 function Administracao() {
+  return (
+    <AdminAccessGate>
+      <PainelAdministracao />
+    </AdminAccessGate>
+  );
+}
+
+function PainelAdministracao() {
   const { empresas, setEmpresas } = useStore();
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<FiltroStatusEmpresa>("todas");
@@ -189,8 +198,8 @@ function Administracao() {
         <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
         <p className="text-sm text-muted-foreground">
           <strong className="text-foreground">Administração em demonstração.</strong> Os cadastros são salvos apenas neste navegador.
-          Ainda não há login administrativo, permissões por usuário nem banco de dados compartilhado.
-          Antes de disponibilizar a clientes, será necessário proteger esta página no servidor.
+          A senha desta página funciona somente neste navegador e não substitui autenticação no servidor.
+          Antes de disponibilizar a clientes, será necessário configurar login, permissões e dados separados por empresa.
         </p>
       </div>
 

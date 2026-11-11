@@ -12,13 +12,13 @@ const nav = [
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/respostas-rapidas", label: "Respostas rápidas", icon: MessageSquareText },
   { to: "/empresas", label: "Empresas", icon: Building2 },
-  { to: "/administracao", label: "Administração", icon: ShieldCheck },
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/horarios", label: "Horários", icon: Clock },
   { to: "/perguntas", label: "Perguntas frequentes", icon: HelpCircle },
   { to: "/atendente", label: "Atendente virtual", icon: Bot },
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
+  { to: "/administracao", label: "Administração", icon: ShieldCheck },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
