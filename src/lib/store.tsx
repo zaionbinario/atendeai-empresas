@@ -17,6 +17,7 @@ type Store = {
   notificacoes: Notificacao[];
   marcarNotificacao: (id: string) => void;
   marcarTodasNotificacoes: () => void;
+  limparTodasNotificacoes: () => void;
 };
 const Ctx = createContext<Store | null>(null);
 function usePersistido<T>(chave: string, inicial: T): [T, Dispatch<SetStateAction<T>>, boolean] {
@@ -45,6 +46,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setNotificacoes((atuais) => marcarNotificacaoLida(atuais, id));
   const marcarTodasNotificacoes = () =>
     setNotificacoes((atuais) => atuais.map((n) => n.lida ? n : { ...n, lida: true }));
+  const limparTodasNotificacoes = () => setNotificacoes([]);
 
   useEffect(() => {
     if (!conversasProntas || !notificacoesProntas) return;
@@ -123,7 +125,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(migracao, "1");
     } catch { /* Mantém o estado atual se as preferências antigas forem inválidas. */ }
   }, [setBotAtivo]);
-  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
 export const novoId = () => Math.random().toString(36).slice(2, 9);

@@ -4,7 +4,7 @@ import { Card, PageHeader } from "@/components/app/ui";
 import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
-import { calcularIndicadores } from "@/lib/metricas";
+import { calcularIndicadores, calcularMensagensRecebidasNaSemana } from "@/lib/metricas";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Painel — Zyon Chat" }, { name: "description", content: "Resumo do atendimento automatizado da sua empresa." }, { property: "og:title", content: "Painel — Zyon Chat" }, { property: "og:description", content: "Resumo do atendimento automatizado da sua empresa." }] }),
@@ -14,7 +14,9 @@ const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 function Painel() {
   const { conversas, botAtivo, ultimoResetIndicadores } = useStore();
   const indicadores = calcularIndicadores(conversas, ultimoResetIndicadores);
-  const max = Math.max(...r.semana);
+  const semana = calcularMensagensRecebidasNaSemana(conversas, ultimoResetIndicadores);
+  const max = Math.max(1, ...semana);
+  const diaAtual = (new Date().getDay() + 6) % 7;
   const kpis = [
     { l: "Conversas registradas", v: indicadores.conversas, i: MessageCircle, hint: "Desde o último reset manual", color: "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" },
     { l: "Clientes atendidos", v: indicadores.clientes, i: Users, hint: "Desde o último reset manual", color: "text-cyan-300 bg-cyan-400/10 light:text-cyan-800 light:bg-cyan-50" },
@@ -58,10 +60,10 @@ function Painel() {
       <Card className="xl:col-span-3">
         <div className="flex items-center justify-between gap-3"><div><h2 className="font-display text-lg font-bold">Conversas na semana</h2><p className="mt-1 text-xs text-muted-foreground">Volume de mensagens recebidas por dia</p></div><span className="rounded-xl bg-accent p-2 text-accent-foreground"><MessageCircle className="h-5 w-5" /></span></div>
         <div className="mt-7 flex h-48 items-end gap-3 sm:gap-5">
-          {r.semana.map((n, i) => (<div key={i} className="group flex h-full flex-1 flex-col items-center justify-end gap-2">
-            <span className="text-xs font-semibold text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">{n}</span>
-            <div className="flex w-full flex-1 items-end"><div className={cn("w-full rounded-t-xl transition-all duration-300 group-hover:brightness-110", i === r.semana.length - 1 ? "bg-primary shadow-md shadow-primary/20" : "bg-primary/25")} style={{ height: `${(n / max) * 100}%` }} /></div>
-            <span className={cn("text-xs", i === r.semana.length - 1 ? "font-bold text-primary" : "text-muted-foreground")}>{dias[i]}</span></div>))}
+          {semana.map((n, i) => (<div key={i} className="group flex h-full flex-1 flex-col items-center justify-end gap-2">
+            <span className="text-xs font-semibold text-muted-foreground">{n}</span>
+            <div className="flex w-full flex-1 items-end"><div className={cn("w-full rounded-t-xl transition-all duration-300 group-hover:brightness-110", i === diaAtual ? "bg-primary shadow-md shadow-primary/20" : "bg-primary/25")} style={{ height: `${(n / max) * 100}%` }} /></div>
+            <span className={cn("text-xs", i === diaAtual ? "font-bold text-primary" : "text-muted-foreground")}>{dias[i]}</span></div>))}
         </div>
       </Card>
       <Card className="xl:col-span-2">

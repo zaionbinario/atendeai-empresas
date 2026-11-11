@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bell, CheckCheck, ChevronRight, MessageCircle, RefreshCw, UserRound } from "lucide-react";
+import { Bell, CheckCheck, ChevronRight, MessageCircle, RefreshCw, Trash2, UserRound } from "lucide-react";
+import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Btn, Card, PageHeader } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
 import type { Notificacao } from "@/lib/notificacoes";
@@ -32,7 +34,7 @@ const categorias: Record<Notificacao["tipo"], string> = {
 };
 
 function Notificacoes() {
-  const { notificacoes, marcarNotificacao, marcarTodasNotificacoes } = useStore();
+  const { notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes } = useStore();
   const [selecionadaId, setSelecionadaId] = useState<string | null>(null);
   const selecionada = notificacoes.find((n) => n.id === selecionadaId);
   const naoLidas = notificacoes.filter((n) => !n.lida).length;
@@ -48,10 +50,44 @@ function Notificacoes() {
       <PageHeader
         title="Notificações"
         desc="Todos os avisos e atualizações do seu atendimento, em um só lugar."
-        action={naoLidas > 0 ? (
-          <Btn type="button" variant="ghost" onClick={marcarTodasNotificacoes}>
-            <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
-          </Btn>
+        action={notificacoes.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {naoLidas > 0 && (
+              <Btn type="button" variant="ghost" onClick={marcarTodasNotificacoes}>
+                <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
+              </Btn>
+            )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Btn type="button" variant="danger">
+                  <Trash2 className="h-4 w-4" /> Limpar todas notificações
+                </Btn>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar todas as notificações?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Os avisos lidos e não lidos serão excluídos deste navegador.
+                    O histórico de conversas e as configurações continuarão intactos.
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => {
+                      limparTodasNotificacoes();
+                      setSelecionadaId(null);
+                      toast.success("Todas as notificações foram limpas.");
+                    }}
+                  >
+                    Sim, limpar todas
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         ) : undefined}
       />
       <div className="flex flex-wrap gap-3 text-sm">

@@ -31,8 +31,8 @@ function Simulador() {
   const enviar = (entrada: string) => {
     const pergunta = entrada.trim();
     if (!pergunta) return;
-    const clienteMsg: Mensagem = { id: novoId(), de: "cliente", texto: pergunta, hora: agora() };
     const instante = new Date().toISOString();
+    const clienteMsg: Mensagem = { id: novoId(), de: "cliente", texto: pergunta, hora: agora(), enviadaEm: instante };
 
     // Sem atraso artificial: não existe resposta pendente capaz de ignorar uma transferência.
     setConversas((anteriores) => {
