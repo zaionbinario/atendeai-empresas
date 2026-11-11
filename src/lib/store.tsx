@@ -5,7 +5,7 @@ import type { Empresa, Produto, Horario, Faq, Instrucoes, Conversa } from "./typ
 import { detectarEventosDeConversas, inserirNotificacao, marcarNotificacaoLida, VERSAO_AVISO, type Notificacao } from "./notificacoes";
 
 type Store = {
-  empresas: Empresa[]; setEmpresas: (v: Empresa[]) => void;
+  empresas: Empresa[]; setEmpresas: Dispatch<SetStateAction<Empresa[]>>;
   produtos: Produto[]; setProdutos: (v: Produto[]) => void;
   horarios: Horario[]; setHorarios: (v: Horario[]) => void;
   faqs: Faq[]; setFaqs: (v: Faq[]) => void;

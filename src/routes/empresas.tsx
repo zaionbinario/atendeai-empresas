@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Phone, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, Phone, MapPin, ShieldCheck } from "lucide-react";
 import { Btn, Card, Field, Input, Modal, PageHeader, QuickAccess, Toggle } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
 import type { Empresa } from "@/lib/types";
@@ -16,7 +16,14 @@ function Empresas() {
   const salvar = () => { if (!form?.nome) return;
     setEmpresas(form.id ? empresas.map((e) => (e.id === form.id ? form : e)) : [...empresas, { ...form, id: novoId() }]); setForm(null); };
   return (<>
-    <PageHeader title="Empresas" desc="As lojas e negócios que usam o atendente virtual." action={<Btn onClick={() => setForm(vazio)}><Plus className="h-4 w-4" />Nova empresa</Btn>} />
+    <PageHeader title="Empresas" desc="As lojas e negócios que usam o atendente virtual." action={
+      <div className="flex flex-wrap items-center gap-2">
+        <Link to="/administracao" className="inline-flex items-center justify-center gap-2 rounded-xl border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-accent">
+          <ShieldCheck className="h-4 w-4" /> Administração
+        </Link>
+        <Btn onClick={() => setForm(vazio)}><Plus className="h-4 w-4" />Nova empresa</Btn>
+      </div>
+    } />
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {empresas.map((e) => (<Card key={e.id}>
         <div className="flex items-start justify-between gap-2"><div><h3 className="font-display text-lg font-bold">{e.nome}</h3><p className="text-sm text-muted-foreground">{e.segmento}</p></div>
