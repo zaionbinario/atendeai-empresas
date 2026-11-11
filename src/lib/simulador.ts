@@ -65,9 +65,24 @@ function responderHorario(texto: string, horarios: Horario[]): string | null {
   return "Claro! Você quer saber o horário de qual dia da semana? 😊";
 }
 
+type Intencao = "pagamento" | "entrega" | "encomenda";
+
+const INTENCOES: { tipo: Intencao; padrao: RegExp; busca: RegExp }[] = [
+  { tipo: "pagamento", padrao: /\\b(debit|debito|credito|cartao|pix|dinheiro|pagamento|pagar|pagam|passam|maquininha)\\w*\\b/, busca: /\\b(pagamento|pagar|pagam|pix|cartao|credito|debito|dinheiro|aceitam|formas)\\w*\\b/ },
+  { tipo: "entrega", padrao: /\\b(entrega|entregam|entregar|delivery|motoboy|frete|domicilio)\\w*\\b/, busca: /\\b(entrega|entregam|delivery|frete|motoboy)\\w*\\b/ },
+  { tipo: "encomenda", padrao: /\\b(encomenda|encomendas|reservar|reserva|antecedencia|pedido)\\w*\\b/, busca: /\\b(encomenda|reserva|pedido|antecedencia)\\w*\\b/ },
+];
+
+function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
+  const t = norm(texto);
+  const intencao = INTENCOES.find((item) => item.padrao.test(t));
+  if (!intencao) return null;
+  return faqs.find((faq) => intencao.busca.test(norm(faq.pergunta)) || intencao.busca.test(norm(faq.resposta))) ?? null;
+}
+
 export function responder(texto: string, ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes }): string {
   const t = norm(texto);
-  const faq = encontrarFaq(texto, ctx.faqs);
+  const faq = encontrarFaqPorIntencao(texto, ctx.faqs) ?? encontrarFaq(texto, ctx.faqs);
   if (faq) return faq.resposta;
   if (/^(oi|ola|bom dia|boa tarde|boa noite)/.test(t)) return ctx.instrucoes.boasVindas;
 
