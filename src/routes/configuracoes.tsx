@@ -113,7 +113,7 @@ function Configuracoes() {
         </div>
       </Card>
       <Card className="border-amber-400/20 bg-amber-500/[0.05]">
-        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Por enquanto, as preferências são salvas apenas neste navegador. Respostas automáticas controla o status do bot no painel e seu comportamento no Simulador, mas ainda não envia mensagens reais a clientes. Notificações também não são disparadas de verdade.</p></div></div>
+        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Por enquanto, as preferências são salvas apenas neste navegador. Respostas automáticas controla o status do bot no painel e seu comportamento no Simulador, mas ainda não envia mensagens reais a clientes. As notificações de atendimentos e atualizações aparecem no sino dentro deste navegador; ainda não há notificações push, sincronização entre dispositivos ou envios pelo WhatsApp.</p></div></div>
       </Card>
     </div>
   );

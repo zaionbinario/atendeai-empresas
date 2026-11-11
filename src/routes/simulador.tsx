@@ -4,7 +4,7 @@ import { Send, RotateCcw, CheckCheck } from "lucide-react";
 import { Btn, PageHeader } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
 import { responder } from "@/lib/simulador";
-import { iaPodeResponder } from "@/lib/atendimento";
+import { iaPodeResponder, respostaSolicitaHumano } from "@/lib/atendimento";
 import type { Mensagem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -41,11 +41,14 @@ function Simulador() {
       const iaAtivaAqui = iaPodeResponder(botAtivo, atual);
       const novasMensagens: Mensagem[] = [...historico, clienteMsg];
 
+      let transferidoPelaIa = false;
       if (iaAtivaAqui) {
+        const resposta = responder(pergunta, store, historico.slice(-8).map((m) => m.texto));
+        transferidoPelaIa = store.instrucoes.transferirHumano && respostaSolicitaHumano(resposta);
         novasMensagens.push({
           id: novoId(),
           de: "bot",
-          texto: responder(pergunta, store, historico.slice(-8).map((m) => m.texto)),
+          texto: resposta,
           hora: agora(),
         });
       } else if (!botAtivo && atual?.status !== "humano") {
@@ -63,7 +66,7 @@ function Simulador() {
         ultimaMensagem: pergunta,
         atualizadaEm: agora(),
         ultimaAtividadeEm: instante,
-        status: iaAtivaAqui ? "ia" as const : "humano" as const,
+        status: iaAtivaAqui && !transferidoPelaIa ? "ia" as const : "humano" as const,
         mensagens: novasMensagens,
       };
       return [novaConversa, ...anteriores.filter((c) => c.id !== "simulador")];

@@ -5,6 +5,12 @@ export function iaPodeResponder(botAtivo: boolean, conversa?: Pick<Conversa, "st
   return botAtivo && conversa?.status !== "humano";
 }
 
+/** Reconhece somente uma transferência afirmativa, não um oferecimento opcional de ajuda. */
+export function respostaSolicitaHumano(resposta: string): boolean {
+  const normalizada = resposta.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return /\b(vou chamar alguem|vou pedir para a equipe|vou transferir|vou encaminhar)\b/.test(normalizada);
+}
+
 export function transferirAtendimento(
   conversas: Conversa[],
   id: string,
