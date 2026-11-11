@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MessageCircle, Bot, Timer, Star, ArrowUpRight, Building2, Package, Clock3, CircleHelp, Sparkles, TrendingUp, Zap, CheckCircle2, Rocket, Users } from "lucide-react";
+import { MessageCircle, Bot, Timer, ArrowUpRight, Building2, Package, Clock3, CircleHelp, Sparkles, TrendingUp, Zap, CheckCircle2, Rocket, Users } from "lucide-react";
 import { Card, PageHeader } from "@/components/app/ui";
 import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
