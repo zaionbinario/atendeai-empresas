@@ -29,7 +29,7 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 
-## AtendeAI architecture
+## Zyon Chat architecture
 - Domain types live in `src/lib/types.ts` and mirror future database tables; keep them in sync when adding persistence.
 - App state is served by `useStore()` (`src/lib/store.tsx`) with demo data; swap its internals for backend queries without changing page code.
 - Bot replies go through `responder()` in `src/lib/simulador.ts`; future AI/WhatsApp integration should replace that function server-side with the same inputs.
