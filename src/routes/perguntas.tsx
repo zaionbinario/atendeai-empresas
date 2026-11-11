@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { Btn, Card, Field, Input, Modal, PageHeader, Textarea } from "@/components/app/ui";
+import { Btn, Card, Field, Input, Modal, PageHeader, QuickAccess, Textarea } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
 import type { Faq } from "@/lib/types";
 
@@ -21,6 +21,7 @@ function Perguntas() {
         <div className="flex gap-1"><Btn variant="ghost" aria-label="Editar" onClick={() => setForm(f)}><Pencil className="h-4 w-4" /></Btn>
           <Btn variant="danger" aria-label="Excluir" onClick={() => setFaqs(faqs.filter((x) => x.id !== f.id))}><Trash2 className="h-4 w-4" /></Btn></div></div></Card>))}
     </div>
+    <QuickAccess />
     <Modal open={!!form} title={form?.id ? "Editar pergunta" : "Nova pergunta"} onClose={() => setForm(null)}>
       {form && <div className="space-y-4">
         <Field label="Pergunta do cliente"><Input value={form.pergunta} onChange={(e) => setForm({ ...form, pergunta: e.target.value })} /></Field>
