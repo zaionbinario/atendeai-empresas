@@ -14,6 +14,8 @@ const nav = [
   { to: "/horarios", label: "Horários", icon: Clock },
   { to: "/perguntas", label: "Perguntas frequentes", icon: HelpCircle },
   { to: "/atendente", label: "Atendente virtual", icon: Bot },
+  { to: "/integracoes", label: "Integrações", icon: Plug },
+  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -31,9 +33,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           {path === to && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
         </Link>
       ))}
-      <div className="my-3 border-t border-white/10" />
-      <div className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-500"><Plug className="h-[19px] w-[19px]" />Integrações <span className="ml-auto text-[10px]">EM BREVE</span></div>
-      <div className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-500"><Settings className="h-[19px] w-[19px]" />Configurações <span className="ml-auto text-[10px]">EM BREVE</span></div>
     </nav>
   );
   const logo = (
