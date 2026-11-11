@@ -1,6 +1,6 @@
-# AtendeAI Empresas
+# Zyon Chat
 
-Crie um sistema SaaS chamado AtendeAI, totalmente em português brasileiro.
+Crie um sistema SaaS chamado Zyon Chat, totalmente em português brasileiro.
 
 O objetivo é oferecer atendimento automatizado com inteligência artificial para pequenas empresas e lojas.
 
