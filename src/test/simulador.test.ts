@@ -47,3 +47,27 @@ describe("respostas contextuais de funcionamento", () => {
     expect(responder("Qual o horário?", ctx())).toContain("Nosso horário");
   });
 });
+
+
+describe("conversa natural e contexto", () => {
+  it("responde a saudações e perguntas sociais", () => {
+    expect(responder("Oi!", ctx())).toBe(d.instrucoesDemo.boasVindas);
+    expect(responder("Tudo bem?", ctx())).toContain("Tudo ótimo");
+  });
+  it("entende uma pergunta curta sobre sábado pelo contexto de horário", () => {
+    expect(responder("E no sábado?", ctx(), ["Qual é o horário de funcionamento?"])).toContain("Abrimos sábado");
+  });
+  it("normaliza quebras de linha literais em respostas de FAQ", () => {
+    const faqs = [{ id: "x", pergunta: "Qual o endereço?", resposta: "Rua A\\nNúmero 10" }];
+    expect(responder("Qual o endereço?", ctx(faqs))).toBe("Rua A\nNúmero 10");
+  });
+  it("não inventa endereço quando não há informação cadastrada", () => {
+    expect(responder("Qual o endereço?", ctx())).toContain("não tenho o endereço cadastrado");
+  });
+  it("lista produtos com respostas objetivas", () => {
+    expect(responder("Ver produtos", ctx())).toContain("Pão francês");
+  });
+  it("oferece ajuda humana quando não reconhece a informação", () => {
+    expect(responder("Vocês oferecem um serviço que não conheço?", ctx())).toContain("Vou chamar alguém da equipe");
+  });
+});
