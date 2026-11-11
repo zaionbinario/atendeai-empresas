@@ -4,7 +4,7 @@ import { Btn, Card, Input, PageHeader, QuickAccess, Toggle } from "@/components/
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/horarios")({
-  head: () => ({ meta: [{ title: "Horários de funcionamento — AtendeAI" }, { name: "description", content: "Defina os dias e horários de funcionamento da sua empresa." }, { property: "og:title", content: "Horários de funcionamento — AtendeAI" }, { property: "og:description", content: "Defina os dias e horários de funcionamento da sua empresa." }] }),
+  head: () => ({ meta: [{ title: "Horários de funcionamento — Zyon Chat" }, { name: "description", content: "Defina os dias e horários de funcionamento da sua empresa." }, { property: "og:title", content: "Horários de funcionamento — Zyon Chat" }, { property: "og:description", content: "Defina os dias e horários de funcionamento da sua empresa." }] }),
   component: Horarios,
 });
 function Horarios() {
