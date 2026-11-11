@@ -115,21 +115,68 @@ function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
   return faqs.find((faq) => intencao.busca.test(norm(faq.pergunta)) || intencao.busca.test(norm(faq.resposta))) ?? null;
 }
 
-export function responder(texto: string, ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes }): string {
-  const t = norm(texto);
-  const faq = encontrarFaqPorIntencao(texto, ctx.faqs) ?? encontrarFaq(texto, ctx.faqs);
-  if (faq) return faq.resposta;
-  if (/^(oi|ola|bom dia|boa tarde|boa noite)/.test(t)) return ctx.instrucoes.boasVindas;
+function normalizarTextoResposta(texto: string): string {
+  return texto.replace(/\\\\r\\\\n/g, "\n").replace(/\\\\n/g, "\n").replace(/\\\\t/g, " ").trim();
+}
 
-  const horario = responderHorario(texto, ctx.horarios);
+function saudacao(texto: string, ctx: { instrucoes: Instrucoes }): string | null {
+  const t = norm(texto);
+  if (/^(oi|ola|eai|e ai|opa|bom dia|boa tarde|boa noite)( |$)/.test(t)) {
+    return ctx.instrucoes.boasVindas || "Olá! 😊 Como posso te ajudar?";
+  }
+  if (/^(tudo bem|tudo bom|como vai|como voce esta)( |$)/.test(t)) {
+    return "Tudo ótimo por aqui! 😊 E com você? Como posso ajudar?";
+  }
+  if (/^(obrigado|obrigada|valeu|agradeco)( |$)/.test(t)) return "Por nada! 😊 Se precisar de mais alguma coisa, é só chamar.";
+  if (/^(tchau|ate mais|ate logo)( |$)/.test(t)) return "Até mais! Foi um prazer ajudar. 😊";
+  return null;
+}
+
+function inferirContexto(texto: string, historico: string[]): string {
+  const t = norm(texto);
+  const curto = t.split(" ").length <= 6;
+  if (!curto || !historico.length) return texto;
+  const anterior = norm(historico.slice(-6).join(" "));
+  if (/(horario|abre|abrem|aberto|fecha|funciona|funcionamento)/.test(anterior) && /(sabado|domingo|segunda|terca|quarta|quinta|sexta|hoje|amanha)/.test(t)) return `horario ${texto}`;
+  if (/(preco|custa|valor|produto|cardapio)/.test(anterior) && /(quanto|esse|essa|ele|ela|qual|e o|e a)/.test(t)) return `preço ${texto}`;
+  if (/(entrega|delivery)/.test(anterior) && /(bairro|aqui|la|regiao|taxa|prazo)/.test(t)) return `entrega ${texto}`;
+  return texto;
+}
+
+export function responder(
+  texto: string,
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes },
+  historico: string[] = [],
+): string {
+  const conversa = inferirContexto(texto, historico);
+  const t = norm(conversa);
+
+  const cumprimento = saudacao(texto, ctx);
+  if (cumprimento) return cumprimento;
+
+  const horario = responderHorario(conversa, ctx.horarios);
   if (horario) return horario;
 
+  const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
+  if (faq) return normalizarTextoResposta(faq.resposta);
+
   const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\\s(]/).some((w) => w.length > 3 && t.includes(w)));
-  if (prod) return `O ${prod.nome} custa ${brl(prod.preco)}. ${prod.descricao}`;
-  if (/(cardapio|produtos|preco|precos|menu)/.test(t))
-    return "Nossos produtos:\\n" + ctx.produtos.map((p) => `• ${p.nome} — ${brl(p.preco)}`).join("\\n");
+  if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
+
+  if (/(cardapio|produtos|preco|precos|menu|servicos|servico)/.test(t)) {
+    if (!ctx.produtos.length) return "Ainda não tenho produtos ou serviços cadastrados. Posso chamar alguém da equipe para te ajudar. 🙋";
+    const lista = ctx.produtos.map((p) => `• ${p.nome} — ${brl(p.preco)}`).join("\n");
+    return `Claro! Aqui estão algumas opções:\n${lista}\n\nQuer saber mais sobre algum deles?`;
+  }
+
+  if (/(endereco|onde fica|localizacao|local)/.test(t)) {
+    return "Não tenho o endereço cadastrado nesta conversa. Para não te passar uma informação errada, posso chamar alguém da equipe para confirmar. 🙋";
+  }
+  if (/(agendar|agendamento|marcar horario|consulta)/.test(t)) {
+    return "Claro! 😊 Qual dia e horário você prefere? Se quiser, também posso chamar a equipe para confirmar a disponibilidade.";
+  }
 
   return ctx.instrucoes.transferirHumano
-    ? "Não tenho essa informação agora. Vou chamar um atendente humano para te ajudar! 🙋"
-    : "Desculpe, não entendi. Pode reformular a pergunta?";
+    ? "Não encontrei essa informação por aqui e prefiro não te passar algo errado. Vou chamar alguém da equipe para te ajudar. 🙋"
+    : "Não encontrei essa informação por aqui. Você pode me explicar de outro jeito?";
 }
