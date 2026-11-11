@@ -7,6 +7,15 @@ describe("prioridade das Perguntas frequentes", () => {
   it("variações reconhecem a mesma pergunta", () => {
     for (const m of ["Vocês fazem entrega?", "vcs entregam em casa?", "Tem delivery?", "fazem entregas no meu bairro"]) expect(responder(m, ctx())).toBe(entrega);
   });
+  it("reconhece diferentes formas de perguntar sobre débito", () => {
+    for (const pergunta of ["Vocês pagam no débito?", "Passam cartão de débito?", "Aceita débito?", "Posso pagar no cartão de débito?"]) {
+      expect(responder(pergunta, ctx())).toBe(d.faqsDemo[1]!.resposta);
+    }
+  });
+  it("reconhece perguntas informais sobre entrega e encomendas", () => {
+    expect(responder("Tem delivery?", ctx())).toBe(d.faqsDemo[0]!.resposta);
+    expect(responder("Consigo fazer uma encomenda?", ctx())).toBe(d.faqsDemo[2]!.resposta);
+  });
   it("pagamento com outras palavras", () => {
     expect(responder("posso pagar com pix?", ctx())).toBe(d.faqsDemo[1]!.resposta);
   });
