@@ -51,7 +51,7 @@ function responderHorario(texto: string, horarios: Horario[]): string | null {
   const perguntaHorario = /(horario|abre|abrem|aberto|aberta|fecha|fecham|funciona|funcionam|funcionamento)/.test(t);
   if (!perguntaHorario) return null;
 
-  const dia = DIAS.find((d) => d.aliases.some((alias) => new RegExp(`(^|\\\\s)${alias}($|\\\\s)`).test(t)));
+  const dia = DIAS.find((d) => d.aliases.some((alias) => new RegExp(`(^|\\s)${alias}($|\\s)`).test(t)));
   if (dia) {
     const horario = horarios.find((h) => norm(h.dia) === norm(dia.dia));
     if (!horario) return `Ainda não tenho o horário de ${dia.dia.toLowerCase()} cadastrado. Vou pedir para a equipe confirmar essa informação. 🙋`;
