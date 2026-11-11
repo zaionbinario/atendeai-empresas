@@ -43,6 +43,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (salvo) {
         const preferencias = JSON.parse(salvo) as { respostasAutomaticas?: unknown };
         if (typeof preferencias.respostasAutomaticas === "boolean") {
+          // Atualiza também o armazenamento antes de restaurar o estado React.
+          localStorage.setItem("zyon-bot-ativo", JSON.stringify(preferencias.respostasAutomaticas));
           setBotAtivo(preferencias.respostasAutomaticas);
         }
       }
