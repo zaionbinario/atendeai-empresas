@@ -54,7 +54,7 @@ export function SiteSearch() {
           <CommandIcon className="h-3 w-3" /> K
         </span>
       </button>
-      <CommandDialog open={aberto} onOpenChange={mudarAbertura}>
+      <CommandDialog open={aberto} onOpenChange={mudarAbertura} shouldFilter={false}>
         <CommandInput
           value={termo}
           onValueChange={setTermo}
