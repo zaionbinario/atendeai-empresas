@@ -6,7 +6,7 @@ import { novoId, useStore } from "@/lib/store";
 import type { Empresa } from "@/lib/types";
 
 export const Route = createFileRoute("/empresas")({
-  head: () => ({ meta: [{ title: "Empresas — AtendeAI" }, { name: "description", content: "Cadastre e gerencie as empresas atendidas pela IA." }, { property: "og:title", content: "Empresas — AtendeAI" }, { property: "og:description", content: "Cadastre e gerencie as empresas atendidas pela IA." }] }),
+  head: () => ({ meta: [{ title: "Empresas — Zyon Chat" }, { name: "description", content: "Cadastre e gerencie as empresas atendidas pela IA." }, { property: "og:title", content: "Empresas — Zyon Chat" }, { property: "og:description", content: "Cadastre e gerencie as empresas atendidas pela IA." }] }),
   component: Empresas,
 });
 const vazio: Empresa = { id: "", nome: "", segmento: "", telefone: "", cidade: "", ativa: true };
