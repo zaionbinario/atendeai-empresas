@@ -12,6 +12,7 @@ type Store = {
   conversas: Conversa[]; setConversas: (v: Conversa[]) => void;
   respostasRapidas: string[]; setRespostasRapidas: (v: string[]) => void;
   botAtivo: boolean; setBotAtivo: (v: boolean) => void;
+  ultimoResetIndicadores: number | null; zerarIndicadores: () => void;
 };
 const Ctx = createContext<Store | null>(null);
 function usePersistido<T>(chave: string, inicial: T): [T, (v: T) => void] {
@@ -33,6 +34,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [conversas, setConversas] = usePersistido<Conversa[]>("zyon-conversas", []);
   const [respostasRapidas, setRespostasRapidas] = usePersistido<string[]>("zyon-respostas-rapidas", ["Olá! Como posso ajudar? 😊", "Só um momento, vou verificar essa informação.", "Obrigado pelo contato! Estamos à disposição."]);
   const [botAtivo, setBotAtivo] = usePersistido("zyon-bot-ativo", true);
+  const [ultimoResetIndicadores, setUltimoResetIndicadores] = usePersistido<number | null>("zyon-ultimo-reset-indicadores", null);
+  const zerarIndicadores = () => {
+    // Registrar o marco do reset é suficiente: as conversas continuam guardadas.
+    const momento = Date.now();
+    localStorage.setItem("zyon-ultimo-reset-indicadores", JSON.stringify(momento));
+    setUltimoResetIndicadores(momento);
+  };
   // Migra a escolha que já estava salva em Configurações antes da unificação.
   // A migração acontece uma única vez para não sobrescrever mudanças futuras no botão do cabeçalho.
   useEffect(() => {
@@ -51,7 +59,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(migracao, "1");
     } catch { /* Mantém o estado atual se as preferências antigas forem inválidas. */ }
   }, [setBotAtivo]);
-  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
 export const novoId = () => Math.random().toString(36).slice(2, 9);

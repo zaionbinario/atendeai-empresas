@@ -24,20 +24,21 @@ function Simulador() {
   useEffect(() => { setMsgs(inicial()); }, []);
   useEffect(() => { fim.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, digitando]);
   const enviar = (t: string) => { if (!t.trim()) return;
+    const enviadoEm = new Date().toISOString();
     const clienteMsg: Mensagem = { id: novoId(), de: "cliente", texto: t, hora: agora() };
     const historico = [...msgs, clienteMsg];
     setMsgs(historico); setTexto("");
     if (!botAtivo) {
       const aviso: Mensagem = { id: novoId(), de: "bot", texto: "Nosso atendimento automático está pausado no momento. Um atendente humano poderá continuar por aqui. 🙋", hora: agora() };
       const final = [...historico, aviso]; setMsgs(final);
-      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), status: "humano", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
+      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), ultimaAtividadeEm: enviadoEm, status: "humano", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
       return;
     }
     setDigitando(true);
     setTimeout(() => {
       const resposta: Mensagem = { id: novoId(), de: "bot", texto: responder(t, store, historico.slice(-8).map((m) => m.texto)), hora: agora() };
       const final = [...historico, resposta]; setDigitando(false); setMsgs(final);
-      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), status: "ia", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
+      setConversas([{ id: "simulador", cliente: "Cliente do simulador", ultimaMensagem: t, atualizadaEm: agora(), ultimaAtividadeEm: enviadoEm, status: "ia", mensagens: final }, ...conversas.filter((c) => c.id !== "simulador")]);
     }, 900);
   };
   return (<>

@@ -4,6 +4,7 @@ import { Card, PageHeader } from "@/components/app/ui";
 import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
+import { calcularIndicadores } from "@/lib/metricas";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Painel — Zyon Chat" }, { name: "description", content: "Resumo do atendimento automatizado da sua empresa." }, { property: "og:title", content: "Painel — Zyon Chat" }, { property: "og:description", content: "Resumo do atendimento automatizado da sua empresa." }] }),
@@ -11,14 +12,14 @@ export const Route = createFileRoute("/")({
 });
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 function Painel() {
-  const { conversas, botAtivo } = useStore();
-  const clientesUnicos = new Set(conversas.map((c) => c.cliente)).size;
+  const { conversas, botAtivo, ultimoResetIndicadores } = useStore();
+  const indicadores = calcularIndicadores(conversas, ultimoResetIndicadores);
   const max = Math.max(...r.semana);
   const kpis = [
-    { l: "Conversas registradas", v: conversas.length, i: MessageCircle, hint: "Histórico salvo neste navegador", color: "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" },
-    { l: "Clientes atendidos", v: clientesUnicos, i: Users, hint: "Clientes no histórico", color: "text-cyan-300 bg-cyan-400/10 light:text-cyan-800 light:bg-cyan-50" },
-    { l: "Atendimentos pela IA", v: conversas.filter((c) => c.status === "ia").length, i: Bot, hint: "Conversas acompanhadas pelo bot", color: "text-sky-300 bg-sky-400/10 light:text-sky-800 light:bg-sky-50" },
-    { l: "Atendimentos humanos", v: conversas.filter((c) => c.status === "humano").length, i: Users, hint: "Precisam de acompanhamento", color: "text-violet-300 bg-violet-400/10 light:text-violet-800 light:bg-violet-50" },
+    { l: "Conversas registradas", v: indicadores.conversas, i: MessageCircle, hint: "Desde o último reset manual", color: "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" },
+    { l: "Clientes atendidos", v: indicadores.clientes, i: Users, hint: "Desde o último reset manual", color: "text-cyan-300 bg-cyan-400/10 light:text-cyan-800 light:bg-cyan-50" },
+    { l: "Atendimentos pela IA", v: indicadores.ia, i: Bot, hint: "Desde o último reset manual", color: "text-sky-300 bg-sky-400/10 light:text-sky-800 light:bg-sky-50" },
+    { l: "Atendimentos humanos", v: indicadores.humanos, i: Users, hint: "Desde o último reset manual", color: "text-violet-300 bg-violet-400/10 light:text-violet-800 light:bg-violet-50" },
     { l: "Status do atendente", v: botAtivo ? "Ativo" : "Pausado", i: botAtivo ? Bot : Timer, hint: "Controle no topo do painel", color: botAtivo ? "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" : "text-amber-300 bg-amber-400/10 light:text-amber-800 light:bg-amber-50" },
   ];
   const atalhos = [
