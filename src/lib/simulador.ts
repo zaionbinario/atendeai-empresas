@@ -18,7 +18,7 @@ const SINONIMOS: string[][] = [
   ["ender", "local", "onde", "fica", "rua", "endereco"],
 ];
 const conceito = (w: string) => {
-  for (let i = 0; i < SINONIMOS.length; i++) if (SINONIMOS[i].some((r) => w.startsWith(r) || (w.length >= 4 && r.startsWith(w)))) return `#${i}`;
+  for (const [i, g] of SINONIMOS.entries()) if (g.some((r) => w.startsWith(r) || (w.length >= 4 && r.startsWith(w)))) return `#${i}`;
   return w.length > 5 ? w.slice(0, 5) : w;
 };
 const termos = (s: string) => new Set(norm(s).split(/[^a-z0-9]+/).filter((w) => w.length > 1 && !STOP.has(w)).map(conceito));
