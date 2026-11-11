@@ -5,3 +5,5 @@ export type Horario = { dia: string; aberto: boolean; abre: string; fecha: strin
 export type Faq = { id: string; pergunta: string; resposta: string };
 export type Instrucoes = { nomeAtendente: string; tom: "amigavel" | "formal" | "descontraido"; boasVindas: string; regras: string; transferirHumano: boolean };
 export type Mensagem = { id: string; de: "cliente" | "bot"; texto: string; hora: string };
+
+export type Conversa = { id: string; cliente: string; ultimaMensagem: string; atualizadaEm: string; status: "ia" | "humano" | "resolvida"; mensagens: Mensagem[] };
