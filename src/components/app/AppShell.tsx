@@ -1,11 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Search, Bell, ChevronDown, Plug, Settings, Users } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Search, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/store";
 
 const nav = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
-  { to: "/simulador", label: "Conversas", icon: MessageCircle },
+  { to: "/simulador", label: "Simulador", icon: MessageCircle },
+  { to: "/conversas", label: "Histórico de conversas", icon: MessageCircle },
+  { to: "/respostas-rapidas", label: "Respostas rápidas", icon: MessageSquareText },
   { to: "/empresas", label: "Empresas", icon: Building2 },
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/horarios", label: "Horários", icon: Clock },
@@ -16,6 +19,7 @@ const nav = [
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const { botAtivo, setBotAtivo } = useStore();
   const side = (
     <nav className="flex flex-col gap-1" aria-label="Navegação principal">
       {nav.map(({ to, label, icon: Icon }) => (
@@ -62,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="relative hidden w-full max-w-xl sm:block"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input aria-label="Buscar no sistema" placeholder="Buscar no sistema... (Ctrl + K)" className="h-11 w-full rounded-full border border-white/10 bg-white/[0.04] pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400/50" /></div>
           <div className="lg:hidden">{logo}</div>
         </div>
-        <div className="flex items-center gap-3"><button aria-label="Notificações" className="relative rounded-xl p-2.5 text-slate-400 hover:bg-white/5 hover:text-white"><Bell className="h-5 w-5" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500" /></button><div className="hidden h-8 w-px bg-white/10 sm:block" /><button className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-white hover:bg-white/5"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden sm:block">Minha conta</span><ChevronDown className="h-4 w-4 text-slate-500" /></button></div>
+        <div className="flex items-center gap-3"><button onClick={() => setBotAtivo(!botAtivo)} className={cn("hidden items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold sm:inline-flex", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-amber-400/30 bg-amber-500/10 text-amber-300")} title="Alternar atendimento automático">{botAtivo ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}{botAtivo ? "Bot ativo" : "Bot pausado"}</button><button aria-label="Notificações" className="relative rounded-xl p-2.5 text-slate-400 hover:bg-white/5 hover:text-white"><Bell className="h-5 w-5" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500" /></button><div className="hidden h-8 w-px bg-white/10 sm:block" /><button className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-white hover:bg-white/5"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden sm:block">Minha conta</span><ChevronDown className="h-4 w-4 text-slate-500" /></button></div>
       </header>
       {open && <div className="fixed inset-x-0 top-[76px] z-50 space-y-5 border-b border-white/10 bg-[#090f12] p-4 shadow-2xl lg:hidden">{side}{helpCard}</div>}
       <main className="min-h-[calc(100vh-76px)] p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full max-w-[1440px]">{children}</div></main>
