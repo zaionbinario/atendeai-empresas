@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
 import { SiteSearch } from "./SiteSearch";
@@ -25,6 +26,16 @@ const nav = [
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
+  async function handleSignOut() {
+    setSigningOut(true);
+    setSignOutError("");
+    const { error } = await supabase.auth.signOut();
+    if (error) { setSignOutError("Não foi possível sair. Tente novamente."); setSigningOut(false); }
+    else setAccountMenuOpen(false);
+  }
   const [temaClaro, setTemaClaro] = useState(false);
   const { botAtivo, setBotAtivo } = useStore();
   useEffect(() => {
@@ -86,7 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="w-10 shrink-0 sm:w-full sm:max-w-xl"><SiteSearch /></div>
           <div className="lg:hidden">{logo}</div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3"><button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden sm:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button><button onClick={() => setBotAtivo(!botAtivo)} className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-2 text-[10px] font-semibold sm:gap-2 sm:px-3 sm:text-xs", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}{botAtivo ? "Bot ativo" : "Bot pausado"}</button><NotificationBell /><div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" /><button className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-white hover:bg-white/5 light:text-slate-900 light:hover:bg-slate-100"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden sm:block">Minha conta</span><ChevronDown className="h-4 w-4 text-slate-500" /></button></div>
+        <div className="flex items-center gap-2 sm:gap-3"><button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden sm:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button><button onClick={() => setBotAtivo(!botAtivo)} className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-2 text-[10px] font-semibold sm:gap-2 sm:px-3 sm:text-xs", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}{botAtivo ? "Bot ativo" : "Bot pausado"}</button><NotificationBell /><div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" /><div className="relative"><button type="button" aria-expanded={accountMenuOpen} aria-haspopup="menu" onClick={() => setAccountMenuOpen(!accountMenuOpen)} className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-white hover:bg-white/5 light:text-slate-900 light:hover:bg-slate-100"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden sm:block">Minha conta</span><ChevronDown className="h-4 w-4 text-slate-500" /></button>{accountMenuOpen && <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-white/10 bg-[#10191d] p-2 shadow-xl light:border-slate-200 light:bg-white"><button type="button" role="menuitem" disabled={signingOut} onClick={handleSignOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-300 hover:bg-white/10 disabled:opacity-50 light:text-red-700 light:hover:bg-slate-100"><LogOut className="h-4 w-4" />{signingOut ? "Saindo..." : "Sair da conta"}</button>{signOutError && <p role="alert" className="px-3 py-1 text-xs text-red-400">{signOutError}</p>}</div>}</div></div>
       </header>
       {open && <div className="fixed inset-x-0 top-[76px] z-50 space-y-5 border-b border-white/10 bg-[#090f12] p-4 shadow-2xl lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
       <main className="min-h-[calc(100vh-76px)] p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full max-w-[1440px]">{children}</div></main>
