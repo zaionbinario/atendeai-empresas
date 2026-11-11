@@ -125,6 +125,8 @@ export interface RootRouteChildren {
   PerguntasRoute: typeof PerguntasRoute
   ProdutosRoute: typeof ProdutosRoute
   SimuladorRoute: typeof SimuladorRoute
+  ConversasRoute: typeof ConversasRoute
+  RespostasRapidasRoute: typeof RespostasRapidasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -176,6 +178,20 @@ declare module '@tanstack/react-router' {
       path: '/simulador'
       fullPath: '/simulador'
       preLoaderRoute: typeof SimuladorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversas': {
+      id: '/conversas'
+      path: '/conversas'
+      fullPath: '/conversas'
+      preLoaderRoute: typeof ConversasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/respostas-rapidas': {
+      id: '/respostas-rapidas'
+      path: '/respostas-rapidas'
+      fullPath: '/respostas-rapidas'
+      preLoaderRoute: typeof RespostasRapidasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
