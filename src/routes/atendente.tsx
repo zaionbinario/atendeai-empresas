@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Btn, Card, Field, Input, PageHeader, Textarea, Toggle } from "@/components/app/ui";
+import { Btn, Card, Field, Input, PageHeader, QuickAccess, Textarea, Toggle } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Instrucoes } from "@/lib/types";
@@ -30,5 +30,6 @@ function Atendente() {
       <Card className="flex items-center justify-between gap-4"><div><p className="font-semibold">Transferir para um humano</p><p className="text-sm text-muted-foreground">Quando não souber responder, o atendente chama alguém da equipe.</p></div>
         <Toggle label="Transferir para humano" on={i.transferirHumano} onChange={(v) => set({ ...i, transferirHumano: v })} /></Card>
     </div>
+    <QuickAccess />
   </>);
 }
