@@ -91,6 +91,8 @@ export interface FileRouteTypes {
     | '/perguntas'
     | '/produtos'
     | '/simulador'
+    | '/conversas'
+    | '/respostas-rapidas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +102,8 @@ export interface FileRouteTypes {
     | '/perguntas'
     | '/produtos'
     | '/simulador'
+    | '/conversas'
+    | '/respostas-rapidas'
   id:
     | '__root__'
     | '/'
@@ -109,6 +113,8 @@ export interface FileRouteTypes {
     | '/perguntas'
     | '/produtos'
     | '/simulador'
+    | '/conversas'
+    | '/respostas-rapidas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,6 +189,8 @@ const rootRouteChildren: RootRouteChildren = {
   PerguntasRoute: PerguntasRoute,
   ProdutosRoute: ProdutosRoute,
   SimuladorRoute: SimuladorRoute,
+  ConversasRoute: ConversasRoute,
+  RespostasRapidasRoute: RespostasRapidasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
