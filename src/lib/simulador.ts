@@ -49,10 +49,9 @@ const DIAS: { dia: string; aliases: string[] }[] = [
 function formatarFaixaDeDias(inicio: string, fim: string): string {
   if (inicio === fim) return inicio;
   const primeiro = inicio.replace("-feira", "");
-  const ultimo = fim.toLowerCase() === "sábado" || fim.toLowerCase() === "domingo"
-    ? fim.toLowerCase()
-    : fim.replace("-feira", "").toLowerCase();
-  return `${primeiro} a ${ultimo}-feira`;
+  const sufixo = fim.endsWith("-feira") ? "-feira" : "";
+  const ultimo = fim.replace("-feira", "").toLowerCase();
+  return `${primeiro} a ${ultimo}${sufixo}`;
 }
 
 function formatarHorarios(horarios: Horario[]): string {
