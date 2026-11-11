@@ -6,7 +6,7 @@ import { novoId, useStore } from "@/lib/store";
 import type { Faq } from "@/lib/types";
 
 export const Route = createFileRoute("/perguntas")({
-  head: () => ({ meta: [{ title: "Perguntas frequentes — AtendeAI" }, { name: "description", content: "Cadastre perguntas e respostas para o atendente virtual." }, { property: "og:title", content: "Perguntas frequentes — AtendeAI" }, { property: "og:description", content: "Cadastre perguntas e respostas para o atendente virtual." }] }),
+  head: () => ({ meta: [{ title: "Perguntas frequentes — Zyon Desk" }, { name: "description", content: "Cadastre perguntas e respostas para o atendente virtual." }, { property: "og:title", content: "Perguntas frequentes — Zyon Desk" }, { property: "og:description", content: "Cadastre perguntas e respostas para o atendente virtual." }] }),
   component: Perguntas,
 });
 function Perguntas() {

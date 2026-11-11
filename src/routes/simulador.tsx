@@ -8,7 +8,7 @@ import type { Mensagem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/simulador")({
-  head: () => ({ meta: [{ title: "Simulador de conversa — AtendeAI" }, { name: "description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }, { property: "og:title", content: "Simulador de conversa — AtendeAI" }, { property: "og:description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }] }),
+  head: () => ({ meta: [{ title: "Simulador de conversa — Zyon Desk" }, { name: "description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }, { property: "og:title", content: "Simulador de conversa — Zyon Desk" }, { property: "og:description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }] }),
   component: Simulador,
 });
 const agora = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
