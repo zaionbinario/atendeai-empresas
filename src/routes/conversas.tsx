@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, UserRound, Bot, CheckCircle2, Clock3 } from "lucide-react";
+import { MessageCircle, UserRound, Bot, Clock3 } from "lucide-react";
 import { toast } from "sonner";
 import { Btn, Card, PageHeader } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
