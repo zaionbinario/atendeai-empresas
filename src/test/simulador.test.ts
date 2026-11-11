@@ -18,3 +18,15 @@ describe("prioridade das Perguntas frequentes", () => {
     expect(responder("Qual o horário?", ctx())).toContain("Nosso horário");
   });
 });
+
+describe("respostas contextuais de funcionamento", () => {
+  it("responde diretamente quando perguntam se abre no sábado", () => {
+    expect(responder("Vocês abrem no sábado?", ctx())).toBe("Sim! Abrimos sábado, das 07:00 às 13:00. 😊");
+  });
+  it("informa quando a empresa está fechada no domingo", () => {
+    expect(responder("Abre domingo?", ctx())).toBe("Não abrimos domingo. Nosso estabelecimento fica fechado nesse dia. 😊");
+  });
+  it("pergunta o dia quando a dúvida de horário está genérica", () => {
+    expect(responder("Qual o horário?", ctx())).toBe("Claro! Você quer saber o horário de qual dia da semana? 😊");
+  });
+});
