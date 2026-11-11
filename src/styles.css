@@ -175,7 +175,7 @@
 .light aside .text-slate-400,
 .light aside .text-slate-500,
 .light aside .text-slate-600 { color: var(--muted-foreground); }
-.light aside .hover\\:bg-white\\/5:hover { background-color: var(--muted); }
+.light aside a:hover { background-color: var(--muted); }
 .light header .text-white { color: var(--foreground); }
 .light header .text-slate-300,
 .light header .text-slate-400,
