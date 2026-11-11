@@ -33,7 +33,7 @@ function Conversas() {
           <span className={c.status === "humano" ? "rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600" : c.status === "resolvida" ? "rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600" : "rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-600"}>{c.status === "humano" ? "Humano" : c.status === "resolvida" ? "Resolvida" : "IA"}</span>
         </div>
         <details className="mt-3"><summary className="cursor-pointer text-sm font-medium text-primary">Ver mensagens</summary><div className="mt-3 space-y-2 rounded-lg bg-muted/40 p-3">{c.mensagens.map((m) => <div key={m.id} className={m.de === "cliente" ? "text-right" : "text-left"}><span className="inline-block max-w-[90%] rounded-xl bg-background px-3 py-2 text-sm">{m.texto}</span><p className="mt-0.5 text-[10px] text-muted-foreground">{m.de === "cliente" ? "Cliente" : "Atendente"} · {m.hora}</p></div>)}</div></details>
-        <div className="mt-3 flex justify-end">{c.status === "humano" ? <Btn variant="outline" onClick={() => devolver(c.id)}><Bot className="h-4 w-4" /> Devolver para IA</Btn> : <Btn onClick={() => assumir(c.id)}><UserRound className="h-4 w-4" /> Assumir conversa</Btn>}</div>
+        <div className="mt-3 flex justify-end">{c.status === "humano" ? <Btn variant="ghost" onClick={() => devolver(c.id)}><Bot className="h-4 w-4" /> Devolver para IA</Btn> : <Btn onClick={() => assumir(c.id)}><UserRound className="h-4 w-4" /> Assumir conversa</Btn>}</div>
       </div>)}
     </Card>
   </>);
