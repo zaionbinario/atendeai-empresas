@@ -33,6 +33,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [conversas, setConversas] = usePersistido<Conversa[]>("zyon-conversas", []);
   const [respostasRapidas, setRespostasRapidas] = usePersistido<string[]>("zyon-respostas-rapidas", ["Olá! Como posso ajudar? 😊", "Só um momento, vou verificar essa informação.", "Obrigado pelo contato! Estamos à disposição."]);
   const [botAtivo, setBotAtivo] = usePersistido("zyon-bot-ativo", true);
+  // Migra a escolha que já estava salva em Configurações antes da unificação.
+  // A migração acontece uma única vez para não sobrescrever mudanças futuras no botão do cabeçalho.
+  useEffect(() => {
+    try {
+      const migracao = "zyon-status-atendimento-unificado-v1";
+      if (localStorage.getItem(migracao) === "1") return;
+      const salvo = localStorage.getItem("zyon-chat-preferencias");
+      if (salvo) {
+        const preferencias = JSON.parse(salvo) as { respostasAutomaticas?: unknown };
+        if (typeof preferencias.respostasAutomaticas === "boolean") {
+          setBotAtivo(preferencias.respostasAutomaticas);
+        }
+      }
+      localStorage.setItem(migracao, "1");
+    } catch { /* Mantém o estado atual se as preferências antigas forem inválidas. */ }
+  }, [setBotAtivo]);
   return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
