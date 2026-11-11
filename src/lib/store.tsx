@@ -1,5 +1,5 @@
 // Estado compartilhado do painel. Persistência local de demonstração; backend será conectado depois.
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import * as d from "./demo-data";
 import type { Empresa, Produto, Horario, Faq, Instrucoes, Conversa } from "./types";
 
@@ -9,13 +9,13 @@ type Store = {
   horarios: Horario[]; setHorarios: (v: Horario[]) => void;
   faqs: Faq[]; setFaqs: (v: Faq[]) => void;
   instrucoes: Instrucoes; setInstrucoes: (v: Instrucoes) => void;
-  conversas: Conversa[]; setConversas: (v: Conversa[]) => void;
+  conversas: Conversa[]; setConversas: Dispatch<SetStateAction<Conversa[]>>;
   respostasRapidas: string[]; setRespostasRapidas: (v: string[]) => void;
   botAtivo: boolean; setBotAtivo: (v: boolean) => void;
   ultimoResetIndicadores: number | null; zerarIndicadores: () => void;
 };
 const Ctx = createContext<Store | null>(null);
-function usePersistido<T>(chave: string, inicial: T): [T, (v: T) => void] {
+function usePersistido<T>(chave: string, inicial: T): [T, Dispatch<SetStateAction<T>>] {
   const [valor, setValor] = useState<T>(inicial);
   const [pronto, setPronto] = useState(false);
   useEffect(() => {
