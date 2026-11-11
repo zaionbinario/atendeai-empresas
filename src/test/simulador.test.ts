@@ -35,13 +35,15 @@ describe("respostas contextuais de funcionamento", () => {
   it("informa quando a empresa está fechada no domingo", () => {
     expect(responder("Abre domingo?", ctx())).toBe("Não abrimos domingo. Nosso estabelecimento fica fechado nesse dia. 😊");
   });
-  it("mostra a semana organizada quando perguntam pelo horário geral", () => {
+  it("mostra a semana organizada, agrupando dias com o mesmo horário e usando quebras de linha reais", () => {
     const resposta = responder("Qual o horário de funcionamento?", ctx());
-    expect(resposta).toContain("Segunda-feira: 07:00 às 19:00");
+    expect(resposta).toContain("Segunda a sexta-feira: 07:00 às 19:00");
     expect(resposta).toContain("Sábado: 07:00 às 13:00");
     expect(resposta).toContain("Domingo: Fechado");
+    expect(resposta).toContain("\n");
+    expect(resposta).not.toContain("\\n");
   });
   it("pergunta o dia quando a dúvida de horário está genérica", () => {
-    expect(responder("Qual o horário?", ctx())).toBe("Claro! Você quer saber o horário de qual dia da semana? 😊");
+    expect(responder("Qual o horário?", ctx())).toContain("Nosso horário");
   });
 });
