@@ -116,7 +116,7 @@ function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
 }
 
 function normalizarTextoResposta(texto: string): string {
-  return texto.split(String.raw\`\\r\\n\`).join("\n").split(String.raw\`\\n\`).join("\n").split(String.raw\`\\t\`).join(" ").trim();
+  return texto.split("\\r\\n").join("\n").split("\\n").join("\n").split("\\t").join(" ").trim();
 }
 
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes }): string | null {
