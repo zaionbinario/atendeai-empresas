@@ -24,7 +24,7 @@ function Simulador() {
   useEffect(() => { fim.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, digitando]);
   const enviar = (t: string) => { if (!t.trim()) return;
     setMsgs((m) => [...m, { id: novoId(), de: "cliente", texto: t, hora: agora() }]); setTexto(""); setDigitando(true);
-    setTimeout(() => { setDigitando(false); setMsgs((m) => [...m, { id: novoId(), de: "bot", texto: responder(t, store), hora: agora() }]); }, 900); };
+    setTimeout(() => { setDigitando(false); setMsgs((m) => [...m, { id: novoId(), de: "bot", texto: responder(t, store, msgs.slice(-8).map((m) => m.texto)), hora: agora() }]); }, 900); };
   return (<>
     <PageHeader title="Simulador de conversa" desc="Converse como se fosse um cliente e veja as respostas do atendente." action={<Btn variant="ghost" onClick={() => setMsgs(inicial())}><RotateCcw className="h-4 w-4" />Reiniciar</Btn>} />
     <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-xl">
