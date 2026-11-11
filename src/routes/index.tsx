@@ -3,6 +3,7 @@ import { MessageCircle, Bot, Timer, Star, ArrowUpRight, Building2, Package, Cloc
 import { Card, PageHeader } from "@/components/app/ui";
 import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Painel — Zyon Chat" }, { name: "description", content: "Resumo do atendimento automatizado da sua empresa." }, { property: "og:title", content: "Painel — Zyon Chat" }, { property: "og:description", content: "Resumo do atendimento automatizado da sua empresa." }] }),
@@ -10,12 +11,15 @@ export const Route = createFileRoute("/")({
 });
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 function Painel() {
+  const { conversas, botAtivo } = useStore();
+  const clientesUnicos = new Set(conversas.map((c) => c.cliente)).size;
   const max = Math.max(...r.semana);
   const kpis = [
-    { l: "Conversas hoje", v: r.conversasHoje, i: MessageCircle, hint: "Mensagens recebidas", color: "text-emerald-300 bg-emerald-400/10" },
-    { l: "Resolvidas pela IA", v: r.resolvidasIA + "%", i: Bot, hint: "Sem precisar de humano", color: "text-sky-300 bg-sky-400/10" },
-    { l: "Tempo médio de resposta", v: r.tempoMedio, i: Timer, hint: "Agilidade no atendimento", color: "text-violet-300 bg-violet-400/10" },
-    { l: "Satisfação dos clientes", v: r.satisfacao + " / 5", i: Star, hint: "Avaliação média", color: "text-amber-300 bg-amber-400/10" },
+    { l: "Conversas registradas", v: conversas.length, i: MessageCircle, hint: "Histórico salvo neste navegador", color: "text-emerald-300 bg-emerald-400/10" },
+    { l: "Clientes atendidos", v: clientesUnicos, i: Users, hint: "Clientes no histórico", color: "text-cyan-300 bg-cyan-400/10" },
+    { l: "Atendimentos pela IA", v: conversas.filter((c) => c.status === "ia").length, i: Bot, hint: "Conversas acompanhadas pelo bot", color: "text-sky-300 bg-sky-400/10" },
+    { l: "Atendimentos humanos", v: conversas.filter((c) => c.status === "humano").length, i: Users, hint: "Precisam de acompanhamento", color: "text-violet-300 bg-violet-400/10" },
+    { l: "Status do atendente", v: botAtivo ? "Ativo" : "Pausado", i: botAtivo ? Bot : Timer, hint: "Controle no topo do painel", color: botAtivo ? "text-emerald-300 bg-emerald-400/10" : "text-amber-300 bg-amber-400/10" },
   ];
   const atalhos = [
     { to: "/empresas", label: "Cadastrar empresa", desc: "Gerencie seus negócios", icon: Building2, color: "bg-sky-500/10 text-sky-600" },
@@ -39,7 +43,7 @@ function Painel() {
         <Link to="/simulador" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-emerald-800 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">Testar meu atendente <ArrowUpRight className="h-4 w-4" /></Link>
       </div>
     </section>
-    <div className="mb-3 flex items-center justify-between"><h2 className="font-display text-lg font-bold">Resumo do atendimento</h2><span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Dados demonstrativos</span></div>
+    <div className="mb-3 flex items-center justify-between"><h2 className="font-display text-lg font-bold">Resumo do atendimento</h2><span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Dados do histórico local</span></div>
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {kpis.map(({ l, v, i: I, hint }) => (
         <Card key={l} className="group transition-all hover:-translate-y-1 hover:shadow-lg">
@@ -61,7 +65,7 @@ function Painel() {
       </Card>
       <Card className="xl:col-span-2">
         <div className="flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Últimas conversas</h2><p className="mt-1 text-xs text-muted-foreground">Atividades recentes do atendimento</p></div><span className="rounded-xl bg-accent p-2 text-accent-foreground"><MessageCircle className="h-5 w-5" /></span></div>
-        <ul className="mt-3 divide-y">{r.recentes.map((c) => (
+        <ul className="mt-3 divide-y">{(conversas.length ? conversas.slice(0, 4).map((c) => ({ nome: c.cliente, msg: c.ultimaMensagem, hora: c.atualizadaEm, status: c.status === "humano" ? "Humano" : c.status === "resolvida" ? "Resolvida" : "IA" })) : r.recentes).map((c) => (
           <li key={c.nome} className="flex items-center gap-3 py-3">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-secondary font-bold text-secondary-foreground">{c.nome[0]}</div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold">{c.nome} <span className="font-normal text-muted-foreground">· {c.hora}</span></p>
