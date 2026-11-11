@@ -46,12 +46,47 @@ const DIAS: { dia: string; aliases: string[] }[] = [
   { dia: "Domingo", aliases: ["domingo", "domingos", "dom"] },
 ];
 
+function formatarFaixaDeDias(inicio: string, fim: string): string {
+  if (inicio === fim) return inicio;
+  const primeiro = inicio.replace("-feira", "");
+  const ultimo = fim.toLowerCase() === "sábado" || fim.toLowerCase() === "domingo"
+    ? fim.toLowerCase()
+    : fim.replace("-feira", "").toLowerCase();
+  return `${primeiro} a ${ultimo}-feira`;
+}
+
+function formatarHorarios(horarios: Horario[]): string {
+  const linhas: string[] = [];
+  let i = 0;
+
+  while (i < horarios.length) {
+    const atual = horarios[i]!;
+    let fim = i;
+
+    while (fim + 1 < horarios.length) {
+      const proximo = horarios[fim + 1]!;
+      if (
+        proximo.aberto !== atual.aberto ||
+        (atual.aberto && (proximo.abre !== atual.abre || proximo.fecha !== atual.fecha))
+      ) break;
+      fim++;
+    }
+
+    const dia = formatarFaixaDeDias(atual.dia, horarios[fim]!.dia);
+    const expediente = atual.aberto ? `${atual.abre} às ${atual.fecha}` : "Fechado";
+    linhas.push(`• ${dia}: ${expediente}`);
+    i = fim + 1;
+  }
+
+  return linhas.join("\n");
+}
+
 function responderHorario(texto: string, horarios: Horario[]): string | null {
   const t = norm(texto);
   const perguntaHorario = /(horario|abre|abrem|aberto|aberta|fecha|fecham|funciona|funcionam|funcionamento)/.test(t);
   if (!perguntaHorario) return null;
 
-  const dia = DIAS.find((d) => d.aliases.some((alias) => new RegExp(`(^|\\\\s)${alias}($|\\\\s)`).test(t)));
+  const dia = DIAS.find((d) => d.aliases.some((alias) => new RegExp(`(^|\\s)${alias}($|\\s)`).test(t)));
   if (dia) {
     const horario = horarios.find((h) => norm(h.dia) === norm(dia.dia));
     if (!horario) return `Ainda não tenho o horário de ${dia.dia.toLowerCase()} cadastrado. Vou pedir para a equipe confirmar essa informação. 🙋`;
@@ -61,10 +96,7 @@ function responderHorario(texto: string, horarios: Horario[]): string | null {
 
   const perguntaGeral = /(horario|funcionamento|funcionam|abrem|abre|expediente)/.test(t);
   if (perguntaGeral) {
-    const linhas = horarios.map((h) =>
-      `• ${h.dia}: ${h.aberto ? `${h.abre} às ${h.fecha}` : "Fechado"}`
-    );
-    return `Nosso horário de funcionamento é:\\n\\n${linhas.join("\\n")}\\n\\nSe precisar de outro detalhe, é só perguntar! 😊`;
+    return `Claro! 😊 Nosso horário de funcionamento é:\n\n${formatarHorarios(horarios)}\n\nSe precisar de mais alguma informação, estou à disposição! 😊`;
   }
   return null;
 }
@@ -93,7 +125,7 @@ export function responder(texto: string, ctx: { produtos: Produto[]; faqs: Faq[]
   const horario = responderHorario(texto, ctx.horarios);
   if (horario) return horario;
 
-  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
+  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `O ${prod.nome} custa ${brl(prod.preco)}. ${prod.descricao}`;
   if (/(cardapio|produtos|preco|precos|menu)/.test(t))
     return "Nossos produtos:\\n" + ctx.produtos.map((p) => `• ${p.nome} — ${brl(p.preco)}`).join("\\n");
