@@ -1,0 +1,29 @@
+
+name: Verificar Zyon Chat
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Verificar compilacao
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Instalar dependencias
+        run: bun install --frozen-lockfile
+
+      - name: Compilar projeto
+        run: bun run build
