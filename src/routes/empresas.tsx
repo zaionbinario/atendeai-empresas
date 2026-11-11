@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Phone, MapPin } from "lucide-react";
-import { Btn, Card, Field, Input, Modal, PageHeader, Toggle } from "@/components/app/ui";
+import { Btn, Card, Field, Input, Modal, PageHeader, QuickAccess, Toggle } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
 import type { Empresa } from "@/lib/types";
 
@@ -26,6 +26,7 @@ function Empresas() {
           <Btn variant="danger" onClick={() => setEmpresas(empresas.filter((x) => x.id !== e.id))}><Trash2 className="h-4 w-4" />Excluir</Btn></div>
       </Card>))}
     </div>
+    <QuickAccess />
     <Modal open={!!form} title={form?.id ? "Editar empresa" : "Nova empresa"} onClose={() => setForm(null)}>
       {form && <div className="space-y-4">
         <Field label="Nome da empresa"><Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} /></Field>
