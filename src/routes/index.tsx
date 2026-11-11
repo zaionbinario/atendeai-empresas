@@ -5,7 +5,7 @@ import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Painel — AtendeAI" }, { name: "description", content: "Resumo do atendimento automatizado da sua empresa." }, { property: "og:title", content: "Painel — AtendeAI" }, { property: "og:description", content: "Resumo do atendimento automatizado da sua empresa." }] }),
+  head: () => ({ meta: [{ title: "Painel — Zyon Chat" }, { name: "description", content: "Resumo do atendimento automatizado da sua empresa." }, { property: "og:title", content: "Painel — Zyon Chat" }, { property: "og:description", content: "Resumo do atendimento automatizado da sua empresa." }] }),
   component: Painel,
 });
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
