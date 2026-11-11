@@ -84,6 +84,8 @@ export interface FileRoutesByTo {
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
   '/simulador': typeof SimuladorRoute
+  '/conversas': typeof ConversasRoute
+  '/respostas-rapidas': typeof RespostasRapidasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,6 +96,8 @@ export interface FileRoutesById {
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
   '/simulador': typeof SimuladorRoute
+  '/conversas': typeof ConversasRoute
+  '/respostas-rapidas': typeof RespostasRapidasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
