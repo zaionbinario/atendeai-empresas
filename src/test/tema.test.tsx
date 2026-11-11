@@ -49,7 +49,7 @@ describe("temas do painel", () => {
   it("define variáveis do tema claro na folha de estilos", () => {
     const css = readFileSync("src/styles.css", "utf8");
     expect(css).toContain("@custom-variant light");
-    expect(css).toMatch(/\\.light \\{[\\s\\S]*?--background:\\s*oklch\\(/);
-    expect(css).toMatch(/\\.light \\{[\\s\\S]*?--foreground:\\s*oklch\\(/);
+    expect(css).toMatch(/\.light \{[\s\S]*?--background:\s*oklch\(/);
+    expect(css).toMatch(/\.light \{[\s\S]*?--foreground:\s*oklch\(/);
   });
 });
