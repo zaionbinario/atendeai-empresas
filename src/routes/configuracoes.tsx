@@ -41,16 +41,25 @@ function Configuracoes() {
           <Field label="E-mail de contato"><Input type="email" value={prefs.email} onChange={(e) => update({ email: e.target.value })} placeholder="contato@empresa.com" /></Field>
         </Card>
         <Card className="space-y-5">
-          <div className="flex items-center gap-3"><div className="rounded-xl bg-muted p-3"><SlidersHorizontal className="h-5 w-5" /></div><div><h2 className="font-semibold">Preferências do atendimento</h2><p className="text-sm text-muted-foreground">Controles locais de demonstração.</p></div></div>
-          <Toggle label="Respostas automáticas habilitadas" on={prefs.respostasAutomaticas} onChange={(v) => update({ respostasAutomaticas: v })} />
+          <div className="flex items-center gap-3"><div className="rounded-xl bg-muted p-3"><SlidersHorizontal className="h-5 w-5" /></div><div><h2 className="font-semibold">Preferências do atendimento</h2><p className="text-sm text-muted-foreground">Personalize o comportamento do atendimento e os avisos do painel.</p></div></div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0"><p className="text-sm font-medium">Respostas automáticas</p><p className="mt-1 text-xs text-muted-foreground">Define se o atendimento poderá responder automaticamente às mensagens dos clientes.</p></div>
+            <Toggle label="Respostas automáticas" on={prefs.respostasAutomaticas} onChange={(v) => update({ respostasAutomaticas: v })} />
+          </div>
           <div className="border-t border-border" />
           <div className="flex items-center gap-3"><Bell className="h-4 w-4 text-muted-foreground" /><span className="text-sm font-medium">Notificações</span></div>
-          <Toggle label="Notificações gerais" on={prefs.notificacoes} onChange={(v) => update({ notificacoes: v })} />
-          <Toggle label="Avisos de novas conversas" on={prefs.avisosAtendimento} onChange={(v) => update({ avisosAtendimento: v })} />
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0"><p className="text-sm font-medium">Notificações gerais</p><p className="mt-1 text-xs text-muted-foreground">Ativa ou desativa avisos gerais e atualizações importantes do painel.</p></div>
+            <Toggle label="Notificações gerais" on={prefs.notificacoes} onChange={(v) => update({ notificacoes: v })} />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0"><p className="text-sm font-medium">Avisos de novas conversas</p><p className="mt-1 text-xs text-muted-foreground">Mostra um aviso quando um cliente iniciar uma nova conversa.</p></div>
+            <Toggle label="Avisos de novas conversas" on={prefs.avisosAtendimento} onChange={(v) => update({ avisosAtendimento: v })} />
+          </div>
         </Card>
       </div>
       <Card className="border-amber-400/20 bg-amber-500/[0.05]">
-        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Nesta versão, as preferências ficam salvas apenas neste navegador. Para compartilhar configurações entre usuários e dispositivos, será necessário concluir a persistência no Supabase.</p></div></div>
+        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Por enquanto, estas opções são salvas apenas neste navegador e servem como preferências do painel. Elas ainda não ativam o envio real de respostas automáticas nem o disparo de notificações. A integração dessas funções será feita nas próximas etapas.</p></div></div>
       </Card>
     </div>
   );
