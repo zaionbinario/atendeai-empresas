@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
-import { Btn, Card, Field, Input, Modal, PageHeader, Textarea } from "@/components/app/ui";
+import { Btn, Card, Field, Input, Modal, PageHeader, QuickAccess, Textarea } from "@/components/app/ui";
 import { brl, novoId, useStore } from "@/lib/store";
 import type { Produto } from "@/lib/types";
 
@@ -31,6 +31,7 @@ function Produtos() {
         </li>))}
         {!lista.length && <li className="p-8 text-center text-muted-foreground">Nenhum produto encontrado.</li>}</ul>
     </Card>
+    <QuickAccess />
     <Modal open={!!form} title={form?.id ? "Editar produto" : "Novo produto"} onClose={() => setForm(null)}>
       {form && <div className="space-y-4">
         <Field label="Nome do produto"><Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} /></Field>
