@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MessageCircle, Bot, Timer, Star, ArrowUpRight, Building2, Package, Clock3, CircleHelp, Sparkles, TrendingUp, Zap, CheckCircle2, Rocket } from "lucide-react";
+import { MessageCircle, Bot, Timer, Star, ArrowUpRight, Building2, Package, Clock3, CircleHelp, Sparkles, TrendingUp, Zap, CheckCircle2, Rocket, Users } from "lucide-react";
 import { Card, PageHeader } from "@/components/app/ui";
 import { resumoDemo as r } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ function Painel() {
       </div>
     </section>
     <div className="mb-3 flex items-center justify-between"><h2 className="font-display text-lg font-bold">Resumo do atendimento</h2><span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Dados do histórico local</span></div>
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {kpis.map(({ l, v, i: I, hint }) => (
         <Card key={l} className="group transition-all hover:-translate-y-1 hover:shadow-lg">
           <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-medium text-muted-foreground">{l}</p><p className="mt-3 font-display text-3xl font-bold tracking-tight">{v}</p></div>
