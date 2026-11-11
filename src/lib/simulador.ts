@@ -154,11 +154,11 @@ export function responder(
   const cumprimento = saudacao(texto, ctx);
   if (cumprimento) return cumprimento;
 
-  const horario = responderHorario(conversa, ctx.horarios);
-  if (horario) return horario;
-
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
   if (faq) return normalizarTextoResposta(faq.resposta);
+
+  const horario = responderHorario(conversa, ctx.horarios);
+  if (horario) return horario;
 
   const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
