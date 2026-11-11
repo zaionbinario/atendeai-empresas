@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Btn, Card, Input, PageHeader, Toggle } from "@/components/app/ui";
+import { Btn, Card, Input, PageHeader, QuickAccess, Toggle } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/horarios")({
@@ -20,5 +20,6 @@ function Horarios() {
           <Input type="time" className="w-28" value={h.fecha} onChange={(e) => upd(i, { fecha: e.target.value })} /></div>)
           : <span className="text-sm text-muted-foreground">Fechado</span>}
       </li>))}</ul></Card>
+    <QuickAccess />
   </>);
 }
