@@ -84,10 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AtendeAI — Atendimento automatizado com IA" },
+      { title: "Zyon Chat — Atendimento automatizado com IA" },
       { name: "description", content: "Atendimento automatizado com inteligência artificial para pequenas empresas e lojas." },
       
-      { property: "og:title", content: "AtendeAI — Atendimento automatizado com IA" },
+      { property: "og:title", content: "Zyon Chat — Atendimento automatizado com IA" },
       { property: "og:description", content: "Atendimento automatizado com inteligência artificial para pequenas empresas e lojas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
