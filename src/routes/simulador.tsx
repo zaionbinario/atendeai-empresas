@@ -8,7 +8,7 @@ import type { Mensagem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/simulador")({
-  head: () => ({ meta: [{ title: "Simulador de conversa — Zyon Desk" }, { name: "description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }, { property: "og:title", content: "Simulador de conversa — Zyon Desk" }, { property: "og:description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }] }),
+  head: () => ({ meta: [{ title: "Simulador de conversa — AtendeAI" }, { name: "description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }, { property: "og:title", content: "Simulador de conversa — AtendeAI" }, { property: "og:description", content: "Teste o atendente virtual em uma conversa no estilo WhatsApp." }] }),
   component: Simulador,
 });
 const agora = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -27,7 +27,7 @@ function Simulador() {
     setTimeout(() => { setDigitando(false); setMsgs((m) => [...m, { id: novoId(), de: "bot", texto: responder(t, store), hora: agora() }]); }, 900); };
   return (<>
     <PageHeader title="Simulador de conversa" desc="Converse como se fosse um cliente e veja as respostas do atendente." action={<Btn variant="ghost" onClick={() => setMsgs(inicial())}><RotateCcw className="h-4 w-4" />Reiniciar</Btn>} />
-    <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-glow">
+    <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-xl">
       <div className="flex items-center gap-3 bg-wa-header p-3 text-wa-header-foreground">
         <div className="grid h-10 w-10 place-items-center rounded-full bg-wa-header-foreground/20 font-bold">{store.instrucoes.nomeAtendente[0]}</div>
         <div><p className="font-semibold">{store.instrucoes.nomeAtendente} · {store.empresas[0]?.nome}</p><p className="text-xs opacity-80">{digitando ? "digitando..." : "online"}</p></div>
@@ -43,7 +43,7 @@ function Simulador() {
         <button key={s} onClick={() => enviar(s)} className="shrink-0 rounded-full border bg-card px-3 py-1 text-xs">{s}</button>))}</div>
       <form className="flex gap-2 bg-wa-bar p-3" onSubmit={(e) => { e.preventDefault(); enviar(texto); }}>
         <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite uma mensagem" className="flex-1 rounded-full bg-card px-4 py-2.5 text-sm outline-none" />
-        <button aria-label="Enviar" className="grid h-11 w-11 place-items-center rounded-full bg-gradient-brand text-primary-foreground shadow-glow"><Send className="h-5 w-5" /></button>
+        <button aria-label="Enviar" className="grid h-11 w-11 place-items-center rounded-full bg-primary text-primary-foreground"><Send className="h-5 w-5" /></button>
       </form>
     </div>
   </>);

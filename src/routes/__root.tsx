@@ -84,11 +84,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Zyon Desk — Atendimento automatizado com IA" },
-      { name: "description", content: "Zyon Desk: atendimento automatizado com inteligência artificial para pequenos negócios." },
+      { title: "AtendeAI — Atendimento automatizado com IA" },
+      { name: "description", content: "Atendimento automatizado com inteligência artificial para pequenas empresas e lojas." },
       
-      { property: "og:title", content: "Zyon Desk — Atendimento automatizado com IA" },
-      { property: "og:description", content: "Zyon Desk: atendimento automatizado com inteligência artificial para pequenos negócios." },
+      { property: "og:title", content: "AtendeAI — Atendimento automatizado com IA" },
+      { property: "og:description", content: "Atendimento automatizado com inteligência artificial para pequenas empresas e lojas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       
@@ -99,8 +99,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Figtree:wght@400;500;600&display=swap" },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
