@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const logo = (
     <div className="flex items-center gap-3 px-2">
       <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20"><Bot className="h-6 w-6" /></div>
-      <div><span className="font-display text-xl font-bold tracking-tight text-white">Atende<span className="text-emerald-400">AI</span></span><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Central inteligente</p></div>
+      <div><span className="font-display text-xl font-bold tracking-tight text-white">Zyon <span className="text-emerald-400">Chat</span></span><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">CHAT INTELIGENTE</p></div>
     </div>
   );
   const helpCard = (
