@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Bell, Building2, Save, Shield, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { Btn, Card, Field, Input, PageHeader, Toggle } from "@/components/app/ui";
+import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — Zyon Chat" }, { name: "description", content: "Personalize as preferências do painel e do atendimento." }] }),
@@ -13,6 +14,7 @@ type Preferences = { nome: string; email: string; notificacoes: boolean; avisosA
 const defaults: Preferences = { nome: "Minha empresa", email: "", notificacoes: true, avisosAtendimento: true, respostasAutomaticas: true };
 
 function Configuracoes() {
+  const { botAtivo, setBotAtivo } = useStore();
   const [prefs, setPrefs] = useState<Preferences>(defaults);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
@@ -22,10 +24,15 @@ function Configuracoes() {
     } catch { /* Mantém as preferências padrão se o armazenamento estiver indisponível. */ }
     setLoaded(true);
   }, []);
+  // O botão do cabeçalho, o painel e o Simulador usam este mesmo estado.
+  useEffect(() => {
+    setPrefs((current) => current.respostasAutomaticas === botAtivo ? current : { ...current, respostasAutomaticas: botAtivo });
+  }, [botAtivo]);
   const update = (patch: Partial<Preferences>) => setPrefs((current) => ({ ...current, ...patch }));
   const save = () => {
     try {
       localStorage.setItem("zyon-chat-preferencias", JSON.stringify(prefs));
+      setBotAtivo(prefs.respostasAutomaticas);
       toast.success("Preferências salvas neste navegador.");
     } catch {
       toast.error("Não foi possível salvar neste navegador.");
@@ -59,7 +66,7 @@ function Configuracoes() {
         </Card>
       </div>
       <Card className="border-amber-400/20 bg-amber-500/[0.05]">
-        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Por enquanto, estas opções são salvas apenas neste navegador e servem como preferências do painel. Elas ainda não ativam o envio real de respostas automáticas nem o disparo de notificações. A integração dessas funções será feita nas próximas etapas.</p></div></div>
+        <div className="flex items-start gap-3"><Shield className="mt-0.5 h-5 w-5 text-amber-500" /><div><h3 className="font-semibold">Sobre o salvamento</h3><p className="mt-1 text-sm text-muted-foreground">Por enquanto, as preferências são salvas apenas neste navegador. Respostas automáticas controla o status do bot no painel e seu comportamento no Simulador, mas ainda não envia mensagens reais a clientes. Notificações também não são disparadas de verdade.</p></div></div>
       </Card>
     </div>
   );
