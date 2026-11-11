@@ -143,7 +143,7 @@ function inferirContexto(texto: string, historico: string[]): string {
   return texto;
 }
 
-export function responder(
+function responderBase(
   texto: string,
   ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes },
   historico: string[] = [],
@@ -179,4 +179,18 @@ export function responder(
   return ctx.instrucoes.transferirHumano
     ? "Não encontrei essa informação por aqui e prefiro não te passar algo errado. Vou chamar alguém da equipe para te ajudar. 🙋"
     : "Não encontrei essa informação por aqui. Você pode me explicar de outro jeito?";
+}
+
+export function responder(
+  texto: string,
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes },
+  historico: string[] = [],
+): string {
+  let resposta = responderBase(texto, ctx, historico);
+  if (ctx.instrucoes.tom === "formal") {
+    resposta = resposta.replace(/ 😊| 🙋/g, "").replace("Claro!", "Certamente,").replace("Sim!", "Sim,").replace("Tudo ótimo por aqui!", "Estou bem, obrigado(a).");
+  } else if (ctx.instrucoes.tom === "descontraido") {
+    resposta = resposta.replace("Claro!", "Opa!").replace("Sim!", "Siiim!").replace("Não abrimos", "Poxa, não abrimos");
+  }
+  return resposta;
 }
