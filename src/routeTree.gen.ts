@@ -16,6 +16,8 @@ import { Route as HorariosRouteImport } from './routes/horarios'
 import { Route as PerguntasRouteImport } from './routes/perguntas'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SimuladorRouteImport } from './routes/simulador'
+import { Route as ConversasRouteImport } from './routes/conversas'
+import { Route as RespostasRapidasRouteImport } from './routes/respostas-rapidas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +54,16 @@ const SimuladorRoute = SimuladorRouteImport.update({
   path: '/simulador',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConversasRoute = ConversasRouteImport.update({
+  id: '/conversas',
+  path: '/conversas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RespostasRapidasRoute = RespostasRapidasRouteImport.update({
+  id: '/respostas-rapidas',
+  path: '/respostas-rapidas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
   '/simulador': typeof SimuladorRoute
+  '/conversas': typeof ConversasRoute
+  '/respostas-rapidas': typeof RespostasRapidasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
