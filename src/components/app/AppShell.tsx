@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Search, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
+import { SiteSearch } from "./SiteSearch";
 
 const nav = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
@@ -82,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between gap-4 border-b border-white/10 bg-[#090f12]/95 px-4 lg:ml-64 lg:px-8 light:border-slate-200 light:bg-white/95">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <button aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)} className="rounded-xl p-2 text-slate-300 hover:bg-white/5 lg:hidden light:text-slate-700 light:hover:bg-slate-100">{open ? <X /> : <Menu />}</button>
-          <div className="relative hidden w-full max-w-xl sm:block"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input aria-label="Buscar no sistema" placeholder="Buscar no sistema... (Ctrl + K)" className="h-11 w-full rounded-full border border-white/10 bg-white/[0.04] pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400/50 light:border-slate-200 light:bg-slate-50 light:text-slate-900 light:placeholder:text-slate-500" /></div>
+          <div className="w-10 shrink-0 sm:w-full sm:max-w-xl"><SiteSearch /></div>
           <div className="lg:hidden">{logo}</div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3"><button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden sm:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button><button onClick={() => setBotAtivo(!botAtivo)} className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-2 text-[10px] font-semibold sm:gap-2 sm:px-3 sm:text-xs", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}{botAtivo ? "Bot ativo" : "Bot pausado"}</button><NotificationBell /><div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" /><button className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-white hover:bg-white/5 light:text-slate-900 light:hover:bg-slate-100"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden sm:block">Minha conta</span><ChevronDown className="h-4 w-4 text-slate-500" /></button></div>
