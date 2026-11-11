@@ -6,7 +6,7 @@ import { brl, novoId, useStore } from "@/lib/store";
 import type { Produto } from "@/lib/types";
 
 export const Route = createFileRoute("/produtos")({
-  head: () => ({ meta: [{ title: "Produtos — AtendeAI" }, { name: "description", content: "Cadastre produtos, preços e descrições para o atendente virtual." }, { property: "og:title", content: "Produtos — AtendeAI" }, { property: "og:description", content: "Cadastre produtos, preços e descrições para o atendente virtual." }] }),
+  head: () => ({ meta: [{ title: "Produtos — Zyon Chat" }, { name: "description", content: "Cadastre produtos, preços e descrições para o atendente virtual." }, { property: "og:title", content: "Produtos — Zyon Chat" }, { property: "og:description", content: "Cadastre produtos, preços e descrições para o atendente virtual." }] }),
   component: Produtos,
 });
 const vazio: Produto = { id: "", nome: "", preco: 0, descricao: "", categoria: "" };
