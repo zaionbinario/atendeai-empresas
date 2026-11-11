@@ -1,8 +1,7 @@
-// Estado em memória com dados de demonstração.
-// Futuro: substituir por consultas ao banco (Supabase) mantendo a mesma interface.
-import { createContext, useContext, useState, type ReactNode } from "react";
+// Estado compartilhado do painel. Persistência local de demonstração; backend será conectado depois.
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import * as d from "./demo-data";
-import type { Empresa, Produto, Horario, Faq, Instrucoes } from "./types";
+import type { Empresa, Produto, Horario, Faq, Instrucoes, Conversa } from "./types";
 
 type Store = {
   empresas: Empresa[]; setEmpresas: (v: Empresa[]) => void;
@@ -10,15 +9,31 @@ type Store = {
   horarios: Horario[]; setHorarios: (v: Horario[]) => void;
   faqs: Faq[]; setFaqs: (v: Faq[]) => void;
   instrucoes: Instrucoes; setInstrucoes: (v: Instrucoes) => void;
+  conversas: Conversa[]; setConversas: (v: Conversa[]) => void;
+  respostasRapidas: string[]; setRespostasRapidas: (v: string[]) => void;
+  botAtivo: boolean; setBotAtivo: (v: boolean) => void;
 };
 const Ctx = createContext<Store | null>(null);
+function usePersistido<T>(chave: string, inicial: T): [T, (v: T) => void] {
+  const [valor, setValor] = useState<T>(inicial);
+  const [pronto, setPronto] = useState(false);
+  useEffect(() => {
+    try { const salvo = localStorage.getItem(chave); if (salvo) setValor(JSON.parse(salvo) as T); } catch { /* mantém dados iniciais */ }
+    setPronto(true);
+  }, [chave]);
+  useEffect(() => { if (pronto) { try { localStorage.setItem(chave, JSON.stringify(valor)); } catch { /* armazenamento indisponível */ } } }, [chave, valor, pronto]);
+  return [valor, setValor];
+}
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [empresas, setEmpresas] = useState(d.empresasDemo);
-  const [produtos, setProdutos] = useState(d.produtosDemo);
-  const [horarios, setHorarios] = useState(d.horariosDemo);
-  const [faqs, setFaqs] = useState(d.faqsDemo);
-  const [instrucoes, setInstrucoes] = useState(d.instrucoesDemo);
-  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes }}>{children}</Ctx.Provider>;
+  const [empresas, setEmpresas] = usePersistido("zyon-empresas", d.empresasDemo);
+  const [produtos, setProdutos] = usePersistido("zyon-produtos", d.produtosDemo);
+  const [horarios, setHorarios] = usePersistido("zyon-horarios", d.horariosDemo);
+  const [faqs, setFaqs] = usePersistido("zyon-faqs", d.faqsDemo);
+  const [instrucoes, setInstrucoes] = usePersistido("zyon-instrucoes", d.instrucoesDemo);
+  const [conversas, setConversas] = usePersistido<Conversa[]>("zyon-conversas", []);
+  const [respostasRapidas, setRespostasRapidas] = usePersistido<string[]>("zyon-respostas-rapidas", ["Olá! Como posso ajudar? 😊", "Só um momento, vou verificar essa informação.", "Obrigado pelo contato! Estamos à disposição."]);
+  const [botAtivo, setBotAtivo] = usePersistido("zyon-bot-ativo", true);
+  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
 export const novoId = () => Math.random().toString(36).slice(2, 9);
