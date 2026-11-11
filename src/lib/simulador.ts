@@ -68,9 +68,9 @@ function responderHorario(texto: string, horarios: Horario[]): string | null {
 type Intencao = "pagamento" | "entrega" | "encomenda";
 
 const INTENCOES: { tipo: Intencao; padrao: RegExp; busca: RegExp }[] = [
-  { tipo: "pagamento", padrao: /\\b(debit|debito|credito|cartao|pix|dinheiro|pagamento|pagar|pagam|passam|maquininha)\\w*\\b/, busca: /\\b(pagamento|pagar|pagam|pix|cartao|credito|debito|dinheiro|aceitam|formas)\\w*\\b/ },
-  { tipo: "entrega", padrao: /\\b(entrega|entregam|entregar|delivery|motoboy|frete|domicilio)\\w*\\b/, busca: /\\b(entrega|entregam|delivery|frete|motoboy)\\w*\\b/ },
-  { tipo: "encomenda", padrao: /\\b(encomenda|encomendas|reservar|reserva|antecedencia|pedido)\\w*\\b/, busca: /\\b(encomenda|reserva|pedido|antecedencia)\\w*\\b/ },
+  { tipo: "pagamento", padrao: /\b(debit|debito|credito|cartao|pix|dinheiro|pagamento|pagar|pagam|passam|maquininha)\w*\b/, busca: /\b(pagamento|pagar|pagam|pix|cartao|credito|debito|dinheiro|aceitam|formas)\w*\b/ },
+  { tipo: "entrega", padrao: /\b(entrega|entregam|entregar|delivery|motoboy|frete|domicilio)\w*\b/, busca: /\b(entrega|entregam|delivery|frete|motoboy)\w*\b/ },
+  { tipo: "encomenda", padrao: /\b(encomenda|encomendas|reservar|reserva|antecedencia|pedido)\w*\b/, busca: /\b(encomenda|reserva|pedido|antecedencia)\w*\b/ },
 ];
 
 function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
@@ -89,7 +89,7 @@ export function responder(texto: string, ctx: { produtos: Produto[]; faqs: Faq[]
   const horario = responderHorario(texto, ctx.horarios);
   if (horario) return horario;
 
-  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\\s(]/).some((w) => w.length > 3 && t.includes(w)));
+  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `O ${prod.nome} custa ${brl(prod.preco)}. ${prod.descricao}`;
   if (/(cardapio|produtos|preco|precos|menu)/.test(t))
     return "Nossos produtos:\\n" + ctx.produtos.map((p) => `• ${p.nome} — ${brl(p.preco)}`).join("\\n");
