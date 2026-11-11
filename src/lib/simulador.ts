@@ -116,7 +116,7 @@ function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
 }
 
 function normalizarTextoResposta(texto: string): string {
-  return texto.replace(/\\\\r\\\\n/g, "\n").replace(/\\\\n/g, "\n").replace(/\\\\t/g, " ").trim();
+  return texto.split(String.raw\`\\r\\n\`).join("\n").split(String.raw\`\\n\`).join("\n").split(String.raw\`\\t\`).join(" ").trim();
 }
 
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes }): string | null {
@@ -160,7 +160,7 @@ export function responder(
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
   if (faq) return normalizarTextoResposta(faq.resposta);
 
-  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\\s(]/).some((w) => w.length > 3 && t.includes(w)));
+  const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
 
   if (/(cardapio|produtos|preco|precos|menu|servicos|servico)/.test(t)) {
