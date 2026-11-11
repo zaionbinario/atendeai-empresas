@@ -15,18 +15,18 @@ function Painel() {
   const clientesUnicos = new Set(conversas.map((c) => c.cliente)).size;
   const max = Math.max(...r.semana);
   const kpis = [
-    { l: "Conversas registradas", v: conversas.length, i: MessageCircle, hint: "Histórico salvo neste navegador", color: "text-emerald-300 bg-emerald-400/10" },
-    { l: "Clientes atendidos", v: clientesUnicos, i: Users, hint: "Clientes no histórico", color: "text-cyan-300 bg-cyan-400/10" },
-    { l: "Atendimentos pela IA", v: conversas.filter((c) => c.status === "ia").length, i: Bot, hint: "Conversas acompanhadas pelo bot", color: "text-sky-300 bg-sky-400/10" },
-    { l: "Atendimentos humanos", v: conversas.filter((c) => c.status === "humano").length, i: Users, hint: "Precisam de acompanhamento", color: "text-violet-300 bg-violet-400/10" },
-    { l: "Status do atendente", v: botAtivo ? "Ativo" : "Pausado", i: botAtivo ? Bot : Timer, hint: "Controle no topo do painel", color: botAtivo ? "text-emerald-300 bg-emerald-400/10" : "text-amber-300 bg-amber-400/10" },
+    { l: "Conversas registradas", v: conversas.length, i: MessageCircle, hint: "Histórico salvo neste navegador", color: "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" },
+    { l: "Clientes atendidos", v: clientesUnicos, i: Users, hint: "Clientes no histórico", color: "text-cyan-300 bg-cyan-400/10 light:text-cyan-800 light:bg-cyan-50" },
+    { l: "Atendimentos pela IA", v: conversas.filter((c) => c.status === "ia").length, i: Bot, hint: "Conversas acompanhadas pelo bot", color: "text-sky-300 bg-sky-400/10 light:text-sky-800 light:bg-sky-50" },
+    { l: "Atendimentos humanos", v: conversas.filter((c) => c.status === "humano").length, i: Users, hint: "Precisam de acompanhamento", color: "text-violet-300 bg-violet-400/10 light:text-violet-800 light:bg-violet-50" },
+    { l: "Status do atendente", v: botAtivo ? "Ativo" : "Pausado", i: botAtivo ? Bot : Timer, hint: "Controle no topo do painel", color: botAtivo ? "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" : "text-amber-300 bg-amber-400/10 light:text-amber-800 light:bg-amber-50" },
   ];
   const atalhos = [
     { to: "/empresas", label: "Cadastrar empresa", desc: "Gerencie seus negócios", icon: Building2, color: "bg-sky-500/10 text-sky-600" },
     { to: "/produtos", label: "Adicionar produtos", desc: "Atualize preços e descrições", icon: Package, color: "bg-violet-500/10 text-violet-600" },
     { to: "/horarios", label: "Configurar horários", desc: "Informe quando abre e fecha", icon: Clock3, color: "bg-amber-500/10 text-amber-600" },
-    { to: "/perguntas", label: "Perguntas frequentes", desc: "Cadastre respostas para a IA", icon: CircleHelp, color: "bg-amber-500/15 text-amber-300" },
-    { to: "/atendente", label: "Atendente virtual", desc: "Personalize o comportamento da IA", icon: Bot, color: "bg-emerald-500/15 text-emerald-300" },
+    { to: "/perguntas", label: "Perguntas frequentes", desc: "Cadastre respostas para a IA", icon: CircleHelp, color: "bg-amber-500/15 text-amber-300 light:bg-amber-50 light:text-amber-800" },
+    { to: "/atendente", label: "Atendente virtual", desc: "Personalize o comportamento da IA", icon: Bot, color: "bg-emerald-500/15 text-emerald-300 light:bg-emerald-50 light:text-emerald-800" },
   ];
   return (<>
     <PageHeader title="Visão geral" desc="Acompanhe o desempenho do atendimento da sua empresa." />
@@ -77,10 +77,10 @@ function Painel() {
     <section className="mt-5">
       <div className="mb-2 flex items-center gap-2"><Zap className="h-4 w-4 text-primary" /><h2 className="font-display text-base font-bold">Acesso rápido</h2></div>
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-        {atalhos.map(({ to, label, icon: Icon, color }) => <Link key={to} to={to} className="group flex min-w-0 items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 shadow-soft transition-all hover:border-emerald-400/40 hover:bg-white/[0.05]">
+        {atalhos.map(({ to, label, icon: Icon, color }) => <Link key={to} to={to} className="group flex min-w-0 items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 shadow-soft transition-all hover:border-emerald-400/40 hover:bg-white/[0.05] light:border-slate-200 light:bg-white light:hover:border-emerald-500/40 light:hover:bg-emerald-50">
           <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg", color)}><Icon className="h-4 w-4" /></span>
           <span className="min-w-0 flex-1 truncate text-xs font-semibold">{label}</span>
-          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition group-hover:text-emerald-300" />
+          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition group-hover:text-emerald-300 light:group-hover:text-emerald-700" />
         </Link>)}
       </div>
     </section>
