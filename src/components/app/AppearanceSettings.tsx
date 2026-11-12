@@ -19,12 +19,16 @@ export function applyAppearance(settings: Appearance) {
   const color = colors.some(c => c.value === settings.color) ? settings.color : defaultAppearance.color;
   const size = Math.max(85, Math.min(125, Number(settings.fontSize) || 100));
   const font = fonts.includes(settings.font as typeof fonts[number]) ? settings.font : defaultAppearance.font;
+  root.dataset.zyonAccent = "custom";
+  root.style.setProperty("--zyon-accent", color);
   root.style.setProperty("--primary", color);
   root.style.setProperty("--sidebar-primary", color);
   root.style.setProperty("--ring", color);
   root.style.setProperty("--chart-1", color);
   root.style.setProperty("font-size", size + "%");
+  root.style.setProperty("--zyon-font", '"' + font + '", system-ui, sans-serif');
   root.style.setProperty("--font-sans", '"' + font + '", system-ui, sans-serif');
+  root.style.setProperty("--font-display", '"' + font + '", system-ui, sans-serif');
 }
 export function loadAppearance(): Appearance {
   try {
