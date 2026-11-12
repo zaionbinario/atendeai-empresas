@@ -169,19 +169,27 @@ function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: st
     const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
     return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
   }
-  // Cumprimento dirigido ao atendente pelo nome, inclusive com letras prolongadas.
-  const nomeAtendente = normalizarCumprimento(ctx.instrucoes.nomeAtendente || "");
-  const nomeBase = nomeAtendente.split(" ")[0] || "";
-  const palavras = t.split(" ");
-  const inicioSaudacao = /^(?:oi|ola|opa|alo|hey|salve|fala|bom dia|boa tarde|boa noite|e ai)$/;
-  if (nomeBase.length >= 2 && palavras.length >= 2) {
-    const vocativoFinal = palavras[palavras.length - 1] || "";
-    const prefixo = palavras.slice(0, -1).join(" ");
-    const nomeAlongado = new RegExp("^" + [...nomeBase].filter((letra) => /[a-z]/.test(letra)).map((letra) => letra + "+").join("") + "$");
-    if (inicioSaudacao.test(prefixo) && nomeAlongado.test(vocativoFinal)) {
-      const empresa = ctx.nomeEmpresa?.trim();
-      return "Olá, tudo bem? 😊 " + (empresa ? "Aqui é da " + empresa + ". " : "") + "Como posso te ajudar?";
+  // Saudações com o nome do atendente e uma pergunta social no final.
+  // Ex.: "Oiii Dudaaaa, tudo certinho?" — mas não engole pedidos como "Oi Duda, tem ração?".
+  const nomeAtendente = normalizarCumprimento(ctx.instrucoes.nomeAtendente || "").split(" ")[0] || "";
+  const prefixos = ["bom dia", "boa tarde", "boa noite", "e ai", "fala ai", "oi", "ola", "opa", "alo", "hey", "salve", "fala"];
+  const inicio = prefixos.find((p) => t === p || t.startsWith(p + " "));
+  if (inicio && nomeAtendente.length >= 2) {
+    const resto = t.slice(inicio.length).trim();
+    const nomeRegex = new RegExp("^" + [...nomeAtendente].filter((letra) => /[a-z]/.test(letra)).map((letra) => letra + "+").join("") + "(?:\\s+|$)");
+    const comNome = nomeRegex.test(resto + " ");
+    if (comNome) {
+      const depoisNome = resto.replace(nomeRegex, "").trim();
+      const social = /^(?:tudo (?:bem|bom|certinho|certo|tranquilo|na paz)|como (?:vai|voce esta)|ta (?:bem|tudo bem)|beleza|suave|de boa|na paz|tranquilo|blz)?$/;
+      if (social.test(depoisNome)) {
+        const empresa = ctx.nomeEmpresa?.trim();
+        return "Olá, tudo bem? 😊 " + (empresa ? "Aqui é da " + empresa + ". " : "") + "Como posso te ajudar?";
+      }
     }
+  }
+  // Cumprimentos informais sem o nome do atendente.
+  if (/^(?:oi|ola|opa|e ai|bom dia|boa tarde|boa noite|salve|fala)(?:\\s+(?:meu|minha|amigo|amiga|mano|mana|cara|chefe|rei|rainha|parceiro|parceira|colega|chapa))*(?:\\s+tudo (?:bem|bom|certinho|certo|tranquilo|na paz))?$/.test(t)) {
+    return "Olá, tudo bem? 😊 " + (ctx.nomeEmpresa ? "Aqui é da " + ctx.nomeEmpresa + ". " : "") + "Como posso te ajudar?";
   }
   // Confirmações isoladas não são pedidos e não devem transferir para humano.
   if (/^(?:ok|okay|okey|okie|okk|blz|beleza|entendi|entendido|certo|certinho|ta bom|tudo bem|show|fechou|combinado|perfeito|tranquilo|suave|demorou|pode crer|saquei|tendi|joia|massa|top|sim|aham|uhum|hum|hmm|ta|esta bem|de boa)(?:\s+(?:obrigado|obrigada|valeu|entao|beleza|show|mano|cara|amigo|amiga))*$/.test(t)) {
