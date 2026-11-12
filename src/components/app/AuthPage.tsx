@@ -9,6 +9,7 @@ const errors: Record<string, string> = {
   "Email not confirmed": "Confirme seu e-mail antes de entrar.",
   "User already registered": "Já existe uma conta com este e-mail.",
   "Password should be at least 6 characters": "Sua senha é muito curta.",
+  "email rate limit exceeded": "O serviço de e-mail atingiu o limite de envios. Aguarde antes de tentar novamente. Se persistir, o administrador precisa configurar SMTP no Supabase.",
 };
 export function AuthPage({ mode }: { mode: Mode }) {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
   const titulo = mode === "cadastro" ? "Crie sua conta" : mode === "recuperar" ? "Recuperar senha" : "Bem-vindo de volta";
   async function enviar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (enviando) return;
     setErro(""); setSucesso("");
     if (!supabase) { setErro("Autenticação ainda não configurada. Configure as variáveis do Supabase."); return; }
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setErro("Informe um e-mail válido."); return; }
@@ -47,7 +49,8 @@ export function AuthPage({ mode }: { mode: Mode }) {
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Não foi possível concluir a operação.";
-      setErro(mode === "cadastro" && (msg === "User already registered" || msg.toLowerCase().includes("already registered")) ? "Este e-mail pode já ter uma conta. Tente entrar ou recuperar sua senha." : (errors[msg] || msg));
+      const rateLimited = /rate.limit|too.many.requests|429/i.test(msg);
+      setErro(rateLimited ? "Limite de envio de e-mails atingido. Aguarde antes de tentar novamente. Se persistir, o administrador deve configurar SMTP no Supabase." : mode === "cadastro" && (msg === "User already registered" || msg.toLowerCase().includes("already registered")) ? "Este e-mail pode já ter uma conta. Tente entrar ou recuperar sua senha." : (errors[msg] || msg));
     } finally { setEnviando(false); }
   }
   return <main className="min-h-screen bg-[#071310] text-white flex items-center justify-center p-4 sm:p-8">
