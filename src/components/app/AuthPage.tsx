@@ -4,6 +4,7 @@ import { Bot, Eye, EyeOff, LockKeyhole, Mail, UserRound, ArrowRight } from "luci
 import { authConfigured, supabase } from "@/lib/auth-client";
 
 type Mode = "login" | "cadastro" | "recuperar";
+const validarSenha = (valor: string) => valor.length >= 6 && /[a-z]/.test(valor) && /[^A-Za-z0-9]/.test(valor);
 const errors: Record<string, string> = {
   "Invalid login credentials": "E-mail ou senha incorretos.",
   "Email not confirmed": "Confirme seu e-mail antes de entrar.",
@@ -29,7 +30,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
     if (!supabase) { setErro("Autenticação ainda não configurada. Configure as variáveis do Supabase."); return; }
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setErro("Informe um e-mail válido."); return; }
     if (mode === "cadastro" && nome.trim().length < 3) { setErro("Informe seu nome completo."); return; }
-    if (mode !== "recuperar" && senha.length < 8) { setErro("A senha deve ter pelo menos 8 caracteres."); return; }
+    if (mode === "cadastro" && !validarSenha(senha)) { setErro("A senha precisa ter no mínimo 6 caracteres, uma letra minúscula e um caractere especial."); return; }
     if (mode === "cadastro" && senha !== confirmacao) { setErro("As senhas não coincidem."); return; }
     setEnviando(true);
     try {
@@ -63,8 +64,9 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <form onSubmit={enviar} className="space-y-4">
         {mode === "cadastro" && <label className="block text-sm font-medium">Nome completo<div className="relative mt-2"><UserRound className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input autoComplete="name" required minLength={3} value={nome} onChange={e=>setNome(e.target.value)} placeholder="Seu nome completo" className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-3 outline-none focus:border-emerald-400"/></div></label>}
         <label className="block text-sm font-medium">E-mail<div className="relative mt-2"><Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@empresa.com" className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-3 outline-none focus:border-emerald-400"/></div></label>
-        {mode !== "recuperar" && <label className="block text-sm font-medium">Senha<div className="relative mt-2"><LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input type={mostrar ? "text" : "password"} autoComplete={mode === "cadastro" ? "new-password" : "current-password"} required minLength={8} value={senha} onChange={e=>setSenha(e.target.value)} placeholder="Mínimo de 8 caracteres" className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-12 outline-none focus:border-emerald-400"/><button type="button" onClick={()=>setMostrar(!mostrar)} aria-label={mostrar?"Ocultar senha":"Mostrar senha"} className="absolute right-3 top-3 text-slate-400">{mostrar?<EyeOff className="h-5 w-5"/>:<Eye className="h-5 w-5"/>}</button></div></label>}
-        {mode === "cadastro" && <label className="block text-sm font-medium">Confirmar senha<input type={mostrar?"text":"password"} autoComplete="new-password" required minLength={8} value={confirmacao} onChange={e=>setConfirmacao(e.target.value)} placeholder="Repita sua senha" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 outline-none focus:border-emerald-400"/></label>}
+        {mode !== "recuperar" && <label className="block text-sm font-medium">Senha<div className="relative mt-2"><LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input type={mostrar ? "text" : "password"} autoComplete={mode === "cadastro" ? "new-password" : "current-password"} required minLength={mode === "cadastro" ? 6 : undefined} value={senha} onChange={e=>setSenha(e.target.value)} placeholder={mode === "cadastro" ? "Mínimo 6, minúscula e símbolo" : "Sua senha"} className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-12 outline-none focus:border-emerald-400"/><button type="button" onClick={()=>setMostrar(!mostrar)} aria-label={mostrar?"Ocultar senha":"Mostrar senha"} className="absolute right-3 top-3 text-slate-400">{mostrar?<EyeOff className="h-5 w-5"/>:<Eye className="h-5 w-5"/>}</button></div></label>}
+        {mode === "cadastro" && <p className="text-xs text-slate-400">Use pelo menos 6 caracteres, uma letra minúscula (a-z) e um símbolo (ex.: @, # ou !).</p>}
+        {mode === "cadastro" && <label className="block text-sm font-medium">Confirmar senha<input type={mostrar?"text":"password"} autoComplete="new-password" required minLength={6} value={confirmacao} onChange={e=>setConfirmacao(e.target.value)} placeholder="Repita sua senha" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 outline-none focus:border-emerald-400"/></label>}
         {erro && <p role="alert" className="rounded-xl bg-red-500/10 p-3 text-sm text-red-300">{erro}</p>}
         {sucesso && <p role="status" className="rounded-xl bg-emerald-500/10 p-3 text-sm text-emerald-300">{sucesso}</p>}
         {mode === "cadastro" && (sucesso || erro.toLowerCase().includes("já ter uma conta")) && <div className="flex flex-wrap gap-4 text-sm"><Link to="/login" className="font-semibold text-emerald-300 underline">Fazer login</Link><Link to="/recuperar-senha" className="text-emerald-300 underline">Esqueci minha senha</Link></div>}
