@@ -187,3 +187,30 @@
     color: var(--color-foreground);
   }
 }
+
+/* Aparência global: respeita a cor selecionada até nos componentes legados
+   que ainda usam classes emerald fixas. Mantém fundos neutros para legibilidade. */
+html[data-zyon-accent="custom"] body {
+  font-family: var(--zyon-font, "Figtree", system-ui, sans-serif);
+}
+html[data-zyon-accent="custom"] .font-display {
+  font-family: var(--zyon-font, "Outfit", system-ui, sans-serif);
+}
+html[data-zyon-accent="custom"] [class*="text-emerald-"] {
+  color: var(--zyon-accent) !important;
+}
+html[data-zyon-accent="custom"] [class*="bg-emerald-"] {
+  background-color: color-mix(in oklch, var(--zyon-accent) 16%, transparent) !important;
+}
+html[data-zyon-accent="custom"] [class*="border-emerald-"] {
+  border-color: color-mix(in oklch, var(--zyon-accent) 35%, transparent) !important;
+}
+html[data-zyon-accent="custom"] [class*="shadow-emerald-"] {
+  --tw-shadow-color: color-mix(in oklch, var(--zyon-accent) 25%, transparent);
+}
+html[data-zyon-accent="custom"] [class*="from-emerald-"] {
+  --tw-gradient-from: color-mix(in oklch, var(--zyon-accent) 16%, transparent);
+}
+html[data-zyon-accent="custom"] [class*="hover\\:bg-emerald-"]:hover {
+  background-color: color-mix(in oklch, var(--zyon-accent) 24%, transparent) !important;
+}
