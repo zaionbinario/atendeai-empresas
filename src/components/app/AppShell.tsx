@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const side = (
     <nav className="flex flex-col gap-1" aria-label="Navegação principal">
       {nav.map(({ to, label, icon: Icon }) => (
-        <Link key={to} to={to} onClick={() => setOpen(false)}
+        <Link key={to} to={to} preload="intent" preloadDelay={50} onClick={() => setOpen(false)}
           className={cn("group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all",
             path === to ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300 shadow-[0_0_22px_-12px_rgba(16,185,129,.8)] light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "text-slate-400 hover:bg-white/5 hover:text-white light:text-slate-600 light:hover:bg-slate-100 light:hover:text-slate-900")}>
           <Icon className="h-[19px] w-[19px] shrink-0" />
