@@ -140,13 +140,11 @@ function normalizarCumprimento(texto: string): string {
 
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
   const t = normalizarCumprimento(texto);
-  // Vocativos não são saudações por si só: "mano", "cara", "xará" etc.
-  const vocativo = "(?:mano|mana|cara|xara|amigo|amiga|irmao|irma|parceiro|parceira|chefe|meu querido|minha querida)";
+  // Reconhece saudações seguidas de vocativos, sem tratar "mano" sozinho como cumprimento.
   const cumprimento = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
-  const prefixo = "(?:(?:" + cumprimento + ")\\s*)+";
-  const complemento = "(?:(?:" + vocativo + "|com voce|e voce|por ai)\\s*)*";
-  const somenteCumprimento = new RegExp("^" + prefixo + complemento + "$").test(t);
-  if (somenteCumprimento) {
+  const vocativo = "(?:mano|mana|cara|xara|amigo|amiga|colega|chapa|irmao|irma|parceiro|parceira|chefe|rei|rainha|mamae|papai|patrao|patroa|campeao|campea|querido|querida|mestre|jovem|pessoal|gente|meu|minha|seu|sua|com voce|e voce|por ai)";
+  const soCumprimento = new RegExp("^(?:" + cumprimento + ")(?:\\s+(?:" + cumprimento + "|" + vocativo + "))*$").test(t);
+  if (soCumprimento) {
     const nome = ctx.nomeEmpresa?.trim();
     const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
     return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
