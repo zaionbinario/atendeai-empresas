@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
+  useRouterState,
+  Navigate,
   Link,
   createRootRouteWithContext,
   useRouter,
@@ -13,6 +15,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { AppShell } from "../components/app/AppShell";
 import { StoreProvider } from "../lib/store";
+import { AuthProvider, useAuth } from "../lib/auth-context";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -123,18 +126,27 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function ProtectedContent() {
+  const path = useRouterState({ select: s => s.location.pathname });
+  const { session, loading } = useAuth();
+  const publicRoute = ["/login", "/cadastro", "/recuperar-senha", "/redefinir-senha"].includes(path);
+  if (loading) return <main className="flex min-h-screen items-center justify-center bg-[#071310] text-emerald-300">Carregando sessão...</main>;
+  if (publicRoute) {
+    if (session && path !== "/redefinir-senha") return <Navigate to="/" replace />;
+    return <Outlet />;
+  }
+  if (!session) return <Navigate to="/login" replace />;
+  return <StoreProvider><AppShell><Outlet /></AppShell></StoreProvider>;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <StoreProvider>
-        <AppShell>
-          <Outlet />
-        </AppShell>
+      <AuthProvider>
+        <ProtectedContent />
         <Toaster richColors position="top-center" />
-      </StoreProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
