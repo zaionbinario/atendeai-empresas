@@ -160,39 +160,47 @@ function normalizarVocativos(texto: string): string {
 
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
   const t = normalizarVocativos(normalizarCumprimento(texto));
-  // Reconhece saudações seguidas de vocativos, sem tratar "mano" sozinho como cumprimento.
-  const cumprimento = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
-  const vocativo = "(?:mano|mana|cara|xara|amigo|amiga|colega|chapa|irmao|irma|parceiro|parceira|chefe|rei|rainha|mamae|papai|patrao|patroa|campeao|campea|querido|querida|mestre|jovem|pessoal|gente|meu|minha|seu|sua|com voce|e voce|por ai)";
-  const soCumprimento = new RegExp("^(?:" + cumprimento + ")(?:\\s+(?:" + cumprimento + "|" + vocativo + "))*$").test(t);
-  if (soCumprimento) {
-    const nome = ctx.nomeEmpresa?.trim();
-    const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
-    return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
-  }
-  // Saudações com o nome do atendente e uma pergunta social no final.
-  // Ex.: "Oiii Dudaaaa, tudo certinho?" — mas não engole pedidos como "Oi Duda, tem ração?".
+  const resposta = () => "Olá, tudo bem? 😊 " + (ctx.nomeEmpresa?.trim() ? "Aqui é da " + ctx.nomeEmpresa.trim() + ". " : "") + "Como posso te ajudar?";
+
+  // A frase pode conter uma saudação, vocativo e pergunta social, em qualquer combinação.
+  const prefixos = ["bom dia", "boa tarde", "boa noite", "e ai", "fala ai", "oi", "ola", "opa", "alo", "hey", "salve", "fala", "tudo bem", "tudo bom"];
+  const sociais = [
+    "tudo bem", "tudo bom", "tudo certo", "tudo certinho", "tudo tranquilo",
+    "tudo na paz", "como vai", "como voce esta", "ta bem", "ta tudo bem",
+    "suave", "de boa", "na paz", "tranquilo", "tranquila", "beleza", "blz",
+    "firmeza", "tudo firme", "como ta", "como c ta",
+  ];
+  const vocativos = new Set([
+    "meu", "minha", "seu", "sua", "mano", "mana", "cara", "xara", "amigo",
+    "amiga", "colega", "chapa", "irmao", "irma", "parceiro", "parceira",
+    "chefe", "rei", "rainha", "mamae", "papai", "patrao", "patroa",
+    "campeao", "campea", "querido", "querida", "mestre", "jovem", "pessoal",
+    "gente", "bro", "brother", "parca", "parceira", "meu querido",
+  ]);
   const nomeAtendente = normalizarCumprimento(ctx.instrucoes.nomeAtendente || "").split(" ")[0] || "";
-  const prefixos = ["bom dia", "boa tarde", "boa noite", "e ai", "fala ai", "oi", "ola", "opa", "alo", "hey", "salve", "fala"];
-  const inicio = prefixos.find((p) => t === p || t.startsWith(p + " "));
-  if (inicio && nomeAtendente.length >= 2) {
-    const resto = t.slice(inicio.length).trim();
-    const nomeRegex = new RegExp("^" + [...nomeAtendente].filter((letra) => /[a-z]/.test(letra)).map((letra) => letra + "+").join("") + "(?:\\s+|$)");
-    const comNome = nomeRegex.test(resto + " ");
-    if (comNome) {
-      const depoisNome = resto.replace(nomeRegex, "").trim();
-      const social = /^(?:tudo (?:bem|bom|certinho|certo|tranquilo|na paz)|como (?:vai|voce esta)|ta (?:bem|tudo bem)|beleza|suave|de boa|na paz|tranquilo|blz)?$/;
-      if (social.test(depoisNome)) {
-        const empresa = ctx.nomeEmpresa?.trim();
-        return "Olá, tudo bem? 😊 " + (empresa ? "Aqui é da " + empresa + ". " : "") + "Como posso te ajudar?";
-      }
+  const nomeAlongado = nomeAtendente.length >= 2
+    ? new RegExp("^" + [...nomeAtendente].filter((letra) => /[a-z]/.test(letra)).map((letra) => letra + "+").join("") + "$")
+    : null;
+  const removerInicio = (frase: string, expressoes: string[]): string => {
+    const encontrada = [...expressoes].sort((a, b) => b.length - a.length).find((p) => frase === p || frase.startsWith(p + " "));
+    return encontrada ? frase.slice(encontrada.length).trim() : frase;
+  };
+  const temSaudacao = prefixos.some((p) => t === p || t.startsWith(p + " "));
+  if (temSaudacao) {
+    let resto = removerInicio(t, prefixos);
+    // Remove apenas vocativos conhecidos; se houver pedido real, ele permanece.
+    for (let i = 0; i < 8 && resto; i++) {
+      const palavra = resto.split(" ")[0];
+      if (vocativos.has(palavra) || (nomeAlongado && nomeAlongado.test(palavra))) {
+        resto = resto.slice(palavra.length).trim();
+      } else break;
     }
+    if (!resto || sociais.includes(resto)) return resposta();
   }
-  // Cumprimentos informais sem o nome do atendente.
-  if (/^(?:oi|ola|opa|e ai|bom dia|boa tarde|boa noite|salve|fala)(?:\\s+(?:meu|minha|amigo|amiga|mano|mana|cara|chefe|rei|rainha|parceiro|parceira|colega|chapa))*(?:\\s+tudo (?:bem|bom|certinho|certo|tranquilo|na paz))?$/.test(t)) {
-    return "Olá, tudo bem? 😊 " + (ctx.nomeEmpresa ? "Aqui é da " + ctx.nomeEmpresa + ". " : "") + "Como posso te ajudar?";
-  }
-  // Confirmações isoladas não são pedidos e não devem transferir para humano.
-  if (/^(?:ok|okay|okey|okie|okk|blz|beleza|entendi|entendido|certo|certinho|ta bom|tudo bem|show|fechou|combinado|perfeito|tranquilo|suave|demorou|pode crer|saquei|tendi|joia|massa|top|sim|aham|uhum|hum|hmm|ta|esta bem|de boa)(?:\s+(?:obrigado|obrigada|valeu|entao|beleza|show|mano|cara|amigo|amiga))*$/.test(t)) {
+  if (sociais.includes(t)) return resposta();
+
+  // Confirmações isoladas não devem chamar atendente.
+  if (/^(?:ok|okay|okey|okie|okk|blz|beleza|entendi|entendido|certo|certinho|ta bom|show|fechou|combinado|perfeito|tranquilo|suave|demorou|pode crer|saquei|tendi|joia|massa|top|sim|aham|uhum|hum|hmm|ta|esta bem|de boa)(?:\s+(?:obrigado|obrigada|valeu|entao|beleza|show|mano|cara|amigo|amiga))*$/.test(t)) {
     return "Perfeito! 😊 Se precisar de mais alguma coisa, estou à disposição.";
   }
   if (/^(obrigado|obrigada|valeu|agradeco)( |$)/.test(t)) return "Por nada! 😊 Se precisar de mais alguma coisa, é só chamar.";
