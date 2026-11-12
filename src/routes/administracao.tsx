@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { Building2, CheckCircle2, CirclePause, Pencil, Plus, Search, ShieldAlert, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -107,7 +107,6 @@ function PainelAdministracao() {
             <h2 className="flex items-center gap-2 font-display text-lg font-bold"><Building2 className="h-5 w-5 text-primary" /> Empresas cadastradas</h2>
             <p className="text-xs text-muted-foreground">Altere os dados, ative ou desative empresas e exclua cadastros quando necessário.</p>
           </div>
-          <Link to="/empresas" className="text-sm font-semibold text-primary hover:underline">Ver aba Empresas</Link>
         </div>
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_170px]">
           <label className="relative block">
