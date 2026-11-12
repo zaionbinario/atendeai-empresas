@@ -18,11 +18,21 @@ const sugestoes = ["Qual o horário?", "Vocês fazem entrega?", "Quanto custa o 
 
 function Simulador() {
   const store = useStore();
-  const { conversas, setConversas, botAtivo, respostasRapidas } = store;
+  const { conversas, setConversas, botAtivo, respostasRapidas, empresaSelecionadaId, setEmpresaSelecionadaId } = store;
+  const empresa = store.empresas.find((e) => e.id === empresaSelecionadaId) ?? store.empresas[0];
+  const instrucoes = empresa ? (store.instrucoesPorEmpresa[empresa.id] ?? {
+    nomeAtendente: "Atendente virtual",
+    tom: "amigavel" as const,
+    boasVindas: "Olá! Sou o atendente virtual da " + empresa.nome + ". Como posso ajudar? 😊",
+    regras: "",
+    transferirHumano: true,
+  }) : store.instrucoes;
+  const contexto = { ...store, empresas: empresa ? [empresa] : [], instrucoes };
+  const idConversa = empresa ? "simulador-" + empresa.id : "simulador";
   const [texto, setTexto] = useState("");
   const fim = useRef<HTMLDivElement>(null);
-  const conversa = conversas.find((c) => c.id === "simulador");
-  const boasVindas = (): Mensagem => ({ id: "boas-vindas", de: "bot", texto: store.instrucoes.boasVindas, hora: agora() });
+  const conversa = conversas.find((c) => c.id === idConversa);
+  const boasVindas = (): Mensagem => ({ id: "boas-vindas", de: "bot", texto: instrucoes.boasVindas, hora: agora() });
   const msgs = conversa?.mensagens.length ? conversa.mensagens : [boasVindas()];
   const humanoAssumiu = conversa?.status === "humano";
 
@@ -36,15 +46,15 @@ function Simulador() {
 
     // Sem atraso artificial: não existe resposta pendente capaz de ignorar uma transferência.
     setConversas((anteriores) => {
-      const atual = anteriores.find((c) => c.id === "simulador");
+      const atual = anteriores.find((c) => c.id === idConversa);
       const historico = atual?.mensagens.length ? atual.mensagens : [boasVindas()];
       const iaAtivaAqui = iaPodeResponder(botAtivo, atual);
       const novasMensagens: Mensagem[] = [...historico, clienteMsg];
 
       let transferidoPelaIa = false;
       if (iaAtivaAqui) {
-        const resposta = responder(pergunta, store, historico.slice(-8).map((m) => m.texto));
-        transferidoPelaIa = store.instrucoes.transferirHumano && respostaSolicitaHumano(resposta);
+        const resposta = responder(pergunta, contexto, historico.slice(-8).map((m) => m.texto));
+        transferidoPelaIa = instrucoes.transferirHumano && respostaSolicitaHumano(resposta);
         novasMensagens.push({
           id: novoId(),
           de: "bot",
@@ -61,7 +71,7 @@ function Simulador() {
       }
 
       const novaConversa = {
-        id: "simulador",
+        id: idConversa,
         cliente: "Cliente do simulador",
         ultimaMensagem: pergunta,
         atualizadaEm: agora(),
@@ -69,13 +79,13 @@ function Simulador() {
         status: iaAtivaAqui && !transferidoPelaIa ? "ia" as const : "humano" as const,
         mensagens: novasMensagens,
       };
-      return [novaConversa, ...anteriores.filter((c) => c.id !== "simulador")];
+      return [novaConversa, ...anteriores.filter((c) => c.id !== idConversa)];
     });
     setTexto("");
   };
   const reiniciar = () => {
     setConversas((anteriores) => anteriores.map((c) =>
-      c.id === "simulador" ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "" } : c
+      c.id === idConversa ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "" } : c
     ));
     setTexto("");
   };
@@ -85,11 +95,17 @@ function Simulador() {
       <PageHeader title="Simulador de conversa" desc="Teste o atendente virtual em uma conversa de demonstração." action={
         <Btn type="button" variant="ghost" onClick={reiniciar}><RotateCcw className="h-4 w-4" />Reiniciar</Btn>
       } />
+      <div className="mx-auto mb-3 max-w-md">
+        <label htmlFor="empresa-simulador" className="mb-1 block text-sm font-medium">Empresa em teste</label>
+        <select id="empresa-simulador" className="w-full rounded-xl border bg-card px-3 py-2 text-foreground" value={empresa?.id ?? ""} onChange={(e) => setEmpresaSelecionadaId(e.target.value)}>
+          {store.empresas.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
+        </select>
+      </div>
       <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-xl">
         <div className="flex items-center gap-3 bg-wa-header p-3 text-wa-header-foreground">
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-wa-header-foreground/20 font-bold">{store.instrucoes.nomeAtendente[0]}</div>
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-wa-header-foreground/20 font-bold">{instrucoes.nomeAtendente[0]}</div>
           <div>
-            <p className="font-semibold">{store.instrucoes.nomeAtendente} · {store.empresas[0]?.nome}</p>
+            <p className="font-semibold">{instrucoes.nomeAtendente} · {empresa?.nome}</p>
             <p className="text-xs opacity-80">
               {humanoAssumiu ? "Atendimento humano — IA pausada aqui" : !botAtivo ? "atendimento automático pausado" : "IA disponível"}
             </p>
