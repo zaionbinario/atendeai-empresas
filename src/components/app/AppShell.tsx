@@ -4,6 +4,7 @@ import { LayoutDashboard, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, 
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
+import { applyAppearance, loadAppearance } from "./AppearanceSettings";
 import { SiteSearch } from "./SiteSearch";
 import { supabase } from "@/lib/auth-client";
 import { LogOut } from "lucide-react";
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [suporteAberto, setSuporteAberto] = useState(false);
   const [temaClaro, setTemaClaro] = useState(false);
   const { botAtivo, setBotAtivo, conversas } = useStore();
+  useEffect(() => { applyAppearance(loadAppearance()); }, []);
   const pendentes = conversas.filter((c) => c.aguardandoHumano === true).length;
   useEffect(() => {
     let claro = false;
