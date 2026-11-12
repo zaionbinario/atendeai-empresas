@@ -205,16 +205,21 @@ const ITENS = [
   { re: /\b(corte de cabelo|barba|degrade)\b/, ramo: 1 },
   { re: /\b(racao|coleira|banho e tosa)\b/, ramo: 3 },
 ];
-function respostaProdutoNaoCadastrado(texto: string, empresas?: { nome: string; segmento?: string }[]): string | null {
+const RESPOSTA_PRODUTO_AUSENTE = "Não achei esse produto cadastrado aqui nos produtos. Vou chamar alguém para verificar a disponibilidade.";
+
+function respostaProdutoNaoCadastrado(texto: string): string | null {
   const t = norm(texto);
-  if (!/\b(vende|vendem|tem|teria|trabalha|trabalham|oferece|oferecem|comprar|preco|valor|custa|quanto)\b/.test(t)) return null;
-  const item = ITENS.find((i) => i.re.test(t));
-  if (!item) return null;
-  const empresa = empresas?.[0];
-  const nome = empresa?.nome || "Nosso estabelecimento";
-  const ramo = RAMOS.findIndex((r) => r.re.test(norm((empresa?.segmento || "") + " " + nome)));
-  if (ramo >= 0 && ramo !== item.ramo) return "Aqui é " + nome + ", " + RAMOS[ramo].descricao + ". 😊 Esse tipo de produto não está cadastrado aqui. Posso chamar alguém da equipe para confirmar se trabalhamos com ele.";
-  return "Aqui é " + nome + "! 😊 Não encontrei esse item entre os produtos ou serviços cadastrados. Posso chamar alguém da equipe para confirmar a disponibilidade.";
+  // Intenção de consultar um item específico, independente do segmento da empresa.
+  const consulta = /\b(?:tem|teria|teriam|vende|vendem|voces vendem|trabalham com|oferecem|possui|possuem|disponivel|estoque|preco de|preco do|preco da|quanto custa|queria comprar|gostaria de comprar)\b/.test(t);
+  if (!consulta) return null;
+  // Perguntas administrativas não são consultas de produto.
+  if (/\b(?:horario|horarios|aberto|abrem|abre|fecha|fecham|domingo|sabado|segunda|terca|quarta|quinta|sexta|entrega|delivery|endereco|localizacao|pix|cartao|pagamento|agendamento|atendimento|telefone|contato)\b/.test(t)) return null;
+  // Não interpretar "tem?" sozinho como consulta a um produto.
+  const item = t.replace(/^(?:oi|ola|e ai|opa|bom dia|boa tarde|boa noite)\s+/, "")
+    .replace(/^(?:voces?\s+)?(?:tem|teria|teriam|vende|vendem|trabalham com|oferecem|possui|possuem)\s+/, "")
+    .replace(/^(?:um|uma|uns|umas|o|a|os|as)\s+/, "").trim();
+  if (item.length < 3 || /^(?:algo|alguma coisa|produto|produtos|servico|servicos|isso|disponivel)$/.test(item)) return null;
+  return RESPOSTA_PRODUTO_AUSENTE;
 }
 
 // Identifica pedidos claramente fora do ramo sem inventar disponibilidade.
@@ -263,7 +268,7 @@ function responderBase(
   const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
 
-  const naoCadastrado = respostaProdutoNaoCadastrado(conversa, ctx.empresas);
+  const naoCadastrado = respostaProdutoNaoCadastrado(conversa);
   if (naoCadastrado) return naoCadastrado;
 
   if (/\b(cardapio|produtos?|precos?|menu|servicos?)\b/.test(t) && !/\b(se|voces|vcs|tem|oferecem|fazem|vendem)\b/.test(t)) {
