@@ -26,7 +26,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [temaClaro, setTemaClaro] = useState(false);
-  const { botAtivo, setBotAtivo } = useStore();
+  const { botAtivo, setBotAtivo, conversas } = useStore();
+  const pendentes = conversas.filter((c) => c.aguardandoHumano === true).length;
   useEffect(() => {
     let claro = false;
     try { claro = localStorage.getItem("zyon-chat-tema") === "claro"; }
@@ -90,6 +91,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black p-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden xl:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button>
             <button onClick={() => setBotAtivo(!botAtivo)} aria-label={botAtivo ? "Pausar bot" : "Ativar bot"} className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border p-2 text-xs font-semibold sm:px-3", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}<span className="hidden sm:inline">{botAtivo ? "Bot ativo" : "Bot pausado"}</span></button>
+            {pendentes > 0 && <Link to="/conversas" aria-label={pendentes + " conversas aguardando atendimento humano"} title="Conversas aguardando atendimento" className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/50 bg-red-500/15 px-2 py-2 text-xs font-bold text-red-300 hover:bg-red-500/25 light:text-red-700"><Users className="h-4 w-4" /><span>{pendentes}</span><span className="hidden xl:inline">Aguardando atendente</span></Link>}
             <NotificationBell />
             <div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" />
             <button className="flex shrink-0 items-center gap-2 rounded-xl p-1 text-sm text-white hover:bg-white/5 light:text-slate-900 light:hover:bg-slate-100"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden xl:block">Minha conta</span><ChevronDown className="hidden h-4 w-4 text-slate-500 sm:block" /></button>
