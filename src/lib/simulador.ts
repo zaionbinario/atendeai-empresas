@@ -276,25 +276,50 @@ function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; seg
 }
 
 // Perguntas de acompanhamento sobre o último produto mencionado pelo bot.
+function respostaProdutoPorIntencao(texto: string, produto: Produto): string {
+  const t = norm(texto);
+  const nome = produto.nome;
+  const preco = brl(produto.preco);
+  if (/\b(preco|valor|custa|custam|quanto|sai por|quanto ta)\b/.test(t)) {
+    return "A " + nome + " custa " + preco + ". 😊 Quer saber mais alguma coisa sobre ela?";
+  }
+  if (/\b(descricao|descreve|detalhes|caracteristicas|informacoes|como e|do que e feito|composicao)\b/.test(t)) {
+    return produto.descricao?.trim()
+      ? "Claro! 😊 Sobre " + nome + ": " + produto.descricao
+      : "A " + nome + " está cadastrada, mas ainda não tenho uma descrição detalhada. Posso pedir que a equipe confirme.";
+  }
+  const especie = /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(t) ? "gatos"
+    : /\b(filhote|filhotes)\b/.test(t) ? "filhotes"
+    : /\b(cao|caes|cachorro|cachorra|cachorros|canino|caninos)\b/.test(t) ? "cães" : null;
+  if (especie && /\b(serve|indicado|indicada|compativel|pode dar|pode usar|funciona|ideal|apropriado|e pra|para)\b/.test(t)) {
+    const descricao = norm(produto.descricao + " " + produto.categoria + " " + produto.nome);
+    const confirma = especie === "gatos" ? /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(descricao)
+      : especie === "filhotes" ? /\b(filhote|filhotes)\b/.test(descricao)
+      : /\b(cao|caes|cachorro|cachorros|canino|caninos)\b/.test(descricao);
+    return confirma
+      ? "Segundo o cadastro, " + nome + " é indicado para " + especie + ". 🐾 Confira também a embalagem."
+      : "Não tenho confirmação no cadastro de que " + nome + " seja indicado para " + especie + ". Vou chamar alguém da equipe para verificar.";
+  }
+  if (/\b(tem|teria|vendem|vende|disponivel|estoque|possui|possuem|trabalham com)\b/.test(t)) {
+    return "Temos sim! 😊 " + nome + " está no nosso catálogo por " + preco + ". Quer mais detalhes?";
+  }
+  return "Encontrei " + nome + " no catálogo por " + preco + ". 😊 Você quer saber o preço, a descrição ou outra informação?";
+}
+
 function responderSobreUltimoProduto(texto: string, historico: string[], produtos: Produto[]): string | null {
   const t = norm(texto);
-  const pergunta = /\b(ela|ele|esse|essa|isso|serve|indicado|indicada|compativel|pode dar|pode usar|funciona|ideal|apropriado)\b/.test(t);
-  if (!pergunta || !historico.length) return null;
+  const acompanhamento = /\b(ela|ele|esse|essa|isso|dela|dele|desse|dessa|serve|indicado|indicada|compativel|pode dar|pode usar|funciona|ideal|apropriado|descricao|detalhes|caracteristicas|preco|custa|quanto)\b/.test(t);
+  if (!acompanhamento || !historico.length) return null;
   const ultimaResposta = [...historico].reverse().find((mensagem) =>
     produtos.some((produto) => norm(mensagem).includes(norm(produto.nome)))
   );
   if (!ultimaResposta) return null;
   const produto = produtos.find((p) => norm(ultimaResposta).includes(norm(p.nome)));
   if (!produto) return null;
-  const animal = /\b(gato|gata|gatos|gatas|felino|felinos|cachorro|cachorra|cao|caes|filhote|filhotes)\b/.test(t);
-  if (animal) {
-    const especie = /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(t) ? "gatos" : /\b(filhote|filhotes)\b/.test(t) ? "filhotes" : "cães";
-    const descricao = norm(produto.descricao + " " + produto.categoria + " " + produto.nome);
-    const confirma = especie === "gatos" ? /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(descricao) : especie === "filhotes" ? /\b(filhote|filhotes)\b/.test(descricao) : /\b(cao|caes|cachorro|cachorros|canino|caninos)\b/.test(descricao);
-    if (confirma) return "Sim, o cadastro da " + produto.nome + " indica uso para " + especie + ". 🐾 Confira as orientações da embalagem antes de oferecer ao pet.";
-    return "Você está falando da " + produto.nome + ", certo? 🐾 Não tenho confirmação no cadastro de que seja indicada para " + especie + ". Vou chamar alguém da equipe para verificar.";
-  }
-  return "Você está falando de " + produto.nome + ", certo? " + (produto.descricao || "Não há mais detalhes cadastrados sobre esse produto.");
+  // Só usa o contexto se a mensagem atual não mencionar explicitamente outro produto.
+  const outro = produtos.some((p) => p.id !== produto.id && norm(t).includes(norm(p.nome)));
+  if (outro) return null;
+  return respostaProdutoPorIntencao(texto, produto);
 }
 
 function responderBase(
@@ -321,7 +346,7 @@ function responderBase(
   if (horario) return horario;
 
   const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
-  if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
+  if (prod) return respostaProdutoPorIntencao(texto, prod);
 
   const naoCadastrado = respostaProdutoNaoCadastrado(conversa);
   if (naoCadastrado) return naoCadastrado;
