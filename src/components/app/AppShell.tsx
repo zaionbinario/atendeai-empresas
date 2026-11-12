@@ -120,7 +120,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="rounded-xl border border-white/10 p-4 light:border-slate-200">
                 <div className="mb-1 flex items-center gap-2 text-sm text-slate-400 light:text-slate-600"><Phone className="h-4 w-4" /> Telefone / WhatsApp</div>
                 <p className="font-semibold">+55 (62) 98570-7123</p>
-                <a href="https://wa.me/5562985707123" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-emerald-400 hover:underline">Conversar pelo WhatsApp <ExternalLink className="h-3.5 w-3.5" /></a>
+                <a href="https://wa.me/5562985707123" target="_top" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-emerald-400 hover:underline">Conversar pelo WhatsApp <ExternalLink className="h-3.5 w-3.5" /></a>
               </div>
               <div className="rounded-xl border border-white/10 p-4 light:border-slate-200">
                 <div className="mb-1 flex items-center gap-2 text-sm text-slate-400 light:text-slate-600"><Mail className="h-4 w-4" /> E-mail</div>
