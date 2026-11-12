@@ -163,9 +163,37 @@ function inferirContexto(texto: string, historico: string[]): string {
   return texto;
 }
 
+const RAMOS = [
+  { re: /padaria|panific|aliment|confeit|cafeteria/, descricao: "uma padaria ou negócio de alimentação" },
+  { re: /barbearia|barbeiro|salao|beleza/, descricao: "uma barbearia ou salão de beleza" },
+  { re: /roupa|moda|vestuario|boutique/, descricao: "uma loja de roupas" },
+  { re: /pet|veterin|animal/, descricao: "um estabelecimento para animais" },
+  { re: /ferrament|ferragem|construc/, descricao: "uma loja de ferramentas e materiais" },
+  { re: /moveis|decoracao/, descricao: "uma loja de móveis e decoração" },
+];
+const ITENS = [
+  { re: /\b(furadeira|martelo|parafusadeira|ferramentas?)\b/, ramo: 4 },
+  { re: /\b(espelho|sofa|armario|moveis?)\b/, ramo: 5 },
+  { re: /\b(roupas?|camisetas?|calcas?|vestidos?)\b/, ramo: 2 },
+  { re: /\b(pao|paes|bolo|coxinha|salgados?)\b/, ramo: 0 },
+  { re: /\b(corte de cabelo|barba|degrade)\b/, ramo: 1 },
+  { re: /\b(racao|coleira|banho e tosa)\b/, ramo: 3 },
+];
+function respostaProdutoNaoCadastrado(texto: string, empresas?: { nome: string; segmento?: string }[]): string | null {
+  const t = norm(texto);
+  if (!/\b(vende|vendem|tem|teria|trabalha|trabalham|oferece|oferecem|comprar|preco|valor|custa|quanto)\b/.test(t)) return null;
+  const item = ITENS.find((i) => i.re.test(t));
+  if (!item) return null;
+  const empresa = empresas?.[0];
+  const nome = empresa?.nome || "Nosso estabelecimento";
+  const ramo = RAMOS.findIndex((r) => r.re.test(norm((empresa?.segmento || "") + " " + nome)));
+  if (ramo >= 0 && ramo !== item.ramo) return "Aqui é " + nome + ", " + RAMOS[ramo].descricao + ". 😊 Esse tipo de produto não está cadastrado aqui. Posso chamar alguém da equipe para confirmar se trabalhamos com ele.";
+  return "Aqui é " + nome + "! 😊 Não encontrei esse item entre os produtos ou serviços cadastrados. Posso chamar alguém da equipe para confirmar a disponibilidade.";
+}
+
 function responderBase(
   texto: string,
-  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string }[] },
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
   historico: string[] = [],
 ): string {
   const conversa = inferirContexto(texto, historico);
@@ -183,8 +211,15 @@ function responderBase(
   const prod = ctx.produtos.find((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)));
   if (prod) return `${prod.nome}: ${brl(prod.preco)}. ${prod.descricao}`;
 
+  const naoCadastrado = respostaProdutoNaoCadastrado(conversa, ctx.empresas);
+  if (naoCadastrado) return naoCadastrado;
+
   if (/(cardapio|produtos|preco|precos|menu|servicos|servico)/.test(t)) {
-    if (!ctx.produtos.length) return "Ainda não tenho produtos ou serviços cadastrados. Posso chamar alguém da equipe para te ajudar. 🙋";
+    if (!ctx.produtos.length) {
+      const empresa = ctx.empresas?.[0];
+      const ramo = RAMOS.find((r) => r.re.test(norm((empresa?.segmento || "") + " " + (empresa?.nome || ""))));
+      return (empresa?.nome || "Nossa empresa") + " é " + (ramo?.descricao || "um estabelecimento comercial") + ". 😊 Ainda não temos produtos ou serviços cadastrados para informar com segurança. Posso chamar alguém da equipe.";
+    }
     const lista = ctx.produtos.map((p) => `• ${p.nome} — ${brl(p.preco)}`).join("\n");
     return `Claro! Aqui estão algumas opções:\n${lista}\n\nQuer saber mais sobre algum deles?`;
   }
@@ -203,7 +238,7 @@ function responderBase(
 
 export function responder(
   texto: string,
-  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string }[] },
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
   historico: string[] = [],
 ): string {
   let resposta = responderBase(texto, ctx, historico);
