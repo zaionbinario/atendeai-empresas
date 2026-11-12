@@ -169,6 +169,20 @@ function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: st
     const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
     return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
   }
+  // Cumprimento dirigido ao atendente pelo nome, inclusive com letras prolongadas.
+  const nomeAtendente = normalizarCumprimento(ctx.instrucoes.nomeAtendente || "");
+  const nomeBase = nomeAtendente.split(" ")[0] || "";
+  const palavras = t.split(" ");
+  const inicioSaudacao = /^(?:oi|ola|opa|alo|hey|salve|fala|bom dia|boa tarde|boa noite|e ai)$/;
+  if (nomeBase.length >= 2 && palavras.length >= 2) {
+    const vocativoFinal = palavras[palavras.length - 1] || "";
+    const prefixo = palavras.slice(0, -1).join(" ");
+    const nomeAlongado = new RegExp("^" + nomeBase.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\  // Confirmações isoladas não são pedidos e não devem transferir para humano.").split("").map((letra) => letra + "+").join("") + "$");
+    if (inicioSaudacao.test(prefixo) && nomeAlongado.test(vocativoFinal)) {
+      const empresa = ctx.nomeEmpresa?.trim();
+      return "Olá, tudo bem? 😊 " + (empresa ? "Aqui é da " + empresa + ". " : "") + "Como posso te ajudar?";
+    }
+  }
   // Confirmações isoladas não são pedidos e não devem transferir para humano.
   if (/^(?:ok|okay|okey|okie|okk|blz|beleza|entendi|entendido|certo|certinho|ta bom|tudo bem|show|fechou|combinado|perfeito|tranquilo|suave|demorou|pode crer|saquei|tendi|joia|massa|top|sim|aham|uhum|hum|hmm|ta|esta bem|de boa)(?:\s+(?:obrigado|obrigada|valeu|entao|beleza|show|mano|cara|amigo|amiga))*$/.test(t)) {
     return "Perfeito! 😊 Se precisar de mais alguma coisa, estou à disposição.";
