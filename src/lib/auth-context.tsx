@@ -11,8 +11,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted) { setSession(data.session); setLoading(false); }
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (!mounted) return;
+      if (error || !data.user) { setSession(null); setLoading(false); return; }
+      void supabase.auth.getSession().then(({ data: current }) => {
+        if (mounted) { setSession(current.session?.user.id === data.user.id ? current.session : null); setLoading(false); }
+      }).catch(() => { if (mounted) setLoading(false); });
     }).catch(() => { if (mounted) setLoading(false); });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
       if (mounted) { setSession(next); setLoading(false); }
