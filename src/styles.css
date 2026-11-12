@@ -200,7 +200,7 @@ html[data-zyon-accent="custom"] [class*="text-emerald-"] {
   color: var(--zyon-accent) !important;
 }
 html[data-zyon-accent="custom"] [class*="bg-emerald-"] {
-  background-color: color-mix(in oklch, var(--zyon-accent) 16%, transparent) !important;
+  background-color: color-mix(in oklch, var(--zyon-accent) 22%, transparent) !important;
 }
 html[data-zyon-accent="custom"] [class*="border-emerald-"] {
   border-color: color-mix(in oklch, var(--zyon-accent) 35%, transparent) !important;
@@ -222,4 +222,26 @@ html[data-zyon-accent="custom"] header {
 }
 html[data-zyon-accent="custom"] [class*="bg-\\[\\#090f12\\]"] {
   background-color: var(--zyon-surface) !important;
+}
+
+/* Modo claro: contraste legível para componentes com cores fixas do tema escuro. */
+html.light[data-zyon-accent="custom"] [class*="text-white"]:not([class*="text-white/"]),
+html.light[data-zyon-accent="custom"] [class*="text-slate-300"],
+html.light[data-zyon-accent="custom"] [class*="text-slate-400"] {
+  color: oklch(0.29 0.025 250) !important;
+}
+html.light[data-zyon-accent="custom"] [class*="text-emerald-"] {
+  color: color-mix(in oklch, var(--zyon-accent) 78%, black) !important;
+}
+html.light[data-zyon-accent="custom"] [class*="bg-emerald-"] {
+  background-color: color-mix(in oklch, var(--zyon-accent) 12%, transparent) !important;
+}
+html.light[data-zyon-accent="custom"] [class*="border-white/"] {
+  border-color: oklch(0.82 0.012 250 / 70%) !important;
+}
+html[data-zyon-accent="custom"] aside .bg-primary {
+  background-color: var(--zyon-accent) !important;
+}
+html[data-zyon-accent="custom"] aside .bg-primary svg {
+  color: oklch(0.12 0 0) !important;
 }
