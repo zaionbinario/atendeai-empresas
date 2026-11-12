@@ -193,12 +193,12 @@ function respostaProdutoNaoCadastrado(texto: string, empresas?: { nome: string; 
 
 // Identifica pedidos claramente fora do ramo sem inventar disponibilidade.
 const ATIVIDADES_FORA_DO_RAMO = [
-  { ramo: 1, pergunta: /\b(cortam? cabelo|corta cabelo|corte de cabelo|fazem? barba|barbear|cabeleireir|degrade)\b/, resposta: "não cortamos cabelo nem fazemos serviços de barbearia" },
-  { ramo: 4, pergunta: /\b(consertam?|reparam?|vendem?|vende|tem)\s+(?:uma?\s+)?(?:furadeira|martelo|parafusadeira|ferramentas?)\b/, resposta: "não trabalhamos com ferramentas" },
-  { ramo: 2, pergunta: /\b(vendem?|vende|tem|trabalham com)\s+(?:uma?\s+)?(?:roupas?|camisetas?|calcas?|vestidos?)\b/, resposta: "não trabalhamos com roupas" },
-  { ramo: 5, pergunta: /\b(vendem?|vende|tem)\s+(?:uma?\s+)?(?:espelhos?|sofas?|armarios?|moveis?)\b/, resposta: "não trabalhamos com móveis ou decoração" },
-  { ramo: 3, pergunta: /\b(vendem?|vende|tem|fazem?)\s+(?:uma?\s+)?(?:racao|coleira|banho e tosa)\b/, resposta: "não trabalhamos com produtos ou serviços pet" },
-  { ramo: 0, pergunta: /\b(vendem?|vende|tem|fazem?)\s+(?:uma?\s+)?(?:paes?|bolos?|salgados?)\b/, resposta: "não trabalhamos com produtos de padaria" },
+  { ramo: 1, pergunta: /\b(barbearia|barbeiro|cabeleireiro|cabeleireira|cortam?\s+(?:o\s+)?cabelo|corte\s+de\s+cabelo|cortar\s+cabelo|fazem?\s+(?:a\s+)?barba|servicos?\s+de\s+barba|degrade)\b/, resposta: "não oferecemos serviços de barbearia ou corte de cabelo" },
+  { ramo: 4, pergunta: /\b(furadeiras?|martelos?|parafusadeiras?|ferramentas?|material\s+de\s+construcao)\b/, resposta: "não trabalhamos com ferramentas" },
+  { ramo: 2, pergunta: /\b(roupas?|camisetas?|calcas?|vestidos?|vestuario)\b/, resposta: "não trabalhamos com roupas" },
+  { ramo: 5, pergunta: /\b(espelhos?|sofas?|armarios?|moveis?|decoracao)\b/, resposta: "não trabalhamos com móveis ou decoração" },
+  { ramo: 3, pergunta: /\b(racao|coleiras?|banho\s+e\s+tosa|pet\s*shop)\b/, resposta: "não trabalhamos com produtos ou serviços pet" },
+  { ramo: 0, pergunta: /\b(paes?|bolos?|salgados?|padaria)\b/, resposta: "não trabalhamos com produtos de padaria" },
 ];
 function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; segmento?: string }[]; produtos: Produto[]; faqs: Faq[] }): string | null {
   const empresa = ctx.empresas?.[0];
@@ -211,7 +211,7 @@ function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; seg
   // Um cadastro explícito da empresa tem prioridade sobre suposições pelo segmento.
   if (ctx.produtos.some((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)))) return null;
   if (ctx.faqs.some((f) => norm(f.pergunta) === t)) return null;
-  return "Não, " + atividade.resposta + ". 😊 Aqui é " + empresa.nome + ", " + RAMOS[ramo].descricao + ". Posso ajudar com algo relacionado ao nosso negócio?";
+  return "Não, aqui " + atividade.resposta + ". 😊 Somos " + empresa.nome + ", " + RAMOS[ramo].descricao + ". Você gostaria de saber algo sobre nossos produtos ou serviços?";
 }
 
 function responderBase(
@@ -240,7 +240,7 @@ function responderBase(
   const naoCadastrado = respostaProdutoNaoCadastrado(conversa, ctx.empresas);
   if (naoCadastrado) return naoCadastrado;
 
-  if (/(cardapio|produtos|preco|precos|menu|servicos|servico)/.test(t)) {
+  if (/\b(cardapio|produtos?|precos?|menu|servicos?)\b/.test(t) && !/\b(se|voces|vcs|tem|oferecem|fazem|vendem)\b/.test(t)) {
     if (!ctx.produtos.length) {
       const empresa = ctx.empresas?.[0];
       const ramo = RAMOS.find((r) => r.re.test(norm((empresa?.segmento || "") + " " + (empresa?.nome || ""))));
