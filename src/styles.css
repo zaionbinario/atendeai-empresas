@@ -214,3 +214,12 @@ html[data-zyon-accent="custom"] [class*="from-emerald-"] {
 html[data-zyon-accent="custom"] [class*="hover\\:bg-emerald-"]:hover {
   background-color: color-mix(in oklch, var(--zyon-accent) 24%, transparent) !important;
 }
+
+/* Superfícies antes fixas em verde/preto acompanham o tom escolhido. */
+html[data-zyon-accent="custom"] aside,
+html[data-zyon-accent="custom"] header {
+  background-color: var(--zyon-surface) !important;
+}
+html[data-zyon-accent="custom"] [class*="bg-\\[\\#090f12\\]"] {
+  background-color: var(--zyon-surface) !important;
+}
