@@ -40,12 +40,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     setTemaClaro(claro);
     document.documentElement.classList.toggle("light", claro);
     document.documentElement.classList.toggle("dark", !claro);
+    applyAppearance(loadAppearance());
   }, []);
   const alternarTema = () => {
     const novoTemaClaro = !temaClaro;
     setTemaClaro(novoTemaClaro);
     document.documentElement.classList.toggle("light", novoTemaClaro);
     document.documentElement.classList.toggle("dark", !novoTemaClaro);
+    applyAppearance(loadAppearance());
     try { localStorage.setItem("zyon-chat-tema", novoTemaClaro ? "claro" : "escuro"); }
     catch { /* A troca visual funciona mesmo sem persistência. */ }
   };
@@ -69,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
   const logo = (
     <div className="flex items-center gap-3 px-2">
-      <div className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20"><Bot className="h-6 w-6" /></div>
+      <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/25"><Bot className="h-6 w-6" /></div>
       <div><span className="font-display text-xl font-bold tracking-tight text-white light:text-slate-900">Zyon <span className="text-emerald-400">Chat</span></span><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">CHAT INTELIGENTE</p></div>
     </div>
   );
