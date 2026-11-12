@@ -119,10 +119,29 @@ function normalizarTextoResposta(texto: string): string {
   return texto.split("\\r\\n").join("\n").split("\\n").join("\n").split("\\t").join(" ").trim();
 }
 
+// Reconhece letras prolongadas em cumprimentos, sem confundir perguntas com saudações.
+function normalizarCumprimento(texto: string): string {
+  return norm(texto)
+    .replace(/([a-z])\\1{2,}/g, "$1") // "oiii" -> "oi"; "tudooo" -> "tudo"
+    .replace(/\\be\\s*a+i+\\b/g, "e ai")
+    .replace(/\\beae+\\b/g, "e ai")
+    .replace(/\\bo+i+\\b/g, "oi")
+    .replace(/\\bo+la+\\b/g, "ola")
+    .replace(/\\bo+pa+\\b/g, "opa")
+    .replace(/\\bbo+m\\b/g, "bom")
+    .replace(/\\bdi+a+\\b/g, "dia")
+    .replace(/\\bta+rde+\\b/g, "tarde")
+    .replace(/\\bno+i+te+\\b/g, "noite")
+    .replace(/\\btu+do+\\b/g, "tudo")
+    .replace(/\\bbe+m+\\b/g, "bem")
+    .replace(/\\s+/g, " ")
+    .trim();
+}
+
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
-  const t = norm(texto);
-  // Responder apenas a cumprimentos isolados; perguntas reais seguem para FAQ/horários/produtos.
-  const somenteCumprimento = /^(?:(?:oi|ola|e\s*ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai|oi tudo bem|ola tudo bem)(?:\s+|$)){1,3}$/.test(t + " ");
+  const t = normalizarCumprimento(texto);
+  const parte = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
+  const somenteCumprimento = new RegExp(`^(?:${parte})(?:\\\\s+(?:${parte}))*$`).test(t);
   if (somenteCumprimento) {
     const nome = ctx.nomeEmpresa?.trim();
     const apresentacao = nome ? `Aqui é da ${nome}.` : "Seja bem-vindo(a)!";
