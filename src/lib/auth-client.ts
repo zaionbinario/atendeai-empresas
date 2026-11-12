@@ -1,8 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-export const authConfigured = Boolean(url && key);
-export const supabase = authConfigured ? createClient(url!, key!, {
-  auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true },
-}) : null;
+// Project URL is public. Keys must come from the Lovable/Vite build environment.
+// Only publishable/anon keys are valid here; never use service_role or sb_secret.
+const url = import.meta.env.VITE_SUPABASE_URL || "https://kejpnfeyttfozudqpdnm.supabase.co";
+const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const isPublicKey = typeof key === "string" &&
+  (key.startsWith("sb_publishable_") || key.startsWith("eyJ"));
+export const authConfigured = Boolean(url && isPublicKey);
+export const supabase = authConfigured
+  ? createClient(url, key, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: "pkce",
+      },
+    })
+  : null;
