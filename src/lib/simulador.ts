@@ -280,8 +280,9 @@ function respostaProdutoPorIntencao(texto: string, produto: Produto): string {
   const t = norm(texto);
   const nome = produto.nome;
   const preco = brl(produto.preco);
+  const temDescricao = Boolean(produto.descricao?.trim());
   if (/\b(preco|valor|custa|custam|quanto|sai por|quanto ta)\b/.test(t)) {
-    return "A " + nome + " custa " + preco + ". 😊 Quer saber mais alguma coisa sobre ela?";
+    return "A " + nome + " custa " + preco + ". 😊" + (temDescricao ? " Quer saber mais detalhes?" : "");
   }
   if (/\b(descricao|descreve|detalhes|caracteristicas|informacoes|como e|do que e feito|composicao)\b/.test(t)) {
     return produto.descricao?.trim()
@@ -301,9 +302,9 @@ function respostaProdutoPorIntencao(texto: string, produto: Produto): string {
       : "Não tenho confirmação no cadastro de que " + nome + " seja indicado para " + especie + ". Vou chamar alguém da equipe para verificar.";
   }
   if (/\b(tem|teria|vendem|vende|disponivel|estoque|possui|possuem|trabalham com)\b/.test(t)) {
-    return "Temos sim! 😊 " + nome + " está no nosso catálogo por " + preco + ". Quer mais detalhes?";
+    return "Temos sim! 😊 " + nome + " está no nosso catálogo por " + preco + "." + (temDescricao ? " Quer mais detalhes?" : "");
   }
-  return "Encontrei " + nome + " no catálogo por " + preco + ". 😊 Você quer saber o preço, a descrição ou outra informação?";
+  return "Encontrei " + nome + " no catálogo por " + preco + ". 😊" + (temDescricao ? " Quer saber mais detalhes?" : "");
 }
 
 function responderSobreUltimoProduto(texto: string, historico: string[], produtos: Produto[]): string | null {
@@ -329,6 +330,19 @@ function responderBase(
 ): string {
   const conversa = inferirContexto(texto, historico);
   const t = norm(conversa);
+
+  // "Sim" em resposta à oferta de detalhes deve continuar o assunto anterior.
+  if (/^(?:sim|quero|claro|pode|por favor|quero sim|sim por favor|manda|pode mandar)$/.test(norm(texto))) {
+    const ultima = [...historico].reverse().find((m) => /quer (?:saber )?mais detalhes\??/i.test(m));
+    if (ultima) {
+      const produtoAnterior = ctx.produtos.find((p) => norm(ultima).includes(norm(p.nome)));
+      if (produtoAnterior) {
+        return produtoAnterior.descricao?.trim()
+          ? "Claro! 😊 Sobre " + produtoAnterior.nome + ": " + produtoAnterior.descricao
+          : "Ainda não tenho uma descrição cadastrada para " + produtoAnterior.nome + ".";
+      }
+    }
+  }
 
   const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, nomeEmpresa: ctx.empresas?.[0]?.nome });
   if (cumprimento) return cumprimento;
