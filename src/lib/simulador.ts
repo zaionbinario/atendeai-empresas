@@ -191,6 +191,29 @@ function respostaProdutoNaoCadastrado(texto: string, empresas?: { nome: string; 
   return "Aqui é " + nome + "! 😊 Não encontrei esse item entre os produtos ou serviços cadastrados. Posso chamar alguém da equipe para confirmar a disponibilidade.";
 }
 
+// Identifica pedidos claramente fora do ramo sem inventar disponibilidade.
+const ATIVIDADES_FORA_DO_RAMO = [
+  { ramo: 1, pergunta: /\b(cortam? cabelo|corta cabelo|corte de cabelo|fazem? barba|barbear|cabeleireir|degrade)\b/, resposta: "não cortamos cabelo nem fazemos serviços de barbearia" },
+  { ramo: 4, pergunta: /\b(consertam?|reparam?|vendem?|vende|tem)\s+(?:uma?\s+)?(?:furadeira|martelo|parafusadeira|ferramentas?)\b/, resposta: "não trabalhamos com ferramentas" },
+  { ramo: 2, pergunta: /\b(vendem?|vende|tem|trabalham com)\s+(?:uma?\s+)?(?:roupas?|camisetas?|calcas?|vestidos?)\b/, resposta: "não trabalhamos com roupas" },
+  { ramo: 5, pergunta: /\b(vendem?|vende|tem)\s+(?:uma?\s+)?(?:espelhos?|sofas?|armarios?|moveis?)\b/, resposta: "não trabalhamos com móveis ou decoração" },
+  { ramo: 3, pergunta: /\b(vendem?|vende|tem|fazem?)\s+(?:uma?\s+)?(?:racao|coleira|banho e tosa)\b/, resposta: "não trabalhamos com produtos ou serviços pet" },
+  { ramo: 0, pergunta: /\b(vendem?|vende|tem|fazem?)\s+(?:uma?\s+)?(?:paes?|bolos?|salgados?)\b/, resposta: "não trabalhamos com produtos de padaria" },
+];
+function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; segmento?: string }[]; produtos: Produto[]; faqs: Faq[] }): string | null {
+  const empresa = ctx.empresas?.[0];
+  if (!empresa) return null;
+  const ramo = RAMOS.findIndex((r) => r.re.test(norm((empresa.segmento || "") + " " + empresa.nome)));
+  if (ramo < 0) return null;
+  const t = norm(texto);
+  const atividade = ATIVIDADES_FORA_DO_RAMO.find((a) => a.ramo !== ramo && a.pergunta.test(t));
+  if (!atividade) return null;
+  // Um cadastro explícito da empresa tem prioridade sobre suposições pelo segmento.
+  if (ctx.produtos.some((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)))) return null;
+  if (ctx.faqs.some((f) => norm(f.pergunta) === t)) return null;
+  return "Não, " + atividade.resposta + ". 😊 Aqui é " + empresa.nome + ", " + RAMOS[ramo].descricao + ". Posso ajudar com algo relacionado ao nosso negócio?";
+}
+
 function responderBase(
   texto: string,
   ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
@@ -201,6 +224,9 @@ function responderBase(
 
   const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, nomeEmpresa: ctx.empresas?.[0]?.nome });
   if (cumprimento) return cumprimento;
+
+  const foraDoRamo = respostaForaDoRamo(conversa, ctx);
+  if (foraDoRamo) return foraDoRamo;
 
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
   if (faq) return normalizarTextoResposta(faq.resposta);
