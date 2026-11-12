@@ -103,7 +103,7 @@ function Simulador() {
         <div className="wa-wallpaper flex-1 space-y-2 overflow-y-auto p-4">
           {msgs.map((mensagem) => (
             <div key={mensagem.id} className={cn("flex", mensagem.de === "cliente" && "justify-end")}>
-              <div className={cn("max-w-[80%] whitespace-pre-line rounded-lg px-3 py-2 text-sm shadow-sm", mensagem.de === "cliente" ? "rounded-tr-none bg-wa-out" : "rounded-tl-none bg-card")}>
+              <div className={cn("max-w-[80%] whitespace-pre-line rounded-lg px-3 py-2 text-sm shadow-sm", mensagem.de === "cliente" ? "rounded-tr-none bg-wa-out text-black" : "rounded-tl-none bg-card")}>
                 {mensagem.texto}
                 <span className="ml-2 inline-flex items-center gap-1 align-bottom text-[10px] text-muted-foreground">
                   {mensagem.hora}{mensagem.de === "cliente" && <CheckCheck className="h-3 w-3 text-wa-tick" />}
