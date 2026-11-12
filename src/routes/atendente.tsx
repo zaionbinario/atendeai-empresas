@@ -15,10 +15,29 @@ const tons: { v: Instrucoes["tom"]; l: string; d: string }[] = [
   { v: "descontraido", l: "😎 Descontraído", d: "Leve e divertido" },
 ];
 function Atendente() {
-  const { instrucoes: i, setInstrucoes: set } = useStore();
+  const { empresas, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, instrucoes: padrao } = useStore();
+  const empresa = empresas.find((e) => e.id === empresaSelecionadaId) ?? empresas[0];
+  const i = empresa ? (instrucoesPorEmpresa[empresa.id] ?? {
+    nomeAtendente: "Atendente virtual",
+    tom: "amigavel" as const,
+    boasVindas: "Olá! Sou o atendente virtual da " + empresa.nome + ". Como posso ajudar? 😊",
+    regras: "",
+    transferirHumano: true,
+  }) : padrao;
+  const set = (valor: Instrucoes) => {
+    if (empresa) setInstrucoesPorEmpresa((atuais) => ({ ...atuais, [empresa.id]: valor }));
+  };
   return (<>
     <PageHeader title="Atendente virtual" desc="Diga como o seu atendente deve se comportar com os clientes." action={<Btn onClick={() => toast.success("Configurações salvas!")}>Salvar</Btn>} />
     <div className="grid max-w-3xl gap-4">
+      <Card className="space-y-2">
+        <Field label="Empresa deste atendente">
+          <select className="w-full rounded-xl border bg-card px-3 py-2 text-foreground" value={empresa?.id ?? ""} onChange={(e) => setEmpresaSelecionadaId(e.target.value)}>
+            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
+          </select>
+        </Field>
+        <p className="text-xs text-muted-foreground">Cada empresa tem sua própria mensagem e suas instruções.</p>
+      </Card>
       <Card className="space-y-4"><Field label="Nome do atendente"><Input value={i.nomeAtendente} onChange={(e) => set({ ...i, nomeAtendente: e.target.value })} /></Field>
         <div><span className="text-sm font-medium">Tom de voz</span><div className="mt-2 grid gap-2 sm:grid-cols-3">{tons.map((t) => (
           <button key={t.v} onClick={() => set({ ...i, tom: t.v })} className={cn("rounded-xl border-2 p-3 text-left transition-colors", i.tom === t.v ? "border-primary bg-accent" : "hover:bg-muted")}>
