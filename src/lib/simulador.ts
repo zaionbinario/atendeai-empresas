@@ -140,12 +140,16 @@ function normalizarCumprimento(texto: string): string {
 
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
   const t = normalizarCumprimento(texto);
-  const parte = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
-  const somenteCumprimento = new RegExp("^(?:" + parte + ")(?:\\s+(?:" + parte + "))*$").test(t);
+  // Vocativos não são saudações por si só: "mano", "cara", "xará" etc.
+  const vocativo = "(?:mano|mana|cara|xara|amigo|amiga|irmao|irma|parceiro|parceira|chefe|meu querido|minha querida)";
+  const cumprimento = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
+  const prefixo = "(?:(?:" + cumprimento + ")\\s*)+";
+  const complemento = "(?:(?:" + vocativo + "|com voce|e voce|por ai)\\s*)*";
+  const somenteCumprimento = new RegExp("^" + prefixo + complemento + "$").test(t);
   if (somenteCumprimento) {
     const nome = ctx.nomeEmpresa?.trim();
-    const apresentacao = nome ? `Aqui é da ${nome}.` : "Seja bem-vindo(a)!";
-    return `Olá, tudo bem? 😊 ${apresentacao} Como posso te ajudar?`;
+    const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
+    return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
   }
   if (/^(obrigado|obrigada|valeu|agradeco)( |$)/.test(t)) return "Por nada! 😊 Se precisar de mais alguma coisa, é só chamar.";
   if (/^(tchau|ate mais|ate logo)( |$)/.test(t)) return "Até mais! Foi um prazer ajudar. 😊";
