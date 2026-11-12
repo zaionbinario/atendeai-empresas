@@ -77,6 +77,7 @@ function Simulador() {
         atualizadaEm: agora(),
         ultimaAtividadeEm: instante,
         status: iaAtivaAqui && !transferidoPelaIa ? "ia" as const : "humano" as const,
+        aguardandoHumano: transferidoPelaIa || (atual?.aguardandoHumano ?? false),
         mensagens: novasMensagens,
       };
       return [novaConversa, ...anteriores.filter((c) => c.id !== idConversa)];
@@ -85,7 +86,7 @@ function Simulador() {
   };
   const reiniciar = () => {
     setConversas((anteriores) => anteriores.map((c) =>
-      c.id === idConversa ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "", status: "ia" as const } : c
+      c.id === idConversa ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "", status: "ia" as const, aguardandoHumano: false } : c
     ));
     setTexto("");
   };
