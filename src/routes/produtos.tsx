@@ -14,18 +14,28 @@ function Produtos() {
   const { produtos, setProdutos } = useStore();
   const [form, setForm] = useState<Produto | null>(null);
   const [precoTexto, setPrecoTexto] = useState("");
+  const [erroPreco, setErroPreco] = useState("");
   const abrirFormulario = (produto: Produto) => {
     setForm({ ...produto });
+    setErroPreco("");
     setPrecoTexto(produto.id ? produto.preco.toFixed(2).replace(".", ",") : "");
   };
   const [busca, setBusca] = useState("");
   const lista = produtos.filter((p) => p.nome.toLowerCase().includes(busca.toLowerCase()));
   const salvar = () => {
     if (!form?.nome.trim()) return;
-    const texto = precoTexto.trim().replace(/\s/g, "");
-    if (!/^\d+(?:[.,]\d{1,2})?$/.test(texto)) return;
+    const texto = precoTexto.trim().replace(/^R\$\s*/i, "").replace(/\s/g, "");
+    const valido = /^\d+(?:[.,]\d{1,2})?$/.test(texto);
+    if (!valido) {
+      setErroPreco("Digite um preço válido, como 59,90 ou R$ 59,90.");
+      return;
+    }
     const preco = Number(texto.replace(",", "."));
-    if (!Number.isFinite(preco)) return;
+    if (!Number.isFinite(preco)) {
+      setErroPreco("O preço informado é inválido.");
+      return;
+    }
+    setErroPreco("");
     const produto = { ...form, preco };
     setProdutos(form.id ? produtos.map((p) => (p.id === form.id ? produto : p)) : [...produtos, { ...produto, id: novoId() }]);
     setForm(null);
@@ -48,7 +58,7 @@ function Produtos() {
     <Modal open={!!form} title={form?.id ? "Editar produto" : "Novo produto"} onClose={() => setForm(null)}>
       {form && <div className="space-y-4">
         <Field label="Nome do produto"><Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} /></Field>
-        <div className="grid gap-4 sm:grid-cols-2"><Field label="Preço (R$)"><Input type="text" inputMode="decimal" placeholder="Ex.: 59,90" value={precoTexto} onChange={(e) => setPrecoTexto(e.target.value)} /></Field>
+        <div className="grid gap-4 sm:grid-cols-2"><Field label="Preço (R$)"><Input type="text" inputMode="decimal" placeholder="Ex.: 59,90" value={precoTexto} onChange={(e) => { setPrecoTexto(e.target.value); setErroPreco(""); }} />{erroPreco && <p role="alert" className="mt-1 text-xs text-red-400">{erroPreco}</p>}</Field>
           <Field label="Categoria"><Input value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} /></Field></div>
         <Field label="Descrição"><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} /></Field>
         <div className="flex justify-end gap-2"><Btn variant="ghost" onClick={() => setForm(null)}>Cancelar</Btn><Btn onClick={salvar}>Salvar</Btn></div>
