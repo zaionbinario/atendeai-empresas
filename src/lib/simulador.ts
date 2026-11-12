@@ -177,7 +177,7 @@ function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: st
   if (nomeBase.length >= 2 && palavras.length >= 2) {
     const vocativoFinal = palavras[palavras.length - 1] || "";
     const prefixo = palavras.slice(0, -1).join(" ");
-    const nomeAlongado = new RegExp("^" + nomeBase.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\  // Confirmações isoladas não são pedidos e não devem transferir para humano.").split("").map((letra) => letra + "+").join("") + "$");
+    const nomeAlongado = new RegExp("^" + [...nomeBase].filter((letra) => /[a-z]/.test(letra)).map((letra) => letra + "+").join("") + "$");
     if (inicioSaudacao.test(prefixo) && nomeAlongado.test(vocativoFinal)) {
       const empresa = ctx.nomeEmpresa?.trim();
       return "Olá, tudo bem? 😊 " + (empresa ? "Aqui é da " + empresa + ". " : "") + "Como posso te ajudar?";
