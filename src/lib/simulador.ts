@@ -259,6 +259,28 @@ function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; seg
   return "Não, aqui " + atividade.resposta + ". 😊 Somos " + empresa.nome + ", " + RAMOS[ramo].descricao + ". Você gostaria de saber algo sobre nossos produtos ou serviços?";
 }
 
+// Perguntas de acompanhamento sobre o último produto mencionado pelo bot.
+function responderSobreUltimoProduto(texto: string, historico: string[], produtos: Produto[]): string | null {
+  const t = norm(texto);
+  const pergunta = /\b(ela|ele|esse|essa|isso|serve|indicado|indicada|compativel|pode dar|pode usar|funciona|ideal|apropriado)\b/.test(t);
+  if (!pergunta || !historico.length) return null;
+  const ultimaResposta = [...historico].reverse().find((mensagem) =>
+    produtos.some((produto) => norm(mensagem).includes(norm(produto.nome)))
+  );
+  if (!ultimaResposta) return null;
+  const produto = produtos.find((p) => norm(ultimaResposta).includes(norm(p.nome)));
+  if (!produto) return null;
+  const animal = /\b(gato|gata|gatos|gatas|felino|felinos|cachorro|cachorra|cao|caes|filhote|filhotes)\b/.test(t);
+  if (animal) {
+    const especie = /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(t) ? "gatos" : /\b(filhote|filhotes)\b/.test(t) ? "filhotes" : "cães";
+    const descricao = norm(produto.descricao + " " + produto.categoria + " " + produto.nome);
+    const confirma = especie === "gatos" ? /\b(gato|gata|gatos|gatas|felino|felinos)\b/.test(descricao) : especie === "filhotes" ? /\b(filhote|filhotes)\b/.test(descricao) : /\b(cao|caes|cachorro|cachorros|canino|caninos)\b/.test(descricao);
+    if (confirma) return "Sim, o cadastro da " + produto.nome + " indica uso para " + especie + ". 🐾 Confira as orientações da embalagem antes de oferecer ao pet.";
+    return "Você está falando da " + produto.nome + ", certo? 🐾 Não tenho confirmação no cadastro de que seja indicada para " + especie + ". Vou chamar alguém da equipe para verificar.";
+  }
+  return "Você está falando de " + produto.nome + ", certo? " + (produto.descricao || "Não há mais detalhes cadastrados sobre esse produto.");
+}
+
 function responderBase(
   texto: string,
   ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
@@ -269,6 +291,9 @@ function responderBase(
 
   const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, nomeEmpresa: ctx.empresas?.[0]?.nome });
   if (cumprimento) return cumprimento;
+
+  const acompanhamento = responderSobreUltimoProduto(texto, historico, ctx.produtos);
+  if (acompanhamento) return acompanhamento;
 
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
