@@ -39,7 +39,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         const { data, error } = await supabase.auth.signUp({ email: email.trim(), password: senha, options: { data: { full_name: nome.trim() }, emailRedirectTo: window.location.origin + "/" } });
         if (error) throw error;
         if (data.session) await navigate({ to: "/" });
-        else setSucesso("Cadastro enviado! Confira seu e-mail para confirmar sua conta.");
+        else setSucesso("Se este e-mail puder ser cadastrado, você receberá uma confirmação. Se já possui conta, entre pelo login ou recupere sua senha.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
         if (error) throw error;
@@ -47,7 +47,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Não foi possível concluir a operação.";
-      setErro(errors[msg] || msg);
+      setErro(mode === "cadastro" && (msg === "User already registered" || msg.toLowerCase().includes("already registered")) ? "Este e-mail pode já ter uma conta. Tente entrar ou recuperar sua senha." : (errors[msg] || msg));
     } finally { setEnviando(false); }
   }
   return <main className="min-h-screen bg-[#071310] text-white flex items-center justify-center p-4 sm:p-8">
@@ -64,6 +64,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         {mode === "cadastro" && <label className="block text-sm font-medium">Confirmar senha<input type={mostrar?"text":"password"} autoComplete="new-password" required minLength={8} value={confirmacao} onChange={e=>setConfirmacao(e.target.value)} placeholder="Repita sua senha" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 outline-none focus:border-emerald-400"/></label>}
         {erro && <p role="alert" className="rounded-xl bg-red-500/10 p-3 text-sm text-red-300">{erro}</p>}
         {sucesso && <p role="status" className="rounded-xl bg-emerald-500/10 p-3 text-sm text-emerald-300">{sucesso}</p>}
+        {mode === "cadastro" && (sucesso || erro.toLowerCase().includes("já ter uma conta")) && <div className="flex flex-wrap gap-4 text-sm"><Link to="/login" className="font-semibold text-emerald-300 underline">Fazer login</Link><Link to="/recuperar-senha" className="text-emerald-300 underline">Esqueci minha senha</Link></div>}
         <button disabled={enviando || !authConfigured} className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 font-bold text-[#06251d] transition hover:bg-emerald-300 disabled:opacity-50">{enviando?"Aguarde...":mode==="cadastro"?"Criar conta":mode==="recuperar"?"Enviar link":"Entrar"}<ArrowRight className="h-4 w-4"/></button>
       </form>
       <div className="mt-6 space-y-3 text-center text-sm text-slate-400">
