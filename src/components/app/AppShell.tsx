@@ -29,6 +29,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [suporteAberto, setSuporteAberto] = useState(false);
+  const [menuContaAberto, setMenuContaAberto] = useState(false);
+  const [confirmarSaida, setConfirmarSaida] = useState(false);
+  const [saindo, setSaindo] = useState(false);
+  const [erroSaida, setErroSaida] = useState("");
   const [temaClaro, setTemaClaro] = useState(false);
   const { botAtivo, setBotAtivo, conversas } = useStore();
   useEffect(() => { applyAppearance(loadAppearance()); }, []);
@@ -50,6 +54,20 @@ export function AppShell({ children }: { children: ReactNode }) {
     applyAppearance(loadAppearance());
     try { localStorage.setItem("zyon-chat-tema", novoTemaClaro ? "claro" : "escuro"); }
     catch { /* A troca visual funciona mesmo sem persistência. */ }
+  };
+  const sairDaConta = async () => {
+    if (!supabase) { setErroSaida("A autenticação não está disponível no momento."); return; }
+    setSaindo(true);
+    setErroSaida("");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setConfirmarSaida(false);
+      setMenuContaAberto(false);
+      window.location.assign("/login");
+    } catch {
+      setErroSaida("Não foi possível sair da conta. Tente novamente.");
+    } finally { setSaindo(false); }
   };
   const side = (
     <nav className="flex flex-col gap-1" aria-label="Navegação principal">
@@ -104,15 +122,39 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black p-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden xl:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button>
             <button onClick={() => setBotAtivo(!botAtivo)} aria-label={botAtivo ? "Pausar bot" : "Ativar bot"} className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border p-2 text-xs font-semibold sm:px-3", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}<span className="hidden sm:inline">{botAtivo ? "Bot ativo" : "Bot pausado"}</span></button>
             {pendentes > 0 && <Link to="/conversas" aria-label={pendentes + " conversas aguardando atendimento humano"} title="Conversas aguardando atendimento" className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/50 bg-red-500/15 px-2 py-2 text-xs font-bold text-red-300 hover:bg-red-500/25 light:text-red-700"><Users className="h-4 w-4" /><span>{pendentes}</span><span className="hidden xl:inline">Aguardando atendente</span></Link>}
-            <button type="button" onClick={() => { void supabase?.auth.signOut(); }} title="Sair da conta" aria-label="Sair da conta" className="rounded-xl p-2 text-slate-300 hover:bg-white/10"><LogOut className="h-4 w-4" /></button>
             <NotificationBell />
             <div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" />
-            <button className="flex shrink-0 items-center gap-2 rounded-xl p-1 text-sm text-white hover:bg-white/5 light:text-slate-900 light:hover:bg-slate-100"><span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-400 font-bold text-slate-950">Z</span><span className="hidden xl:block">Minha conta</span><ChevronDown className="hidden h-4 w-4 text-slate-500 sm:block" /></button>
+            <div className="relative">
+              <button type="button" aria-label="Abrir menu da conta" aria-expanded={menuContaAberto} aria-haspopup="menu" onClick={() => setMenuContaAberto(v => !v)} className="flex shrink-0 items-center gap-2 rounded-xl p-1 text-sm text-foreground hover:bg-muted">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary font-bold text-primary-foreground">Z</span>
+                <span className="hidden xl:block">Minha conta</span><ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </button>
+              {menuContaAberto && <>
+                <button type="button" aria-label="Fechar menu da conta" className="fixed inset-0 z-40 cursor-default" onClick={() => setMenuContaAberto(false)} />
+                <div role="menu" aria-label="Minha conta" className="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-border bg-card p-2 text-card-foreground shadow-xl">
+                  <p className="px-3 py-2 text-xs font-semibold text-muted-foreground">Minha conta</p>
+                  <button type="button" role="menuitem" onClick={() => { setMenuContaAberto(false); setErroSaida(""); setConfirmarSaida(true); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-destructive hover:bg-muted"><LogOut className="h-4 w-4" />Sair da conta</button>
+                </div>
+              </>}
+            </div>
           </div>
         </div>
         <div className="mt-2 w-full lg:hidden"><SiteSearch /></div>
       </header>
       {open && <div className="fixed inset-x-0 top-[112px] z-50 space-y-5 border-b border-white/10 bg-[#090f12] p-4 shadow-2xl lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
+      {confirmarSaida && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onMouseDown={e => { if (e.target === e.currentTarget && !saindo) setConfirmarSaida(false); }}>
+          <section role="alertdialog" aria-modal="true" aria-labelledby="confirmar-saida-titulo" aria-describedby="confirmar-saida-texto" className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
+            <h2 id="confirmar-saida-titulo" className="text-lg font-bold">Sair da conta?</h2>
+            <p id="confirmar-saida-texto" className="mt-2 text-sm text-muted-foreground">Você tem certeza de que deseja encerrar sua sessão no Zyon Chat?</p>
+            {erroSaida && <p role="alert" className="mt-3 text-sm text-destructive">{erroSaida}</p>}
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" disabled={saindo} onClick={() => setConfirmarSaida(false)} className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
+              <button type="button" disabled={saindo} onClick={() => { void sairDaConta(); }} className="rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground disabled:opacity-50">{saindo ? "Saindo..." : "Sim, sair"}</button>
+            </div>
+          </section>
+        </div>
+      )}
       {suporteAberto && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSuporteAberto(false); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="titulo-suporte" className="w-full max-w-md rounded-2xl border border-white/10 bg-[#091b19] p-6 text-white shadow-2xl light:border-slate-200 light:bg-white light:text-slate-900">
