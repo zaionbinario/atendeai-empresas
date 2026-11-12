@@ -4,6 +4,7 @@ import { Bell, Building2, RotateCcw, Save, Shield, SlidersHorizontal } from "luc
 import { toast } from "sonner";
 import { Btn, Card, Field, Input, PageHeader, Toggle } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
+import { AppearanceSettings } from "@/components/app/AppearanceSettings";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -77,6 +78,7 @@ function Configuracoes() {
           </div>
         </Card>
       </div>
+      <AppearanceSettings />
       <Card className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex max-w-lg items-start gap-3">
