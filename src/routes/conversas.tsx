@@ -29,6 +29,7 @@ function ItemConversa({
   const [aberta, setAberta] = useState(false);
   const [resposta, setResposta] = useState("");
   const humano = conversa.status === "humano";
+  const pendente = conversa.aguardandoHumano === true;
   const enviar = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!humano || !resposta.trim()) return;
@@ -54,7 +55,7 @@ function ItemConversa({
           : conversa.status === "resolvida"
             ? "rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600"
             : "rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-600"}>
-          {humano ? "Humano" : conversa.status === "resolvida" ? "Resolvida" : "IA"}
+          {pendente ? "Aguardando atendente" : humano ? "Humano" : conversa.status === "resolvida" ? "Resolvida" : "IA"}
         </span>
       </div>
       <button
@@ -116,19 +117,21 @@ function ItemConversa({
 function Conversas() {
   const { conversas, setConversas } = useStore();
   const [limite, setLimite] = useState(POR_PAGINA);
+  const [somentePendentes, setSomentePendentes] = useState(false);
+  const lista = conversas.filter((c) => !somentePendentes || c.aguardandoHumano);
 
   const assumir = (id: string) => {
-    setConversas((anteriores) => transferirAtendimento(anteriores, id, "humano"));
+    setConversas((anteriores) => transferirAtendimento(anteriores, id, "humano").map((c) => c.id === id ? { ...c, aguardandoHumano: false } : c));
     toast.success("Conversa assumida. A IA fica pausada somente neste atendimento.");
   };
   const devolver = (id: string) => {
-    setConversas((anteriores) => transferirAtendimento(anteriores, id, "ia"));
+    setConversas((anteriores) => transferirAtendimento(anteriores, id, "ia").map((c) => c.id === id ? { ...c, aguardandoHumano: false } : c));
     toast.success("Conversa devolvida para a IA.");
   };
   const enviarResposta = (id: string, texto: string) => {
     const mensagem: Mensagem = { id: novoId(), de: "humano", texto, hora: horaAtual() };
     const dataIso = new Date().toISOString();
-    setConversas((anteriores) => registrarRespostaHumana(anteriores, id, mensagem, dataIso));
+    setConversas((anteriores) => registrarRespostaHumana(anteriores, id, mensagem, dataIso).map((c) => c.id === id ? { ...c, aguardandoHumano: false } : c));
     toast.success("Resposta registrada neste navegador (não enviada ao WhatsApp).");
   };
 
@@ -140,15 +143,16 @@ function Conversas() {
         <Card><p className="text-sm text-muted-foreground">Com atendimento humano</p><p className="mt-1 text-3xl font-bold">{conversas.filter((c) => c.status === "humano").length}</p></Card>
         <Card><p className="text-sm text-muted-foreground">Atendidas pela IA</p><p className="mt-1 text-3xl font-bold">{conversas.filter((c) => c.status === "ia").length}</p></Card>
       </div>
+      <div className="mb-3 flex items-center gap-2"><input id="filtrar-pendentes" type="checkbox" checked={somentePendentes} onChange={(e) => setSomentePendentes(e.target.checked)} /><label htmlFor="filtrar-pendentes" className="text-sm">Mostrar somente conversas aguardando atendente</label></div>
       <Card className="space-y-3">
-        {conversas.length === 0
+        {lista.length === 0
           ? <div className="py-12 text-center">
               <MessageCircle className="mx-auto h-10 w-10 text-muted-foreground" />
               <p className="mt-3 font-semibold">Nenhuma conversa registrada ainda</p>
               <p className="mt-1 text-sm text-muted-foreground">Use o simulador para criar atendimentos de demonstração.</p>
             </div>
           : <>
-              {conversas.slice(0, limite).map((conversa) => (
+              {lista.slice(0, limite).map((conversa) => (
                 <ItemConversa
                   key={conversa.id}
                   conversa={conversa}
@@ -157,10 +161,10 @@ function Conversas() {
                   enviarResposta={enviarResposta}
                 />
               ))}
-              {conversas.length > limite && (
+              {lista.length > limite && (
                 <div className="pt-2 text-center">
                   <Btn type="button" variant="ghost" onClick={() => setLimite((valor) => valor + POR_PAGINA)}>
-                    Carregar mais conversas ({conversas.length - limite} restantes)
+                    Carregar mais conversas ({lista.length - limite} restantes)
                   </Btn>
                 </div>
               )}
