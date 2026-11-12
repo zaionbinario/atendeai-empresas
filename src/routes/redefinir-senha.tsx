@@ -1,0 +1,9 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
+import { supabase } from "@/lib/auth-client";
+export const Route = createFileRoute("/redefinir-senha")({ component: ResetPage });
+function ResetPage() {
+ const navigate=useNavigate(); const [senha,setSenha]=useState(""); const [confirmar,setConfirmar]=useState(""); const [erro,setErro]=useState(""); const [ocupado,setOcupado]=useState(false);
+ async function salvar(e:FormEvent){e.preventDefault();setErro("");if(senha.length<8||senha!==confirmar){setErro("Use pelo menos 8 caracteres e confirme a mesma senha.");return;}if(!supabase){setErro("Autenticação não configurada.");return;}setOcupado(true);const {error}=await supabase.auth.updateUser({password:senha});setOcupado(false);if(error){setErro("Link inválido ou expirado. Solicite um novo link.");return;}await supabase.auth.signOut();await navigate({to:"/login"});}
+ return <main className="flex min-h-screen items-center justify-center bg-[#071310] p-4 text-white"><form onSubmit={salvar} className="w-full max-w-md space-y-4 rounded-2xl border border-emerald-400/20 bg-[#0c201b] p-8"><h1 className="text-2xl font-bold">Nova senha — Zyon Chat</h1><label className="block">Nova senha<input type="password" autoComplete="new-password" required minLength={8} value={senha} onChange={e=>setSenha(e.target.value)} className="mt-2 w-full rounded-xl bg-white/10 p-3"/></label><label className="block">Confirmar nova senha<input type="password" autoComplete="new-password" required value={confirmar} onChange={e=>setConfirmar(e.target.value)} className="mt-2 w-full rounded-xl bg-white/10 p-3"/></label>{erro&&<p role="alert" className="text-red-300">{erro}</p>}<button disabled={ocupado} className="w-full rounded-xl bg-emerald-400 p-3 font-bold text-black">{ocupado?"Salvando...":"Salvar nova senha"}</button></form></main>;
+}
