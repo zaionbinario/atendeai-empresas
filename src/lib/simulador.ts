@@ -138,8 +138,28 @@ function normalizarCumprimento(texto: string): string {
     .trim();
 }
 
+// Flexões conhecidas de tratamento: não altera palavras de produtos nem frases inteiras.
+function normalizarVocativos(texto: string): string {
+  const formas: Record<string, string> = {
+    amiguinho: "amigo", amigao: "amigo", amiguinha: "amiga", amigona: "amiga",
+    chefinho: "chefe", chefao: "chefe", chefona: "chefe",
+    parceirinho: "parceiro", parceirao: "parceiro", parceirinha: "parceira", parceirona: "parceira",
+    irmaozinho: "irmao", irmaozinha: "irma", irmaozona: "irma",
+    carinha: "cara", carao: "cara", carazao: "cara",
+    maninho: "mano", maninha: "mana", manzao: "mano",
+    coleguinha: "colega", colegao: "colega", colegona: "colega",
+    chapinha: "chapa", chapao: "chapa",
+    reizinho: "rei", reizao: "rei", rainhazinha: "rainha",
+    queridinho: "querido", queridinha: "querida", queridao: "querido",
+    patrãozinho: "patrao", patraozinho: "patrao", patroazinha: "patroa",
+    campeaozinho: "campeao", campeazinha: "campea",
+    mamaezinha: "mamae", papaizinho: "papai",
+  };
+  return texto.split(" ").map((palavra) => formas[palavra] || palavra).join(" ");
+}
+
 function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
-  const t = normalizarCumprimento(texto);
+  const t = normalizarVocativos(normalizarCumprimento(texto));
   // Reconhece saudações seguidas de vocativos, sem tratar "mano" sozinho como cumprimento.
   const cumprimento = "(?:oi|ola|e ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai)";
   const vocativo = "(?:mano|mana|cara|xara|amigo|amiga|colega|chapa|irmao|irma|parceiro|parceira|chefe|rei|rainha|mamae|papai|patrao|patroa|campeao|campea|querido|querida|mestre|jovem|pessoal|gente|meu|minha|seu|sua|com voce|e voce|por ai)";
