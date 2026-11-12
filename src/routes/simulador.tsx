@@ -85,7 +85,7 @@ function Simulador() {
   };
   const reiniciar = () => {
     setConversas((anteriores) => anteriores.map((c) =>
-      c.id === idConversa ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "" } : c
+      c.id === idConversa ? { ...c, mensagens: [boasVindas()], ultimaMensagem: "", status: "ia" as const } : c
     ));
     setTexto("");
   };
