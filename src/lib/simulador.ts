@@ -119,13 +119,14 @@ function normalizarTextoResposta(texto: string): string {
   return texto.split("\\r\\n").join("\n").split("\\n").join("\n").split("\\t").join(" ").trim();
 }
 
-function saudacao(texto: string, ctx: { instrucoes: Instrucoes }): string | null {
+function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: string }): string | null {
   const t = norm(texto);
-  if (/^(oi|ola|eai|e ai|opa|bom dia|boa tarde|boa noite)( |$)/.test(t)) {
-    return ctx.instrucoes.boasVindas || "Olá! 😊 Como posso te ajudar?";
-  }
-  if (/^(tudo bem|tudo bom|como vai|como voce esta)( |$)/.test(t)) {
-    return "Tudo ótimo por aqui! 😊 E com você? Como posso ajudar?";
+  // Responder apenas a cumprimentos isolados; perguntas reais seguem para FAQ/horários/produtos.
+  const somenteCumprimento = /^(?:(?:oi|ola|e\s*ai|opa|alo|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom|como vai|como voce esta|blz|beleza|salve|fala|fala ai|oi tudo bem|ola tudo bem)(?:\s+|$)){1,3}$/.test(t + " ");
+  if (somenteCumprimento) {
+    const nome = ctx.nomeEmpresa?.trim();
+    const apresentacao = nome ? `Aqui é da ${nome}.` : "Seja bem-vindo(a)!";
+    return `Olá, tudo bem? 😊 ${apresentacao} Como posso te ajudar?`;
   }
   if (/^(obrigado|obrigada|valeu|agradeco)( |$)/.test(t)) return "Por nada! 😊 Se precisar de mais alguma coisa, é só chamar.";
   if (/^(tchau|ate mais|ate logo)( |$)/.test(t)) return "Até mais! Foi um prazer ajudar. 😊";
@@ -145,13 +146,13 @@ function inferirContexto(texto: string, historico: string[]): string {
 
 function responderBase(
   texto: string,
-  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes },
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string }[] },
   historico: string[] = [],
 ): string {
   const conversa = inferirContexto(texto, historico);
   const t = norm(conversa);
 
-  const cumprimento = saudacao(texto, ctx);
+  const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, nomeEmpresa: ctx.empresas?.[0]?.nome });
   if (cumprimento) return cumprimento;
 
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
@@ -183,7 +184,7 @@ function responderBase(
 
 export function responder(
   texto: string,
-  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes },
+  ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string }[] },
   historico: string[] = [],
 ): string {
   let resposta = responderBase(texto, ctx, historico);
