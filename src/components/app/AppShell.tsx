@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Package, Clock, HelpCircle, Bot, MessageCircle, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, Headset, Phone, Mail, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
@@ -24,6 +24,7 @@ const nav = [
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const [suporteAberto, setSuporteAberto] = useState(false);
   const [temaClaro, setTemaClaro] = useState(false);
   const { botAtivo, setBotAtivo, conversas } = useStore();
   const pendentes = conversas.filter((c) => c.aguardandoHumano === true).length;
@@ -54,6 +55,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           {path === to && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
         </Link>
       ))}
+      <button type="button" onClick={() => { setOpen(false); setSuporteAberto(true); }}
+        className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-400 transition-all hover:bg-white/5 hover:text-white light:text-slate-600 light:hover:bg-slate-100 light:hover:text-slate-900">
+        <Headset className="h-[19px] w-[19px] shrink-0" />
+        <span className="flex-1">Suporte</span>
+      </button>
     </nav>
   );
   const logo = (
@@ -99,6 +105,32 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mt-2 w-full lg:hidden"><SiteSearch /></div>
       </header>
       {open && <div className="fixed inset-x-0 top-[112px] z-50 space-y-5 border-b border-white/10 bg-[#090f12] p-4 shadow-2xl lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
+      {suporteAberto && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSuporteAberto(false); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="titulo-suporte" className="w-full max-w-md rounded-2xl border border-white/10 bg-[#091b19] p-6 text-white shadow-2xl light:border-slate-200 light:bg-white light:text-slate-900">
+            <div className="mb-5 flex items-start justify-between gap-3">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-emerald-400"><Headset className="h-5 w-5" /><span className="text-sm font-semibold">Central de ajuda</span></div>
+                <h2 id="titulo-suporte" className="font-display text-2xl font-bold">Suporte Zyon Chat</h2>
+                <p className="mt-2 text-sm text-slate-400 light:text-slate-600">Precisa de ajuda? Entre em contato pelos canais abaixo.</p>
+              </div>
+              <button type="button" aria-label="Fechar suporte" onClick={() => setSuporteAberto(false)} className="rounded-lg p-2 text-slate-400 hover:bg-white/10"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <div className="rounded-xl border border-white/10 p-4 light:border-slate-200">
+                <div className="mb-1 flex items-center gap-2 text-sm text-slate-400 light:text-slate-600"><Phone className="h-4 w-4" /> Telefone / WhatsApp</div>
+                <p className="font-semibold">+55 (62) 98570-7123</p>
+                <a href="https://wa.me/5562985707123" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-emerald-400 hover:underline">Conversar pelo WhatsApp <ExternalLink className="h-3.5 w-3.5" /></a>
+              </div>
+              <div className="rounded-xl border border-white/10 p-4 light:border-slate-200">
+                <div className="mb-1 flex items-center gap-2 text-sm text-slate-400 light:text-slate-600"><Mail className="h-4 w-4" /> E-mail</div>
+                <p className="break-all font-semibold">isacnascimento186@gmail.com</p>
+                <a href="mailto:isacnascimento186@gmail.com?subject=Suporte%20Zyon%20Chat" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-emerald-400 hover:underline">Enviar e-mail <ExternalLink className="h-3.5 w-3.5" /></a>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
       <main className="min-h-[calc(100vh-76px)] p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full max-w-[1440px]">{children}</div></main>
     </div>
   );
