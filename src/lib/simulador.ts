@@ -169,6 +169,10 @@ function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: st
     const apresentacao = nome ? "Aqui é da " + nome + "." : "Seja bem-vindo(a)!";
     return "Olá, tudo bem? 😊 " + apresentacao + " Como posso te ajudar?";
   }
+  // Confirmações isoladas não são pedidos e não devem transferir para humano.
+  if (/^(?:ok|okay|okey|okie|okk|blz|beleza|entendi|entendido|certo|certinho|ta bom|tudo bem|show|fechou|combinado|perfeito|tranquilo|suave|demorou|pode crer|saquei|tendi|joia|massa|top|sim|aham|uhum|hum|hmm|ta|esta bem|de boa)(?:\s+(?:obrigado|obrigada|valeu|entao|beleza|show|mano|cara|amigo|amiga))*$/.test(t)) {
+    return "Perfeito! 😊 Se precisar de mais alguma coisa, estou à disposição.";
+  }
   if (/^(obrigado|obrigada|valeu|agradeco)( |$)/.test(t)) return "Por nada! 😊 Se precisar de mais alguma coisa, é só chamar.";
   if (/^(tchau|ate mais|ate logo)( |$)/.test(t)) return "Até mais! Foi um prazer ajudar. 😊";
   return null;
