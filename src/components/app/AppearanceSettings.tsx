@@ -21,6 +21,23 @@ export function applyAppearance(settings: Appearance) {
   const font = fonts.includes(settings.font as typeof fonts[number]) ? settings.font : defaultAppearance.font;
   root.dataset.zyonAccent = "custom";
   root.style.setProperty("--zyon-accent", color);
+  // Fundos discretamente tingidos na cor escolhida, preservando contraste.
+  const hue = settings.color === colors[1].value ? 25
+    : settings.color === colors[2].value ? 300
+    : settings.color === colors[3].value ? 350
+    : settings.color === colors[4].value ? 255
+    : settings.color === colors[5].value ? 0 : 155;
+  const chroma = settings.color === colors[5].value ? 0 : 0.018;
+  const tint = (lightness: number) => `oklch(${lightness} ${chroma} ${hue})`;
+  const isLight = root.classList.contains("light");
+  root.style.setProperty("--background", tint(isLight ? 0.98 : 0.12));
+  root.style.setProperty("--card", tint(isLight ? 1 : 0.17));
+  root.style.setProperty("--popover", tint(isLight ? 1 : 0.17));
+  root.style.setProperty("--secondary", tint(isLight ? 0.94 : 0.23));
+  root.style.setProperty("--muted", tint(isLight ? 0.95 : 0.20));
+  root.style.setProperty("--sidebar", tint(isLight ? 1 : 0.105));
+  root.style.setProperty("--sidebar-accent", tint(isLight ? 0.94 : 0.20));
+  root.style.setProperty("--zyon-surface", tint(isLight ? 1 : 0.105));
   root.style.setProperty("--primary", color);
   root.style.setProperty("--sidebar-primary", color);
   root.style.setProperty("--ring", color);
