@@ -18,7 +18,7 @@ const nav = [
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/horarios", label: "Horários", icon: Clock },
   { to: "/perguntas", label: "Perguntas frequentes", icon: HelpCircle },
-  { to: "/atendente", label: "Atendente virtual", icon: Bot },
+  { to: "/atendente", label: "Atendente virtual", icon: Headset },
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
   { to: "/administracao", label: "Administração", icon: ShieldCheck },
