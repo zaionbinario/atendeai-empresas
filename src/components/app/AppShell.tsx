@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Package, Clock, HelpCircle, Bot, MessageCircle, MessagesSquare, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, Headset, Phone, Mail, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Package, ContactRound, Clock, HelpCircle, Bot, MessageCircle, MessagesSquare, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, Headset, Phone, Mail, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
@@ -18,7 +18,7 @@ const nav = [
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/horarios", label: "Horários", icon: Clock },
   { to: "/perguntas", label: "Perguntas frequentes", icon: HelpCircle },
-  { to: "/atendente", label: "Atendente virtual", icon: Headset },
+  { to: "/atendente", label: "Atendente virtual", icon: ContactRound },
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
   { to: "/administracao", label: "Administração", icon: ShieldCheck },
