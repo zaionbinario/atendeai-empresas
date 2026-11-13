@@ -37,7 +37,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
       if (mode === "recuperar") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/redefinir-senha" });
         if (error) throw error;
-        setSucesso("Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.");
+        setSucesso("Solicitação recebida! Verifique sua caixa de entrada e a pasta de spam. Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.");
       } else if (mode === "cadastro") {
         const { data, error } = await supabase.auth.signUp({ email: email.trim(), password: senha, options: { data: { full_name: nome.trim() }, emailRedirectTo: window.location.origin + "/" } });
         if (error) throw error;
