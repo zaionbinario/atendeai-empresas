@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { Btn, Card, Field, Input, Modal, PageHeader, QuickAccess, Textarea } from "@/components/app/ui";
 import { brl, novoId, useStore } from "@/lib/store";
@@ -21,6 +21,15 @@ function Produtos() {
     setPrecoTexto(produto.id ? produto.preco.toFixed(2).replace(".", ",") : "");
   };
   const [busca, setBusca] = useState("");
+  useEffect(() => {
+    try {
+      const produtoPendente = sessionStorage.getItem("zyon-busca-produto-pendente");
+      if (produtoPendente) {
+        setBusca(produtoPendente);
+        sessionStorage.removeItem("zyon-busca-produto-pendente");
+      }
+    } catch { /* A página continua acessível sem sessionStorage. */ }
+  }, []);
   const lista = produtos.filter((p) => p.nome.toLowerCase().includes(busca.toLowerCase()));
   const salvar = () => {
     if (!form?.nome.trim()) return;
