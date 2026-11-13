@@ -19,7 +19,7 @@ export function applyAppearance(settings: Appearance) {
   const color = colors.some(c => c.value === settings.color) ? settings.color : defaultAppearance.color;
   const size = Math.max(85, Math.min(125, Number(settings.fontSize) || 100));
   const font = fonts.includes(settings.font as typeof fonts[number]) ? settings.font : defaultAppearance.font;
-  root.dataset.zyonAccent = "custom";
+  root.dataset["zyonAccent"] = "custom";
   root.style.setProperty("--zyon-accent", color);
   // Fundos discretamente tingidos na cor escolhida, preservando contraste.
   const hue = settings.color === colors[1].value ? 25

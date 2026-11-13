@@ -21,7 +21,9 @@ describe("gestão administrativa de empresas", () => {
     expect(filtrarEmpresas(empresas, "", "inativas").map((e) => e.id)).toEqual(["2"]);
   });
   it("rejeita nomes vazios", () => {
-    expect(dadosEmpresaValidos({ ...empresas[0], nome: "  " })).toBe(false);
-    expect(dadosEmpresaValidos(empresas[0])).toBe(true);
+    const empresa = empresas[0];
+    if (!empresa) throw new Error("Empresa de teste ausente");
+    expect(dadosEmpresaValidos({ ...empresa, nome: "  " })).toBe(false);
+    expect(dadosEmpresaValidos(empresa)).toBe(true);
   });
 });

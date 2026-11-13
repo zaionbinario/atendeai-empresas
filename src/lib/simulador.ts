@@ -239,6 +239,7 @@ function saudacao(texto: string, ctx: { instrucoes: Instrucoes; nomeEmpresa?: st
     // Remove apenas vocativos conhecidos; se houver pedido real, ele permanece.
     for (let i = 0; i < 8 && resto; i++) {
       const palavra = resto.split(" ")[0];
+      if (!palavra) break;
       if (vocativos.has(palavra) || (nomeAlongado && nomeAlongado.test(palavra))) {
         resto = resto.slice(palavra.length).trim();
       } else break;
@@ -313,14 +314,15 @@ function respostaForaDoRamo(texto: string, ctx: { empresas?: { nome: string; seg
   const empresa = ctx.empresas?.[0];
   if (!empresa) return null;
   const ramo = RAMOS.findIndex((r) => r.re.test(norm((empresa.segmento || "") + " " + empresa.nome)));
-  if (ramo < 0) return null;
+  const ramoEncontrado = RAMOS[ramo];
+  if (!ramoEncontrado) return null;
   const t = norm(texto);
   const atividade = ATIVIDADES_FORA_DO_RAMO.find((a) => a.ramo !== ramo && a.pergunta.test(t));
   if (!atividade) return null;
   // Um cadastro explícito da empresa tem prioridade sobre suposições pelo segmento.
   if (ctx.produtos.some((p) => norm(p.nome).split(/[\s(]/).some((w) => w.length > 3 && t.includes(w)))) return null;
   if (ctx.faqs.some((f) => norm(f.pergunta) === t)) return null;
-  return "Não, aqui " + atividade.resposta + ". 😊 Somos " + empresa.nome + ", " + RAMOS[ramo].descricao + ". Você gostaria de saber algo sobre nossos produtos ou serviços?";
+  return "Não, aqui " + atividade.resposta + ". 😊 Somos " + empresa.nome + ", " + ramoEncontrado.descricao + ". Você gostaria de saber algo sobre nossos produtos ou serviços?";
 }
 
 // Perguntas de acompanhamento sobre o último produto mencionado pelo bot.
@@ -392,7 +394,7 @@ function responderBase(
     }
   }
 
-  const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, nomeEmpresa: ctx.empresas?.[0]?.nome });
+  const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, ...(ctx.empresas?.[0] ? { nomeEmpresa: ctx.empresas[0].nome } : {}) });
   if (cumprimento) return cumprimento;
 
   const acompanhamento = responderSobreUltimoProduto(texto, historico, ctx.produtos);
@@ -405,7 +407,8 @@ function responderBase(
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? (perguntaLogistica ? null : encontrarFaq(conversa, ctx.faqs));
   if (faq) return normalizarTextoResposta(faq.resposta);
 
-  const logistica = respostaLogisticaSemCadastro(conversa, ctx.faqs);\n  if (logistica) return logistica;
+  const logistica = respostaLogisticaSemCadastro(conversa, ctx.faqs);
+  if (logistica) return logistica;
 
   const horario = responderHorario(conversa, ctx.horarios);
   if (horario) return horario;

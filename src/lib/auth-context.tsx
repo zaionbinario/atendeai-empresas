@@ -10,11 +10,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
+    const client = supabase;
     let mounted = true;
     supabase.auth.getUser().then(({ data, error }) => {
       if (!mounted) return;
       if (error || !data.user) { setSession(null); setLoading(false); return; }
-      void supabase.auth.getSession().then(({ data: current }) => {
+      void client.auth.getSession().then(({ data: current }) => {
         if (mounted) { setSession(current.session?.user.id === data.user.id ? current.session : null); setLoading(false); }
       }).catch(() => { if (mounted) setLoading(false); });
     }).catch(() => { if (mounted) setLoading(false); });

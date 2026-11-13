@@ -9,8 +9,8 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   const { session } = useAuth();
-  const nome = typeof session?.user.user_metadata?.full_name === "string"
-    ? session.user.user_metadata.full_name : "";
+  const nome = typeof session?.user.user_metadata?.["full_name"] === "string"
+    ? session.user.user_metadata["full_name"] : "";
   return <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
     <header className="rounded-3xl border border-emerald-400/20 bg-gradient-to-r from-[#062d25] to-[#087b50] p-7 text-white">
       <div className="mb-3 flex items-center gap-2 text-emerald-200"><LayoutDashboard className="h-5 w-5" /> Área privada</div>
