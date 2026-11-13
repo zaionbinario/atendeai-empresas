@@ -96,13 +96,13 @@ function Simulador() {
       <PageHeader title="Simulador de conversa" desc="Teste o atendente virtual em uma conversa de demonstração." action={
         <Btn type="button" variant="ghost" onClick={reiniciar}><RotateCcw className="h-4 w-4" />Reiniciar</Btn>
       } />
-      <div className="mx-auto mb-3 max-w-md">
+      <div className="mx-auto mb-3 w-full max-w-3xl">
         <label htmlFor="empresa-simulador" className="mb-1 block text-sm font-medium">Empresa em teste</label>
         <select id="empresa-simulador" className="w-full rounded-xl border bg-card px-3 py-2 text-foreground" value={empresa?.id ?? ""} onChange={(e) => setEmpresaSelecionadaId(e.target.value)}>
           {store.empresas.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
         </select>
       </div>
-      <div className="mx-auto flex h-[70vh] max-w-md flex-col overflow-hidden rounded-3xl border shadow-xl">
+      <div className="mx-auto flex h-[min(72vh,780px)] min-h-[480px] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border shadow-xl">
         <div className="flex items-center gap-3 bg-wa-header p-3 text-wa-header-foreground">
           <div className="grid h-10 w-10 place-items-center rounded-full bg-wa-header-foreground/20 font-bold">{instrucoes.nomeAtendente[0]}</div>
           <div>
@@ -136,7 +136,7 @@ function Simulador() {
           ))}
         </div>
         <form className="flex gap-2 bg-wa-bar p-3" onSubmit={(e) => { e.preventDefault(); enviar(texto); }}>
-          <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite uma mensagem" className="min-w-0 flex-1 rounded-full bg-card px-4 py-2.5 text-sm outline-none" />
+          <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite uma mensagem" className="min-w-0 flex-1 rounded-full bg-card px-5 py-3 text-base outline-none" />
           <button type="submit" aria-label="Enviar" disabled={!texto.trim()} className="grid h-11 w-11 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-50"><Send className="h-5 w-5" /></button>
         </form>
       </div>
