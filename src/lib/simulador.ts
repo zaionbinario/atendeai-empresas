@@ -150,6 +150,21 @@ function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
     ? faqs.find((faq) => pagamento.busca.test(norm(faq.pergunta))) ?? null
     : null;
 }
+// Se a FAQ de entrega já informa uma taxa, reaproveita o valor ao perguntar
+// pelo frete. Nunca inventa um preço quando ele não foi cadastrado.
+function taxaDeEntregaCadastrada(faqs: Faq[]): string | null {
+  for (const faq of faqs) {
+    if (!TERMOS_LOGISTICA.test(norm(faq.pergunta + " " + faq.resposta))) continue;
+    const resposta = normalizarTextoResposta(faq.resposta);
+    const valor = resposta.match(/(?:taxa(?:\\s+de\\s+entrega)?|frete)[^.!?\\n]{0,65}?(?:R\\$\\s*\\d+(?:[.,]\\d{1,2})?)/i)
+      ?? resposta.match(/(?:R\\$\\s*\\d+(?:[.,]\\d{1,2})?)[^.!?\\n]{0,45}?(?:taxa|frete)/i);
+    if (valor) {
+      const preco = valor[0].match(/R\\$\\s*\\d+(?:[.,]\\d{1,2})?/i);
+      if (preco) return preco[0].replace(/\\s+/g, " ");
+    }
+  }
+  return null;
+}
 function respostaLogisticaSemCadastro(texto: string, faqs: Faq[]): string | null {
   const assunto = assuntoLogistico(texto);
   if (!assunto) return null;
@@ -402,6 +417,11 @@ function responderBase(
 
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
+
+  if (assuntoLogistico(conversa) === "taxa") {
+    const taxa = taxaDeEntregaCadastrada(ctx.faqs);
+    if (taxa) return "A taxa de entrega cadastrada é de " + taxa + ". 😊";
+  }
 
   const perguntaLogistica = assuntoLogistico(conversa) !== null;
   const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? (perguntaLogistica ? null : encontrarFaq(conversa, ctx.faqs));
