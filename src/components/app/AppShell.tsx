@@ -140,7 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <div className="mt-2 w-full lg:hidden"><SiteSearch /></div>
       </header>
-      {open && <div className="fixed inset-x-0 top-[112px] z-50 space-y-5 border-b border-white/10 bg-[#090f12] p-4 shadow-2xl lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
+      {open && <div className="fixed inset-x-0 top-[112px] bottom-0 z-50 flex flex-col gap-5 overflow-y-auto overscroll-contain touch-pan-y border-b border-white/10 bg-[#090f12] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl [-webkit-overflow-scrolling:touch] lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
       {confirmarSaida && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onMouseDown={e => { if (e.target === e.currentTarget && !saindo) setConfirmarSaida(false); }}>
           <section role="alertdialog" aria-modal="true" aria-labelledby="confirmar-saida-titulo" aria-describedby="confirmar-saida-texto" className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
