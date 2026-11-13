@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Command as CommandIcon, Search, Package } from "lucide-react";
+import { ArrowRight, Command as CommandIcon, Search } from "lucide-react";
 import { buscarPaginas, normalizarBusca } from "@/lib/busca";
 import { useStore } from "@/lib/store";
 import {
@@ -17,14 +17,16 @@ export function SiteSearch() {
   const [termo, setTermo] = useState("");
   const navegar = useNavigate();
   const { produtos } = useStore();
-  const resultados = buscarPaginas(termo);
+  const paginas = buscarPaginas(termo);
   const palavras = normalizarBusca(termo).split(" ").filter(Boolean);
-  const produtosEncontrados = palavras.length
-    ? produtos.filter(p => {
-        const conteudo = normalizarBusca([p.nome, p.categoria, p.descricao].join(" "));
-        return palavras.every(palavra => conteudo.includes(palavra));
-      }).slice(0, 12)
-    : [];
+  const produtoEncontrado = palavras.length > 0 && produtos.some(produto => {
+    const texto = normalizarBusca([produto.nome, produto.categoria, produto.descricao].join(" "));
+    return palavras.every(palavra => texto.includes(palavra));
+  });
+  const paginaProdutos = buscarPaginas("produtos").find(pagina => pagina.to === "/produtos");
+  const resultados = produtoEncontrado && paginaProdutos && !paginas.some(pagina => pagina.to === "/produtos")
+    ? [paginaProdutos, ...paginas]
+    : paginas;
 
   useEffect(() => {
     const tecla = (evento: KeyboardEvent) => {
@@ -45,12 +47,6 @@ export function SiteSearch() {
   const selecionar = (destino: (typeof resultados)[number]) => {
     mudarAbertura(false);
     void navegar({ to: destino.to });
-  };
-
-  const selecionarProduto = (nome: string) => {
-    try { sessionStorage.setItem("zyon-busca-produto-pendente", nome); } catch {}
-    mudarAbertura(false);
-    void navegar({ to: "/produtos" });
   };
 
   return (
@@ -77,7 +73,7 @@ export function SiteSearch() {
           placeholder="Busque notificações, histórico, empresas..."
         />
         <CommandList className="max-h-[min(60vh,400px)]">
-          {resultados.length === 0 && produtosEncontrados.length === 0 ? (
+          {resultados.length === 0 ? (
             <CommandEmpty>Nenhuma página encontrada. Tente outra palavra.</CommandEmpty>
           ) : (
             <CommandGroup heading={termo.trim() ? "Páginas encontradas" : "Páginas do Zyon Chat"}>
@@ -92,25 +88,6 @@ export function SiteSearch() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{destino.titulo}</span>
                     <span className="mt-0.5 block truncate text-xs text-muted-foreground">{destino.descricao}</span>
-                  </span>
-                  <CommandShortcut><ArrowRight className="h-3.5 w-3.5" /></CommandShortcut>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
-          {produtosEncontrados.length > 0 && (
-            <CommandGroup heading="Produtos encontrados">
-              {produtosEncontrados.map((produto) => (
-                <CommandItem
-                  key={"produto-" + produto.id}
-                  value={"produto-" + produto.id}
-                  onSelect={() => selecionarProduto(produto.nome)}
-                  className="flex min-h-14 items-center gap-3 px-3 py-2"
-                >
-                  <Package className="h-4 w-4 shrink-0 text-primary" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold">{produto.nome}</span>
-                    <span className="block truncate text-xs text-muted-foreground">Produto · {produto.categoria} · {produto.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
                   </span>
                   <CommandShortcut><ArrowRight className="h-3.5 w-3.5" /></CommandShortcut>
                 </CommandItem>
