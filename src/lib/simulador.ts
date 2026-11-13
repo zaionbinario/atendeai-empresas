@@ -11,7 +11,7 @@ const STOP = new Set("o a os as um uma uns umas de do da dos das no na nos nas e
 const SINONIMOS: string[][] = [
   ["entreg", "deliver", "levam", "levar", "mandam", "mandar", "envia", "envio", "frete", "casa", "domicil", "motob", "taxa"],
   ["pagam", "pagar", "pago", "pix", "cartao", "credit", "debit", "dinhei", "forma", "aceit"],
-  ["encome", "pedido", "reserv", "antece", "sob", "personal"],
+  ["encome", "pedido", "reserv", "antece", "sob", "personal", "solicit"],
   ["horar", "abre", "abert", "fecha", "funcio", "expedi", "hora"],
   ["preco", "custa", "valor", "quant", "cobra"],
   ["ender", "local", "onde", "fica", "rua", "endereco"],
@@ -108,11 +108,45 @@ const INTENCOES: { tipo: Intencao; padrao: RegExp; busca: RegExp }[] = [
   { tipo: "encomenda", padrao: /\b(encomenda|encomendas|reservar|reserva|antecedencia|pedido)\w*\b/, busca: /\b(encomenda|reserva|pedido|antecedencia)\w*\b/ },
 ];
 
+// Intenções relacionadas compartilham contexto, mas não garantem o mesmo serviço.
+const DETALHES_ENTREGA = /\\b(frete|taxa|valor|preco|custa|quanto|bairro|regiao|cidade|cep|prazo|tempo|demora|dias|horas|quando)\\b/;
+const TERMOS_LOGISTICA = /\\b(entreg\\w*|delivery|frete|motoboy|domicilio|envi\\w*|levam|levar|mandam|mandar)\\b/;
+const TERMOS_ENCOMENDA = /\\b(encomend\\w*|pedido\\w*|reserv\\w*|antecedencia)\\b/;
+
 function encontrarFaqPorIntencao(texto: string, faqs: Faq[]): Faq | null {
   const t = norm(texto);
-  const intencao = INTENCOES.find((item) => item.padrao.test(t));
-  if (!intencao) return null;
-  return faqs.find((faq) => intencao.busca.test(norm(faq.pergunta)) || intencao.busca.test(norm(faq.resposta))) ?? null;
+  const entrega = TERMOS_LOGISTICA.test(t);
+  const detalhe = entrega && DETALHES_ENTREGA.test(t);
+  const candidatas = faqs
+    .filter((faq) => {
+      const pergunta = norm(faq.pergunta);
+      const resposta = norm(faq.resposta);
+      if (entrega) {
+        // Não usar "aceitamos encomendas" como confirmação de entrega ou frete.
+        if (!TERMOS_LOGISTICA.test(pergunta) && !TERMOS_LOGISTICA.test(resposta)) return false;
+        if (detalhe && !DETALHES_ENTREGA.test(pergunta + " " + resposta)) return false;
+        return true;
+      }
+      if (TERMOS_ENCOMENDA.test(t)) return TERMOS_ENCOMENDA.test(pergunta);
+      return INTENCOES.some((item) => item.padrao.test(t) && item.tipo === "pagamento" && item.busca.test(pergunta));
+    });
+  return candidatas[0] ?? null;
+}
+
+function respostaLogisticaSemCadastro(texto: string, faqs: Faq[]): string | null {
+  const t = norm(texto);
+  if (!TERMOS_LOGISTICA.test(t)) return null;
+  const perguntaEspecifica = DETALHES_ENTREGA.test(t);
+  const relacionadas = faqs.filter((f) => TERMOS_LOGISTICA.test(norm(f.pergunta) + " " + norm(f.resposta)));
+  if (relacionadas.length) {
+    return perguntaEspecifica
+      ? "Ainda não tenho essa informação específica sobre entrega ou frete cadastrada. Vou pedir para a equipe confirmar. 🙋"
+      : "Não tenho confirmação dessa modalidade de entrega no cadastro. Vou pedir para a equipe verificar. 🙋";
+  }
+  const encomenda = faqs.some((f) => TERMOS_ENCOMENDA.test(norm(f.pergunta)));
+  return encomenda
+    ? "Temos informações sobre encomendas, mas não há confirmação de entrega ou frete no cadastro. Vou pedir para a equipe verificar. 🙋"
+    : "Ainda não tenho informações sobre entregas ou frete cadastradas. Vou pedir para a equipe confirmar. 🙋";
 }
 
 function normalizarTextoResposta(texto: string): string {
@@ -353,8 +387,8 @@ function responderBase(
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
 
-  const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? encontrarFaq(conversa, ctx.faqs);
-  if (faq) return normalizarTextoResposta(faq.resposta);
+  const perguntaLogistica = TERMOS_LOGISTICA.test(t);\n  const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? (perguntaLogistica ? null : encontrarFaq(conversa, ctx.faqs));
+  if (faq) return normalizarTextoResposta(faq.resposta);\n\n  const logistica = respostaLogisticaSemCadastro(conversa, ctx.faqs);\n  if (logistica) return logistica;
 
   const horario = responderHorario(conversa, ctx.horarios);
   if (horario) return horario;
