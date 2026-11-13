@@ -255,3 +255,31 @@ html, body, #root {
 @supports not (overflow: clip) {
   html, body, #root { overflow-x: hidden; }
 }
+
+
+/* Legibilidade do tema claro: letras mais encorpadas e cinzas com contraste
+   suficiente, sem alterar o tema escuro ou as escolhas de tamanho da fonte. */
+html.light {
+  --foreground: oklch(0.19 0.018 245);
+  --card-foreground: oklch(0.19 0.018 245);
+  --popover-foreground: oklch(0.19 0.018 245);
+  --muted-foreground: oklch(0.38 0.02 245);
+  --sidebar-foreground: oklch(0.19 0.018 245);
+}
+html.light body {
+  font-weight: 500;
+  -webkit-font-smoothing: auto;
+}
+html.light .font-normal { font-weight: 500; }
+html.light .font-medium { font-weight: 600; }
+html.light .font-semibold { font-weight: 700; }
+html.light .font-bold { font-weight: 750; }
+html.light [class*="text-slate-500"],
+html.light [class*="text-slate-600"] {
+  color: oklch(0.37 0.02 245);
+}
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: oklch(0.43 0.015 245);
+  opacity: 1;
+}
