@@ -103,14 +103,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen w-full min-w-0 overflow-x-clip bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col gap-8 border-r border-white/10 bg-[#090f12] p-4 lg:flex light:border-slate-200 light:bg-white">
         {logo}
         <div><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Menu principal</p>{side}</div>
         {helpCard}
         <div className="flex items-center gap-3 border-t border-white/10 px-2 pt-4 light:border-slate-200"><div className="grid h-10 w-10 place-items-center rounded-full bg-violet-500 text-lg font-bold text-white">Z</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white light:text-slate-900">Minha conta</p><p className="text-xs text-emerald-400 light:text-emerald-700">Plano demonstração</p></div><Users className="h-4 w-4 text-slate-500" /></div>
       </aside>
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#090f12]/95 px-3 py-2 lg:ml-64 lg:px-8 light:border-slate-200 light:bg-white/95">
+      <header className="sticky top-0 z-30 min-w-0 border-b border-white/10 bg-[#090f12]/95 px-3 py-2 lg:ml-64 lg:px-8 light:border-slate-200 light:bg-white/95">
         <div className="flex min-h-14 items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <button aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)} className="shrink-0 rounded-xl p-2 text-slate-300 hover:bg-white/5 lg:hidden light:text-slate-700 light:hover:bg-slate-100">{open ? <X /> : <Menu />}</button>
@@ -180,7 +180,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </section>
         </div>
       )}
-      <main className="min-h-[calc(100vh-76px)] p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full max-w-[1440px]">{children}</div></main>
+      <main className="min-h-[calc(100vh-76px)] min-w-0 max-w-full p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full min-w-0 max-w-[1440px]">{children}</div></main>
     </div>
   );
 }
