@@ -10,23 +10,57 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdministracaoRouteImport } from './routes/administracao'
 import { Route as AtendenteRouteImport } from './routes/atendente'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as ConversasRouteImport } from './routes/conversas'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as HorariosRouteImport } from './routes/horarios'
+import { Route as IntegracoesRouteImport } from './routes/integracoes'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as PerguntasRouteImport } from './routes/perguntas'
 import { Route as ProdutosRouteImport } from './routes/produtos'
-import { Route as SimuladorRouteImport } from './routes/simulador'
-import { Route as ConversasRouteImport } from './routes/conversas'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RespostasRapidasRouteImport } from './routes/respostas-rapidas'
+import { Route as SimuladorRouteImport } from './routes/simulador'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdministracaoRoute = AdministracaoRouteImport.update({
+  id: '/administracao',
+  path: '/administracao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AtendenteRoute = AtendenteRouteImport.update({
   id: '/atendente',
   path: '/atendente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConversasRoute = ConversasRouteImport.update({
+  id: '/conversas',
+  path: '/conversas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmpresasRoute = EmpresasRouteImport.update({
@@ -39,6 +73,21 @@ const HorariosRoute = HorariosRouteImport.update({
   path: '/horarios',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegracoesRoute = IntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PerguntasRoute = PerguntasRouteImport.update({
   id: '/perguntas',
   path: '/perguntas',
@@ -49,14 +98,14 @@ const ProdutosRoute = ProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SimuladorRoute = SimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConversasRoute = ConversasRouteImport.update({
-  id: '/conversas',
-  path: '/conversas',
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RespostasRapidasRoute = RespostasRapidasRouteImport.update({
@@ -64,87 +113,155 @@ const RespostasRapidasRoute = RespostasRapidasRouteImport.update({
   path: '/respostas-rapidas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SimuladorRoute = SimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
   '/atendente': typeof AtendenteRoute
+  '/cadastro': typeof CadastroRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/conversas': typeof ConversasRoute
+  '/dashboard': typeof DashboardRoute
   '/empresas': typeof EmpresasRoute
   '/horarios': typeof HorariosRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
-  '/simulador': typeof SimuladorRoute
-  '/conversas': typeof ConversasRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/respostas-rapidas': typeof RespostasRapidasRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
   '/atendente': typeof AtendenteRoute
+  '/cadastro': typeof CadastroRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/conversas': typeof ConversasRoute
+  '/dashboard': typeof DashboardRoute
   '/empresas': typeof EmpresasRoute
   '/horarios': typeof HorariosRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
-  '/simulador': typeof SimuladorRoute
-  '/conversas': typeof ConversasRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/respostas-rapidas': typeof RespostasRapidasRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/administracao': typeof AdministracaoRoute
   '/atendente': typeof AtendenteRoute
+  '/cadastro': typeof CadastroRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/conversas': typeof ConversasRoute
+  '/dashboard': typeof DashboardRoute
   '/empresas': typeof EmpresasRoute
   '/horarios': typeof HorariosRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/login': typeof LoginRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/perguntas': typeof PerguntasRoute
   '/produtos': typeof ProdutosRoute
-  '/simulador': typeof SimuladorRoute
-  '/conversas': typeof ConversasRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/respostas-rapidas': typeof RespostasRapidasRoute
+  '/simulador': typeof SimuladorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/administracao'
     | '/atendente'
+    | '/cadastro'
+    | '/configuracoes'
+    | '/conversas'
+    | '/dashboard'
     | '/empresas'
     | '/horarios'
+    | '/integracoes'
+    | '/login'
+    | '/notificacoes'
     | '/perguntas'
     | '/produtos'
-    | '/simulador'
-    | '/conversas'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
     | '/respostas-rapidas'
+    | '/simulador'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/administracao'
     | '/atendente'
+    | '/cadastro'
+    | '/configuracoes'
+    | '/conversas'
+    | '/dashboard'
     | '/empresas'
     | '/horarios'
+    | '/integracoes'
+    | '/login'
+    | '/notificacoes'
     | '/perguntas'
     | '/produtos'
-    | '/simulador'
-    | '/conversas'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
     | '/respostas-rapidas'
+    | '/simulador'
   id:
     | '__root__'
     | '/'
+    | '/administracao'
     | '/atendente'
+    | '/cadastro'
+    | '/configuracoes'
+    | '/conversas'
+    | '/dashboard'
     | '/empresas'
     | '/horarios'
+    | '/integracoes'
+    | '/login'
+    | '/notificacoes'
     | '/perguntas'
     | '/produtos'
-    | '/simulador'
-    | '/conversas'
+    | '/recuperar-senha'
+    | '/redefinir-senha'
     | '/respostas-rapidas'
+    | '/simulador'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdministracaoRoute: typeof AdministracaoRoute
   AtendenteRoute: typeof AtendenteRoute
+  CadastroRoute: typeof CadastroRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  ConversasRoute: typeof ConversasRoute
+  DashboardRoute: typeof DashboardRoute
   EmpresasRoute: typeof EmpresasRoute
   HorariosRoute: typeof HorariosRoute
+  IntegracoesRoute: typeof IntegracoesRoute
+  LoginRoute: typeof LoginRoute
+  NotificacoesRoute: typeof NotificacoesRoute
   PerguntasRoute: typeof PerguntasRoute
   ProdutosRoute: typeof ProdutosRoute
-  SimuladorRoute: typeof SimuladorRoute
-  ConversasRoute: typeof ConversasRoute
+  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   RespostasRapidasRoute: typeof RespostasRapidasRoute
+  SimuladorRoute: typeof SimuladorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,11 +273,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/administracao': {
+      id: '/administracao'
+      path: '/administracao'
+      fullPath: '/administracao'
+      preLoaderRoute: typeof AdministracaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/atendente': {
       id: '/atendente'
       path: '/atendente'
       fullPath: '/atendente'
       preLoaderRoute: typeof AtendenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conversas': {
+      id: '/conversas'
+      path: '/conversas'
+      fullPath: '/conversas'
+      preLoaderRoute: typeof ConversasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/empresas': {
@@ -177,6 +329,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HorariosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integracoes': {
+      id: '/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof IntegracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/perguntas': {
       id: '/perguntas'
       path: '/perguntas'
@@ -191,18 +364,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/simulador': {
-      id: '/simulador'
-      path: '/simulador'
-      fullPath: '/simulador'
-      preLoaderRoute: typeof SimuladorRouteImport
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/conversas': {
-      id: '/conversas'
-      path: '/conversas'
-      fullPath: '/conversas'
-      preLoaderRoute: typeof ConversasRouteImport
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/respostas-rapidas': {
@@ -212,19 +385,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RespostasRapidasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/simulador': {
+      id: '/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof SimuladorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdministracaoRoute: AdministracaoRoute,
   AtendenteRoute: AtendenteRoute,
+  CadastroRoute: CadastroRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  ConversasRoute: ConversasRoute,
+  DashboardRoute: DashboardRoute,
   EmpresasRoute: EmpresasRoute,
   HorariosRoute: HorariosRoute,
+  IntegracoesRoute: IntegracoesRoute,
+  LoginRoute: LoginRoute,
+  NotificacoesRoute: NotificacoesRoute,
   PerguntasRoute: PerguntasRoute,
   ProdutosRoute: ProdutosRoute,
-  SimuladorRoute: SimuladorRoute,
-  ConversasRoute: ConversasRoute,
+  RecuperarSenhaRoute: RecuperarSenhaRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   RespostasRapidasRoute: RespostasRapidasRoute,
+  SimuladorRoute: SimuladorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
