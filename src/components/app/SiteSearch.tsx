@@ -47,6 +47,12 @@ export function SiteSearch() {
     void navegar({ to: destino.to });
   };
 
+  const selecionarProduto = (nome: string) => {
+    try { sessionStorage.setItem("zyon-busca-produto-pendente", nome); } catch {}
+    mudarAbertura(false);
+    void navegar({ to: "/produtos" });
+  };
+
   return (
     <>
       <button
@@ -86,6 +92,25 @@ export function SiteSearch() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{destino.titulo}</span>
                     <span className="mt-0.5 block truncate text-xs text-muted-foreground">{destino.descricao}</span>
+                  </span>
+                  <CommandShortcut><ArrowRight className="h-3.5 w-3.5" /></CommandShortcut>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+          {produtosEncontrados.length > 0 && (
+            <CommandGroup heading="Produtos encontrados">
+              {produtosEncontrados.map((produto) => (
+                <CommandItem
+                  key={"produto-" + produto.id}
+                  value={"produto-" + produto.id}
+                  onSelect={() => selecionarProduto(produto.nome)}
+                  className="flex min-h-14 items-center gap-3 px-3 py-2"
+                >
+                  <Package className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{produto.nome}</span>
+                    <span className="block truncate text-xs text-muted-foreground">Produto · {produto.categoria} · {produto.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
                   </span>
                   <CommandShortcut><ArrowRight className="h-3.5 w-3.5" /></CommandShortcut>
                 </CommandItem>
