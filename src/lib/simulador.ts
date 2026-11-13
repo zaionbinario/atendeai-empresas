@@ -401,8 +401,11 @@ function responderBase(
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
 
-  const perguntaLogistica = assuntoLogistico(conversa) !== null;\n  const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? (perguntaLogistica ? null : encontrarFaq(conversa, ctx.faqs));
-  if (faq) return normalizarTextoResposta(faq.resposta);\n\n  const logistica = respostaLogisticaSemCadastro(conversa, ctx.faqs);\n  if (logistica) return logistica;
+  const perguntaLogistica = assuntoLogistico(conversa) !== null;
+  const faq = encontrarFaqPorIntencao(conversa, ctx.faqs) ?? (perguntaLogistica ? null : encontrarFaq(conversa, ctx.faqs));
+  if (faq) return normalizarTextoResposta(faq.resposta);
+
+  const logistica = respostaLogisticaSemCadastro(conversa, ctx.faqs);\n  if (logistica) return logistica;
 
   const horario = responderHorario(conversa, ctx.horarios);
   if (horario) return horario;
