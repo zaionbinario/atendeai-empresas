@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Command as CommandIcon, Search } from "lucide-react";
-import { buscarPaginas } from "@/lib/busca";
+import { ArrowRight, Command as CommandIcon, Search, Package } from "lucide-react";
+import { buscarPaginas, normalizarBusca } from "@/lib/busca";
+import { useStore } from "@/lib/store";
 import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput,
   CommandItem, CommandList, CommandShortcut,
@@ -15,7 +16,15 @@ export function SiteSearch() {
   const [aberto, setAberto] = useState(false);
   const [termo, setTermo] = useState("");
   const navegar = useNavigate();
+  const { produtos } = useStore();
   const resultados = buscarPaginas(termo);
+  const palavras = normalizarBusca(termo).split(" ").filter(Boolean);
+  const produtosEncontrados = palavras.length
+    ? produtos.filter(p => {
+        const conteudo = normalizarBusca([p.nome, p.categoria, p.descricao].join(" "));
+        return palavras.every(palavra => conteudo.includes(palavra));
+      }).slice(0, 12)
+    : [];
 
   useEffect(() => {
     const tecla = (evento: KeyboardEvent) => {
@@ -62,10 +71,10 @@ export function SiteSearch() {
           placeholder="Busque notificações, histórico, empresas..."
         />
         <CommandList className="max-h-[min(60vh,400px)]">
-          {resultados.length === 0 ? (
+          {resultados.length === 0 && produtosEncontrados.length === 0 ? (
             <CommandEmpty>Nenhuma página encontrada. Tente outra palavra.</CommandEmpty>
           ) : (
-            <CommandGroup heading={termo.trim() ? "Resultados da pesquisa" : "Páginas do Zyon Chat"}>
+            <CommandGroup heading={termo.trim() ? "Páginas encontradas" : "Páginas do Zyon Chat"}>
               {resultados.map((destino) => (
                 <CommandItem
                   key={destino.to}
