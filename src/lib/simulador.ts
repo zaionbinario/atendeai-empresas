@@ -4,7 +4,7 @@
 import type { Faq, Horario, Instrucoes, Produto } from "./types";
 import { brl } from "./store";
 
-const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[!?.,;:]/g, " ").replace(/\s+/g, " ").trim();
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
 
 const STOP = new Set("o a os as um uma uns umas de do da dos das no na nos nas em para pra pro por com e ou que qual quais quanto quantos quando como voces voce vcs vc tem ter ha eu me minha meu seu sua sobre se sim nao isso esse essa ai la ja so tambem mais muito oi ola gostaria queria saber pode podem posso favor obrigado".split(" "));
 
@@ -156,8 +156,9 @@ function taxaDeEntregaCadastrada(faqs: Faq[]): string | null {
   for (const faq of faqs) {
     if (!TERMOS_LOGISTICA.test(norm(faq.pergunta + " " + faq.resposta))) continue;
     const resposta = normalizarTextoResposta(faq.resposta);
-    const valor = resposta.match(/(?:taxa(?:\\s+de\\s+entrega)?|frete)[^.!?\\n]{0,65}?(?:R\\$\\s*\\d+(?:[.,]\\d{1,2})?)/i)
-      ?? resposta.match(/(?:R\\$\\s*\\d+(?:[.,]\\d{1,2})?)[^.!?\\n]{0,45}?(?:taxa|frete)/i);
+    // Aceita "taxa de R$ 5,00", "frete: R$ 5,00" e "R$ 5,00 de frete".
+    const valor = resposta.match(/(?:taxa|frete)[^.!?\\n]{0,65}?R\\$\\s*\\d+(?:[.,]\\d{1,2})?/i)
+      ?? resposta.match(/R\\$\\s*\\d+(?:[.,]\\d{1,2})?[^.!?\\n]{0,45}?(?:taxa|frete)/i);
     if (valor) {
       const preco = valor[0].match(/R\\$\\s*\\d+(?:[.,]\\d{1,2})?/i);
       if (preco) return preco[0].replace(/\\s+/g, " ");
