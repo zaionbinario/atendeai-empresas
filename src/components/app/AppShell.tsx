@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     });
     return () => { ativo = false; revisao++; subscription.unsubscribe(); };
   }, []);
-  const { botAtivo, setBotAtivo, conversas } = useStore();
+  const { botAtivo, setBotAtivo, conversas, empresas, empresaSelecionadaId, setEmpresaSelecionadaId } = useStore();
   useEffect(() => { applyAppearance(loadAppearance()); }, []);
   const pendentes = conversas.filter((c) => c.aguardandoHumano === true).length;
   useEffect(() => {
@@ -97,6 +97,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       setErroSaida("Não foi possível sair da conta. Tente novamente.");
     } finally { setSaindo(false); }
   };
+  const companySelector = empresas.length > 0 ? (
+    <div className="min-w-0 px-2 pb-2">
+      <label htmlFor="empresa-ativa" className="mb-1 block text-[11px] font-semibold text-slate-400">Empresa ativa</label>
+      <select id="empresa-ativa" value={empresaSelecionadaId} onChange={(e) => setEmpresaSelecionadaId(e.target.value)} className="w-full min-w-0 rounded-xl border border-white/15 bg-[#152125] px-2 py-2 text-sm text-white outline-none focus:border-emerald-400" aria-label="Selecionar empresa">
+        {empresas.map((empresa) => <option key={empresa.id} value={empresa.id}>{empresa.nome}</option>)}
+      </select>
+    </div>
+  ) : null;
   const side = (
     <nav className="flex flex-col gap-1" aria-label="Navegação principal">
       {nav.filter(({ to }) => to !== "/administracao" || isAdminPlataforma).map(({ to, label, icon: Icon }) => (
@@ -135,6 +143,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen w-full min-w-0 overflow-x-clip bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-40 hidden h-dvh w-64 flex-col gap-3 overflow-hidden border-r border-white/10 bg-[#090f12] p-4 lg:flex light:border-slate-200 light:bg-white">
         {logo}
+        {companySelector}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:#64748b_transparent] [scrollbar-width:thin]"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Menu principal</p>{side}</div>
         <div className="shrink-0">{helpCard}</div>
         <div className="flex shrink-0 items-center gap-3 border-t border-white/10 px-2 pt-4 light:border-slate-200"><div className="grid h-10 w-10 place-items-center rounded-full bg-violet-500 text-lg font-bold text-white">{inicialConta}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white light:text-slate-900">Minha conta</p><p className="text-xs text-emerald-400 light:text-emerald-700">Plano demonstração</p></div><Users className="h-4 w-4 text-slate-500" /></div>
@@ -169,7 +178,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <div className="mt-1 w-full lg:hidden"><SiteSearch /></div>
       </header>
-      {open && <div className="fixed inset-x-0 top-[112px] bottom-0 z-50 flex flex-col gap-5 overflow-y-auto overscroll-contain touch-pan-y border-b border-white/10 bg-[#090f12] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl [-webkit-overflow-scrolling:touch] lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
+      {open && <div className="fixed inset-x-0 top-[112px] bottom-0 z-50 flex flex-col gap-5 overflow-y-auto overscroll-contain touch-pan-y border-b border-white/10 bg-[#090f12] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl [-webkit-overflow-scrolling:touch] lg:hidden light:border-slate-200 light:bg-white">{companySelector}{side}{helpCard}</div>}
       {confirmarSaida && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onMouseDown={e => { if (e.target === e.currentTarget && !saindo) setConfirmarSaida(false); }}>
           <section role="alertdialog" aria-modal="true" aria-labelledby="confirmar-saida-titulo" aria-describedby="confirmar-saida-texto" className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
