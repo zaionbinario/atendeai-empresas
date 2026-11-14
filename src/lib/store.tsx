@@ -1,6 +1,8 @@
 // Estado compartilhado do painel. Persistência local de demonstração; backend será conectado depois.
 import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import * as d from "./demo-data";
+import { supabase } from "./auth-client";
+import { toast } from "sonner";
 import type { Empresa, Produto, Horario, Faq, Instrucoes, Conversa } from "./types";
 import { detectarEventosDeConversas, inserirNotificacao, marcarNotificacaoLida, VERSAO_AVISO, type Notificacao } from "./notificacoes";
 
@@ -34,9 +36,61 @@ function usePersistido<T>(chave: string, inicial: T): [T, Dispatch<SetStateActio
 }
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [empresas, setEmpresas] = usePersistido("zyon-empresas", d.empresasDemo);
-  const [produtos, setProdutos] = usePersistido("zyon-produtos", d.produtosDemo);
-  const [horarios, setHorarios] = usePersistido("zyon-horarios", d.horariosDemo);
-  const [faqs, setFaqs] = usePersistido("zyon-faqs", d.faqsDemo);
+  // Dados comerciais são privados por empresa, nunca compartilhados pelo localStorage.
+  const [produtos, setProdutosState] = useState<Produto[]>([]);
+  const [horarios, setHorariosState] = useState<Horario[]>([]);
+  const [faqs, setFaqsState] = useState<Faq[]>([]);
+  const [empresaDadosId, setEmpresaDadosId] = useState("");
+  const [dadosProntos, setDadosProntos] = useState(false);
+  const empresaDadosIdRef = useRef("");
+  const dadosProntosRef = useRef(false);
+  useEffect(() => {
+    let cancelled = false;
+    async function carregarDados() {
+      empresaDadosIdRef.current = "";
+      dadosProntosRef.current = false;
+      setDadosProntos(false);
+      setProdutosState([]);
+      setHorariosState([]);
+      setFaqsState([]);
+      if (!supabase) return;
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (cancelled || authError || !auth.user) return;
+      const { data: vinculos, error: vinculosError } = await supabase.from("empresa_usuarios").select("empresa_id").eq("usuario_id", auth.user.id);
+      if (cancelled || vinculosError || !vinculos?.length) return;
+      const { data: ativas, error: empresasError } = await supabase.from("empresas").select("id").in("id", vinculos.map(v => v.empresa_id)).eq("status", "ativa").order("criado_em", { ascending: true }).limit(1);
+      if (cancelled || empresasError || !ativas?.length) return;
+      const id = ativas[0].id;
+      const { data, error } = await supabase.from("empresa_dados").select("secao,conteudo").eq("empresa_id", id);
+      if (cancelled) return;
+      if (error) { toast.error("Não foi possível carregar os dados da empresa: " + error.message); return; }
+      const sections = new Map((data ?? []).map(item => [item.secao, item.conteudo]));
+      setProdutosState(Array.isArray(sections.get("produtos")) ? sections.get("produtos") as Produto[] : []);
+      setHorariosState(Array.isArray(sections.get("horarios")) ? sections.get("horarios") as Horario[] : d.horariosDemo);
+      setFaqsState(Array.isArray(sections.get("faqs")) ? sections.get("faqs") as Faq[] : []);
+      empresaDadosIdRef.current = id;
+      dadosProntosRef.current = true;
+      setEmpresaDadosId(id);
+      setDadosProntos(true);
+    }
+    void carregarDados();
+    return () => { cancelled = true; };
+  }, []);
+  async function salvarSecao(secao: "produtos" | "horarios" | "faqs", conteudo: Produto[] | Horario[] | Faq[]) {
+    const id = empresaDadosIdRef.current;
+    if (!supabase || !id || !dadosProntosRef.current) { toast.error("Aguarde o carregamento da empresa."); return; }
+    const { error } = await supabase.from("empresa_dados").upsert({
+      empresa_id: id, secao, conteudo, atualizado_em: new Date().toISOString(),
+    }, { onConflict: "empresa_id,secao" });
+    if (error) { toast.error("Erro ao salvar no Supabase: " + error.message); return; }
+    if (secao === "produtos") setProdutosState(conteudo as Produto[]);
+    if (secao === "horarios") setHorariosState(conteudo as Horario[]);
+    if (secao === "faqs") setFaqsState(conteudo as Faq[]);
+    toast.success("Dados salvos no Supabase!");
+  }
+  const setProdutos = (v: Produto[]) => { void salvarSecao("produtos", v); };
+  const setHorarios = (v: Horario[]) => { void salvarSecao("horarios", v); };
+  const setFaqs = (v: Faq[]) => { void salvarSecao("faqs", v); };
   const [instrucoes, setInstrucoes] = usePersistido("zyon-instrucoes", d.instrucoesDemo);
   const [empresaSelecionadaId, setEmpresaSelecionadaId] = usePersistido("zyon-empresa-selecionada", "");
   const [instrucoesPorEmpresa, setInstrucoesPorEmpresa] = usePersistido<Record<string, Instrucoes>>("zyon-instrucoes-por-empresa", {});
