@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Package, ContactRound, Clock, HelpCircle, Bot, MessageCircle, MessagesSquare, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, Headset, Phone, Mail, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Building2, Package, ContactRound, Clock, HelpCircle, Bot, MessageCircle, MessagesSquare, Menu, X, Sparkles, ShieldCheck, ArrowUpRight, Bell, ChevronDown, Plug, Settings, Users, MessageSquareText, PauseCircle, PlayCircle, Sun, Moon, Headset, Phone, Mail, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
 import { NotificationBell } from "./NotificationBell";
@@ -12,6 +12,7 @@ import { LogOut } from "lucide-react";
 const nav = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
   { to: "/simulador", label: "Simulador", icon: Bot },
+  { to: "/empresas", label: "Cadastrar empresa", icon: Building2 },
   { to: "/conversas", label: "Histórico de conversas", icon: MessagesSquare },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/respostas-rapidas", label: "Respostas rápidas", icon: MessageSquareText },
