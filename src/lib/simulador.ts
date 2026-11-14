@@ -413,6 +413,32 @@ function responderBase(
   const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, ...(ctx.empresas?.[0] ? { nomeEmpresa: ctx.empresas[0].nome } : {}) });
   if (cumprimento) return cumprimento;
 
+  // Nomes explícitos (inclusive abreviados: "a vegetariana") têm prioridade
+  // sobre o último produto mencionado. Consulta apenas o cadastro desta empresa.
+  const tokensAtuais = norm(texto).split(" ").filter(Boolean);
+  const ignorar = new Set(["pizza", "pizzas", "produto", "produtos", "servico", "servicos", "de", "da", "do"]);
+  const nomes = [
+    ...ctx.produtos.map((p) => ({ nome: p.nome, tipo: "produto" as const, produto: p })),
+    ...ctx.faqs.map((f) => ({ nome: f.pergunta, tipo: "faq" as const, faq: f })),
+  ];
+  const candidatos = nomes.map((item) => {
+    const palavras = norm(item.nome).split(" ").filter((w) =>
+      w.length >= 4 && !ignorar.has(w) && !STOP.has(w) &&
+      !["voces", "vendem", "tem", "quanto", "custa", "preco", "qual"].includes(w)
+    );
+    const acertos = palavras.filter((w) => tokensAtuais.includes(w)).length;
+    return { item, acertos };
+  }).filter((x) => x.acertos > 0).sort((a, b) => b.acertos - a.acertos);
+  if (candidatos.length && (!candidatos[1] || candidatos[0]!.acertos > candidatos[1].acertos)) {
+    const escolhido = candidatos[0]!.item;
+    if (escolhido.tipo === "produto") return respostaProdutoPorIntencao(texto, escolhido.produto);
+    const preco = escolhido.faq.resposta.match(/R\$\s*\d+(?:[.,]\d{1,2})?/i);
+    if (/\b(?:quanto|custa|preco|valor)\b/.test(norm(texto)) && preco)
+      return "O preço informado é " + preco[0] + ". 😊";
+    if (/\b(?:quanto|custa|preco|valor)\b/.test(norm(texto)))
+      return "Não tenho um preço confirmado para esse item no cadastro.";
+  }
+
   const acompanhamento = responderSobreUltimoProduto(texto, historico, ctx.produtos);
   if (acompanhamento) return acompanhamento;
   // Respostas de FAQ podem conter um produto que não está no catálogo.
