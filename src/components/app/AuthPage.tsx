@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bot, Eye, EyeOff, LockKeyhole, Mail, UserRound, ArrowRight } from "lucide-react";
 import { authConfigured, getRememberMe, setRememberMe, supabase } from "@/lib/auth-client";
-import { Robot3D } from "./Robot3D";
 
 type Mode = "login" | "cadastro" | "recuperar";
 const validarSenha = (valor: string) => valor.length >= 6 && /[a-z]/.test(valor) && /[^A-Za-z0-9]/.test(valor);
@@ -66,7 +65,6 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.65)_100%)]" />
       <div className="absolute left-[8%] top-[12%] h-24 w-24 rounded-full bg-blue-500/15 blur-3xl" />
     </div>
-    <Robot3D />
     <div className="relative z-10 w-full max-w-[440px] rounded-[24px] border border-white/20 bg-[#070e2a]/65 px-6 py-8 shadow-[0_25px_90px_rgba(0,0,0,.65),0_0_60px_rgba(25,82,225,.16)] backdrop-blur-2xl sm:px-10 sm:py-10">
       <div className="mb-6 flex items-center justify-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl border border-sky-300/40 bg-sky-400/10 text-sky-300 shadow-[0_0_25px_rgba(56,189,248,.18)]"><Bot className="h-6 w-6" /></span>
