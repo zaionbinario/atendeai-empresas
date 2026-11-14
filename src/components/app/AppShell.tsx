@@ -139,22 +139,22 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-3 border-t border-white/10 px-2 pt-4 light:border-slate-200"><div className="grid h-10 w-10 place-items-center rounded-full bg-violet-500 text-lg font-bold text-white">{inicialConta}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white light:text-slate-900">Minha conta</p><p className="text-xs text-emerald-400 light:text-emerald-700">Plano demonstração</p></div><Users className="h-4 w-4 text-slate-500" /></div>
       </aside>
       <header className="sticky top-0 z-30 min-w-0 border-b border-white/10 bg-[#090f12]/95 px-3 py-2 lg:ml-64 lg:px-8 light:border-slate-200 light:bg-white/95">
-        <div className="flex min-h-14 items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-h-12 items-center justify-between gap-1 sm:min-h-14 sm:gap-2">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             <button aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)} className="shrink-0 rounded-xl p-2 text-slate-300 hover:bg-white/5 lg:hidden light:text-slate-700 light:hover:bg-slate-100">{open ? <X /> : <Menu />}</button>
             <div className="hidden min-w-0 w-full max-w-xl lg:block"><SiteSearch /></div>
-            <div className="min-w-0 lg:hidden"><span className="whitespace-nowrap font-display text-base font-bold text-white light:text-slate-900">Zyon <span className="text-emerald-400">Chat</span></span></div>
+            <div className="min-w-0 lg:hidden"><span className="whitespace-nowrap font-display text-sm font-bold text-white min-[380px]:text-base light:text-slate-900">Zyon <span className="text-emerald-400">Chat</span></span></div>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-            <button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black p-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden xl:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button>
-            <button onClick={() => setBotAtivo(!botAtivo)} aria-label={botAtivo ? "Pausar bot" : "Ativar bot"} className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border p-2 text-xs font-semibold sm:px-3", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}<span className="hidden sm:inline">{botAtivo ? "Bot ativo" : "Bot pausado"}</span></button>
+          <div className="flex shrink-0 items-center gap-0.5 min-[380px]:gap-1 sm:gap-3">
+            <button onClick={alternarTema} aria-label={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} title={temaClaro ? "Ativar tema escuro" : "Ativar tema claro"} className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black p-1.5 sm:p-2 text-xs font-semibold text-white transition hover:bg-zinc-800 sm:px-3">{temaClaro ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}<span className="hidden xl:inline">{temaClaro ? "Tema escuro" : "Tema claro"}</span></button>
+            <button onClick={() => setBotAtivo(!botAtivo)} aria-label={botAtivo ? "Pausar bot" : "Ativar bot"} className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border p-1.5 sm:p-2 text-xs font-semibold sm:px-3", botAtivo ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300 light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "border-amber-400/30 bg-amber-500/10 text-amber-300 light:border-amber-500/30 light:bg-amber-50 light:text-amber-800")} title="Alternar atendimento automático">{botAtivo ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}<span className="hidden sm:inline">{botAtivo ? "Bot ativo" : "Bot pausado"}</span></button>
             {pendentes > 0 && <Link to="/conversas" aria-label={pendentes + " conversas aguardando atendimento humano"} title="Conversas aguardando atendimento" className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-500/50 bg-red-500/15 px-2 py-2 text-xs font-bold text-red-300 hover:bg-red-500/25 light:text-red-700"><Users className="h-4 w-4" /><span>{pendentes}</span><span className="hidden xl:inline">Aguardando atendente</span></Link>}
             <NotificationBell />
             <div className="hidden h-8 w-px bg-white/10 sm:block light:bg-slate-200" />
             <div className="relative">
-              <button type="button" aria-label="Abrir menu da conta" aria-expanded={menuContaAberto} aria-haspopup="menu" onClick={() => setMenuContaAberto(v => !v)} className="flex shrink-0 items-center gap-2 rounded-xl p-1 text-sm text-foreground hover:bg-muted">
+              <button type="button" aria-label="Abrir menu da conta" aria-expanded={menuContaAberto} aria-haspopup="menu" onClick={() => setMenuContaAberto(v => !v)} className="flex shrink-0 items-center gap-1 rounded-xl p-0.5 text-sm text-foreground hover:bg-muted sm:gap-2 sm:p-1">
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-primary font-bold text-primary-foreground">{inicialConta}</span>
-                <span className="hidden xl:block">Minha conta</span><ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <span className="hidden xl:block">Minha conta</span><ChevronDown className="hidden h-4 w-4 text-muted-foreground min-[380px]:block" />
               </button>
               {menuContaAberto && <>
                 <button type="button" aria-label="Fechar menu da conta" className="fixed inset-0 z-40 cursor-default" onClick={() => setMenuContaAberto(false)} />
@@ -166,7 +166,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </div>
-        <div className="mt-2 w-full lg:hidden"><SiteSearch /></div>
+        <div className="mt-1 w-full lg:hidden"><SiteSearch /></div>
       </header>
       {open && <div className="fixed inset-x-0 top-[112px] bottom-0 z-50 flex flex-col gap-5 overflow-y-auto overscroll-contain touch-pan-y border-b border-white/10 bg-[#090f12] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl [-webkit-overflow-scrolling:touch] lg:hidden light:border-slate-200 light:bg-white">{side}{helpCard}</div>}
       {confirmarSaida && (
@@ -208,7 +208,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </section>
         </div>
       )}
-      <main className="min-h-[calc(100vh-76px)] min-w-0 max-w-full p-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full min-w-0 max-w-[1440px]">{children}</div></main>
+      <main className="min-h-[calc(100vh-76px)] min-w-0 max-w-full overflow-x-hidden px-3 py-4 sm:p-7 lg:ml-64 lg:p-8"><div className="mx-auto w-full min-w-0 max-w-[1440px]">{children}</div></main>
     </div>
   );
 }
