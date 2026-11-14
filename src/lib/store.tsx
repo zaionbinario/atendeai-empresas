@@ -10,7 +10,7 @@ type Store = {
   empresas: Empresa[]; setEmpresas: Dispatch<SetStateAction<Empresa[]>>;
   produtos: Produto[]; setProdutos: (v: Produto[]) => void; salvarProdutos: (v: Produto[]) => Promise<boolean>;
   horarios: Horario[]; setHorarios: (v: Horario[]) => void; salvarHorarios: (v: Horario[]) => Promise<boolean>;
-  faqs: Faq[]; setFaqs: (v: Faq[]) => void;
+  faqs: Faq[]; setFaqs: (v: Faq[]) => void; salvarFaqs: (v: Faq[]) => Promise<boolean>;
   instrucoes: Instrucoes; setInstrucoes: (v: Instrucoes) => void;
   empresaSelecionadaId: string; setEmpresaSelecionadaId: (id: string) => void;
   instrucoesPorEmpresa: Record<string, Instrucoes>; setInstrucoesPorEmpresa: Dispatch<SetStateAction<Record<string, Instrucoes>>>;
@@ -97,7 +97,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const setProdutos = (v: Produto[]) => { void salvarProdutos(v); };
   const salvarHorarios = (v: Horario[]) => salvarSecao("horarios", v);
   const setHorarios = (v: Horario[]) => { void salvarHorarios(v); };
-  const setFaqs = (v: Faq[]) => { void salvarSecao("faqs", v); };
+  const salvarFaqs = (v: Faq[]) => salvarSecao("faqs", v);
+  const setFaqs = (v: Faq[]) => { void salvarFaqs(v); };
   const [instrucoes, setInstrucoes] = useState<Instrucoes>({ nomeAtendente: "Atendente virtual", tom: "amigavel", boasVindas: "", regras: "", transferirHumano: true });
   const [empresaSelecionadaId, setEmpresaSelecionadaId] = useState("");
   const [instrucoesPorEmpresa, setInstrucoesPorEmpresaState] = useState<Record<string, Instrucoes>>({});
@@ -204,7 +205,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(migracao, "1");
     } catch { /* Mantém o estado atual se as preferências antigas forem inválidas. */ }
   }, [setBotAtivo]);
-  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, salvarProdutos, horarios, setHorarios, salvarHorarios, faqs, setFaqs, instrucoes, setInstrucoes, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, salvarProdutos, horarios, setHorarios, salvarHorarios, faqs, setFaqs, salvarFaqs, instrucoes, setInstrucoes, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
 export const novoId = () => Math.random().toString(36).slice(2, 9);
