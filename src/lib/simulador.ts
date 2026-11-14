@@ -415,36 +415,44 @@ function responderBase(
 
   const acompanhamento = responderSobreUltimoProduto(texto, historico, ctx.produtos);
   if (acompanhamento) return acompanhamento;
-  // Acompanha referências a itens citados na resposta anterior de uma FAQ.
-  // Ex.: "Temos pizza vegetariana por R$ 42" -> "Quanto ela custa?"
-  // Só reutiliza informações que constam explicitamente na FAQ da empresa.
-  const perguntaSeguimento = /\\b(?:ela|ele|essa|esse|isso|dela|dele|quanto|preco|valor|custa|ingredientes|composicao|feito|leva)\\b/.test(norm(texto));
-  if (perguntaSeguimento && historico.length) {
+  // Respostas de FAQ podem conter um produto que não está no catálogo.
+  // Só recupera o assunto quando a pergunta é de acompanhamento, e nunca
+  // reaproveita uma FAQ antiga para responder uma nova intenção independente.
+  const perguntaAtual = norm(texto);
+  const consultaPreco = /\b(?:quanto|preco|valor|custa|custam|sai)\b/.test(perguntaAtual);
+  const consultaIngredientes = /\b(?:ingredientes|composicao|feito|leva)\b/.test(perguntaAtual);
+  const referencia = /\b(?:ela|ele|essa|esse|isso|dela|dele|desse|dessa)\b/.test(perguntaAtual);
+  const novoAssunto = /\b(?:entrega|entregam|delivery|frete|horario|abre|abrem|fecha|funcionamento|pix|pagamento|cartao|endereco|agendamento)\b/.test(perguntaAtual);
+  const produtoExplicito = ctx.produtos.some((p) => norm(perguntaAtual).includes(norm(p.nome)));
+  const faqExplicita = ctx.faqs.some((f) => {
+    const palavras = [...termos(f.pergunta)];
+    return palavras.length > 0 && palavras.every((w) => termos(perguntaAtual).has(w));
+  });
+  if ((consultaPreco || consultaIngredientes) && !novoAssunto && !produtoExplicito && !faqExplicita && historico.length) {
+    // Resposta anterior da FAQ, sem misturar dados de outra empresa.
     const ultimaResposta = [...historico].reverse().find((m) =>
       ctx.faqs.some((f) => normalizarTextoResposta(f.resposta) === normalizarTextoResposta(m))
     );
     const faqAnterior = ultimaResposta
       ? ctx.faqs.find((f) => normalizarTextoResposta(f.resposta) === normalizarTextoResposta(ultimaResposta))
       : null;
-    if (faqAnterior) {
-      const perguntaAtual = norm(texto);
-      const consultaPreco = /\\b(?:quanto|preco|valor|custa|custam|sai)\\b/.test(perguntaAtual);
+    // Não responder com o preço de um item antigo se a pergunta mencionar outro.
+    const assuntoAnterior = faqAnterior ? [...termos(faqAnterior.pergunta)] : [];
+    const termosAtuais = [...termos(texto)];
+    const assuntoDiferente = !referencia && termosAtuais.some((w) =>
+      !assuntoAnterior.includes(w) && !["#4", "preco", "custa", "valor", "quant", "ingre", "compo", "feito", "leva"].includes(w)
+    );
+    if (faqAnterior && !assuntoDiferente) {
       if (consultaPreco) {
-        const valor = faqAnterior.resposta.match(/R\\$\\s*\\d+(?:[.,]\\d{1,2})?/i);
-        if (valor) {
-          const item = norm(faqAnterior.pergunta)
-            .replace(/^.*?\\b(?:pizza|produto|servico)\\b/, (match) => match.slice(match.lastIndexOf(" ") + 1))
-            .replace(/[?!.]+$/, "").trim();
-          return (item ? "O preço de " + item + " é " : "O preço informado é ") + valor[0] + ". 😊";
-        }
+        const valor = faqAnterior.resposta.match(/R\$\s*\d+(?:[.,]\d{1,2})?/i);
+        if (valor) return "O preço informado para esse item é " + valor[0] + ". 😊";
         return "Ainda não tenho um preço confirmado para esse item no cadastro. 😊";
       }
-      if (/\\b(?:ingredientes|composicao|feito|leva)\\b/.test(perguntaAtual)) {
-        return "Ainda não tenho os ingredientes ou a composição desse item cadastrados. Vou pedir para a equipe confirmar. 😊";
+      if (consultaIngredientes) {
+        return "Ainda não tenho os ingredientes desse item cadastrados de forma específica. Posso pedir para a equipe confirmar. 😊";
       }
     }
   }
-
 
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
