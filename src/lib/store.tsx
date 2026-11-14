@@ -35,7 +35,7 @@ function usePersistido<T>(chave: string, inicial: T): [T, Dispatch<SetStateActio
   return [valor, setValor, pronto];
 }
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [empresas, setEmpresas] = usePersistido("zyon-empresas", d.empresasDemo);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
   // Dados comerciais são privados por empresa, nunca compartilhados pelo localStorage.
   const [produtos, setProdutosState] = useState<Produto[]>([]);
   const [horarios, setHorariosState] = useState<Horario[]>([]);
@@ -58,9 +58,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (cancelled || authError || !auth.user) return;
       const { data: vinculos, error: vinculosError } = await supabase.from("empresa_usuarios").select("empresa_id").eq("usuario_id", auth.user.id);
       if (cancelled || vinculosError || !vinculos?.length) return;
-      const { data: ativas, error: empresasError } = await supabase.from("empresas").select("id").in("id", vinculos.map(v => v.empresa_id)).eq("status", "ativa").order("criado_em", { ascending: true }).limit(1);
+      const { data: ativas, error: empresasError } = await supabase.from("empresas").select("id,nome").in("id", vinculos.map(v => v.empresa_id)).eq("status", "ativa").order("criado_em", { ascending: true }).limit(1);
       if (cancelled || empresasError || !ativas?.length) return;
       const id = ativas[0].id;
+      setEmpresas(ativas.map(e => ({ id: e.id, nome: e.nome, segmento: "", telefone: "", cidade: "", ativa: true })));
       const { data, error } = await supabase.from("empresa_dados").select("secao,conteudo").eq("empresa_id", id);
       if (cancelled) return;
       if (error) { toast.error("Não foi possível carregar os dados da empresa: " + error.message); return; }
@@ -68,6 +69,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setProdutosState(Array.isArray(sections.get("produtos")) ? sections.get("produtos") as Produto[] : []);
       setHorariosState(Array.isArray(sections.get("horarios")) ? sections.get("horarios") as Horario[] : d.horariosDemo);
       setFaqsState(Array.isArray(sections.get("faqs")) ? sections.get("faqs") as Faq[] : []);
+      const savedAssistant = sections.get("instrucoes");
+      setInstrucoesPorEmpresaState(savedAssistant && typeof savedAssistant === "object" && !Array.isArray(savedAssistant) ? { [id]: savedAssistant as Instrucoes } : {});
+      setEmpresaSelecionadaId(id);
       empresaDadosIdRef.current = id;
       dadosProntosRef.current = true;
       setEmpresaDadosId(id);
@@ -91,9 +95,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const setProdutos = (v: Produto[]) => { void salvarSecao("produtos", v); };
   const setHorarios = (v: Horario[]) => { void salvarSecao("horarios", v); };
   const setFaqs = (v: Faq[]) => { void salvarSecao("faqs", v); };
-  const [instrucoes, setInstrucoes] = usePersistido("zyon-instrucoes", d.instrucoesDemo);
-  const [empresaSelecionadaId, setEmpresaSelecionadaId] = usePersistido("zyon-empresa-selecionada", "");
-  const [instrucoesPorEmpresa, setInstrucoesPorEmpresa] = usePersistido<Record<string, Instrucoes>>("zyon-instrucoes-por-empresa", {});
+  const [instrucoes, setInstrucoes] = useState<Instrucoes>({ nomeAtendente: "Atendente virtual", tom: "amigavel", boasVindas: "", regras: "", transferirHumano: true });
+  const [empresaSelecionadaId, setEmpresaSelecionadaId] = useState("");
+  const [instrucoesPorEmpresa, setInstrucoesPorEmpresaState] = useState<Record<string, Instrucoes>>({});
+  const setInstrucoesPorEmpresa: Dispatch<SetStateAction<Record<string, Instrucoes>>> = (action) => {
+    setInstrucoesPorEmpresaState(previous => {
+      const next = typeof action === "function" ? action(previous) : action;
+      const id = empresaDadosIdRef.current;
+      if (id && next[id] && supabase) {
+        void supabase.from("empresa_dados").upsert({
+          empresa_id: id, secao: "instrucoes", conteudo: next[id], atualizado_em: new Date().toISOString()
+        }, { onConflict: "empresa_id,secao" }).then(({ error }) => {
+          if (error) toast.error("Erro ao salvar atendente: " + error.message);
+        });
+      }
+      return next;
+    });
+  };
   const [conversas, setConversas, conversasProntas] = usePersistido<Conversa[]>("zyon-conversas", []);
   const [respostasRapidas, setRespostasRapidas] = usePersistido<string[]>("zyon-respostas-rapidas", ["Olá! Como posso ajudar? 😊", "Só um momento, vou verificar essa informação.", "Obrigado pelo contato! Estamos à disposição."]);
   const [botAtivo, setBotAtivo] = usePersistido("zyon-bot-ativo", true);
