@@ -4,6 +4,7 @@ import { Palette, RotateCcw } from "lucide-react";
 const KEY = "zyon-chat-aparencia";
 const colors = [
   { name: "Azul", value: "oklch(0.67 0.18 255)", hex: "#3b82f6" },
+  { name: "Verde", value: "oklch(0.76 0.17 155)", hex: "#34d399" },
   { name: "Roxo", value: "oklch(0.68 0.20 300)", hex: "#a855f7" },
   { name: "Rosa", value: "oklch(0.72 0.19 350)", hex: "#ec4899" },
   { name: "Vermelho", value: "oklch(0.65 0.22 25)", hex: "#ef4444" },
@@ -24,6 +25,7 @@ export function applyAppearance(settings: Appearance) {
   const selectedColor = colors.find(c => c.value === color);
   const hue = selectedColor?.name === "Roxo" ? 300
     : selectedColor?.name === "Rosa" ? 350
+    : selectedColor?.name === "Verde" ? 155
     : selectedColor?.name === "Vermelho" ? 25
     : selectedColor?.name === "Branco" ? 0 : 255;
   const chroma = selectedColor?.name === "Branco" ? 0 : 0.018;
