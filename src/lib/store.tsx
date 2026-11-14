@@ -8,7 +8,7 @@ import { detectarEventosDeConversas, inserirNotificacao, marcarNotificacaoLida, 
 
 type Store = {
   empresas: Empresa[]; setEmpresas: Dispatch<SetStateAction<Empresa[]>>;
-  produtos: Produto[]; setProdutos: (v: Produto[]) => void;
+  produtos: Produto[]; setProdutos: (v: Produto[]) => void; salvarProdutos: (v: Produto[]) => Promise<boolean>;
   horarios: Horario[]; setHorarios: (v: Horario[]) => void;
   faqs: Faq[]; setFaqs: (v: Faq[]) => void;
   instrucoes: Instrucoes; setInstrucoes: (v: Instrucoes) => void;
@@ -80,19 +80,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     void carregarDados();
     return () => { cancelled = true; };
   }, []);
-  async function salvarSecao(secao: "produtos" | "horarios" | "faqs", conteudo: Produto[] | Horario[] | Faq[]) {
+  async function salvarSecao(secao: "produtos" | "horarios" | "faqs", conteudo: Produto[] | Horario[] | Faq[]): Promise<boolean> {
     const id = empresaDadosIdRef.current;
-    if (!supabase || !id || !dadosProntosRef.current) { toast.error("Aguarde o carregamento da empresa."); return; }
+    if (!supabase || !id || !dadosProntosRef.current) { toast.error("Aguarde o carregamento da empresa."); return false; }
     const { error } = await supabase.from("empresa_dados").upsert({
       empresa_id: id, secao, conteudo, atualizado_em: new Date().toISOString(),
     }, { onConflict: "empresa_id,secao" });
-    if (error) { toast.error("Erro ao salvar no Supabase: " + error.message); return; }
+    if (error) { toast.error("Erro ao salvar no Supabase: " + error.message); return false; }
     if (secao === "produtos") setProdutosState(conteudo as Produto[]);
     if (secao === "horarios") setHorariosState(conteudo as Horario[]);
     if (secao === "faqs") setFaqsState(conteudo as Faq[]);
     toast.success("Dados salvos no Supabase!");
+    return true;
   }
-  const setProdutos = (v: Produto[]) => { void salvarSecao("produtos", v); };
+  const salvarProdutos = (v: Produto[]) => salvarSecao("produtos", v);
+  const setProdutos = (v: Produto[]) => { void salvarProdutos(v); };
   const setHorarios = (v: Horario[]) => { void salvarSecao("horarios", v); };
   const setFaqs = (v: Faq[]) => { void salvarSecao("faqs", v); };
   const [instrucoes, setInstrucoes] = useState<Instrucoes>({ nomeAtendente: "Atendente virtual", tom: "amigavel", boasVindas: "", regras: "", transferirHumano: true });
@@ -201,7 +203,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(migracao, "1");
     } catch { /* Mantém o estado atual se as preferências antigas forem inválidas. */ }
   }, [setBotAtivo]);
-  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ empresas, setEmpresas, produtos, setProdutos, salvarProdutos, horarios, setHorarios, faqs, setFaqs, instrucoes, setInstrucoes, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, conversas, setConversas, respostasRapidas, setRespostasRapidas, botAtivo, setBotAtivo, ultimoResetIndicadores, zerarIndicadores, notificacoes, marcarNotificacao, marcarTodasNotificacoes, limparTodasNotificacoes }}>{children}</Ctx.Provider>;
 }
 export function useStore() { const s = useContext(Ctx); if (!s) throw new Error("StoreProvider ausente"); return s; }
 export const novoId = () => Math.random().toString(36).slice(2, 9);
