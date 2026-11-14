@@ -56,30 +56,30 @@ function Painel() {
         </Card>
       ))}
     </div>
-    <div className="mt-5 grid gap-4 xl:grid-cols-5">
-      <Card className="xl:col-span-3">
+    <div className="mt-5 grid min-w-0 gap-3 sm:gap-4 xl:grid-cols-5">
+      <Card className="min-w-0 xl:col-span-3">
         <div className="flex items-center justify-between gap-3"><div><h2 className="font-display text-lg font-bold">Conversas na semana</h2><p className="mt-1 text-xs text-muted-foreground">Volume de mensagens recebidas por dia</p></div><span className="rounded-xl bg-accent p-2 text-accent-foreground"><MessageCircle className="h-5 w-5" /></span></div>
-        <div className="mt-7 flex h-48 items-end gap-3 sm:gap-5">
+        <div className="mt-5 flex h-36 min-w-0 items-end gap-1.5 sm:mt-7 sm:h-48 sm:gap-5">
           {semana.map((n, i) => (<div key={i} className="group flex h-full flex-1 flex-col items-center justify-end gap-2">
             <span className="text-xs font-semibold text-muted-foreground">{n}</span>
             <div className="flex w-full flex-1 items-end"><div className={cn("w-full rounded-t-xl transition-all duration-300 group-hover:brightness-110", i === diaAtual ? "bg-primary shadow-md shadow-primary/20" : "bg-primary/25")} style={{ height: `${(n / max) * 100}%` }} /></div>
             <span className={cn("text-xs", i === diaAtual ? "font-bold text-primary" : "text-muted-foreground")}>{dias[i]}</span></div>))}
         </div>
       </Card>
-      <Card className="xl:col-span-2">
-        <div className="flex items-center justify-between"><div><h2 className="font-display text-lg font-bold">Últimas conversas</h2><p className="mt-1 text-xs text-muted-foreground">Atividades recentes do atendimento</p></div><span className="rounded-xl bg-accent p-2 text-accent-foreground"><MessageCircle className="h-5 w-5" /></span></div>
+      <Card className="min-w-0 xl:col-span-2">
+        <div className="flex min-w-0 items-center justify-between gap-2"><div className="min-w-0"><h2 className="font-display text-base font-bold sm:text-lg">Últimas conversas</h2><p className="mt-1 text-xs text-muted-foreground">Atividades recentes do atendimento</p></div><span className="rounded-xl bg-accent p-2 text-accent-foreground"><MessageCircle className="h-5 w-5" /></span></div>
         <ul className="mt-3 divide-y">{(conversas.length ? conversas.slice(0, 4).map((c) => ({ nome: c.cliente, msg: c.ultimaMensagem, hora: c.atualizadaEm, status: c.status === "humano" ? "Humano" : c.status === "resolvida" ? "Resolvida" : "IA" })) : r.recentes).map((c) => (
-          <li key={c.nome} className="flex items-center gap-3 py-3">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-secondary font-bold text-secondary-foreground">{c.nome[0]}</div>
-            <div className="min-w-0 flex-1"><p className="text-sm font-semibold">{c.nome} <span className="font-normal text-muted-foreground">· {c.hora}</span></p>
-              <p className="truncate text-sm text-muted-foreground">{c.msg}</p></div>
-            <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold", c.status === "Resolvida" ? "bg-accent text-accent-foreground" : "bg-warning/15 text-warning")}>{c.status}</span>
+          <li key={c.nome} className="flex min-w-0 items-center gap-2 py-2.5 sm:gap-3 sm:py-3">
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-secondary sm:h-10 sm:w-10 font-bold text-secondary-foreground">{c.nome[0]}</div>
+            <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold sm:text-sm">{c.nome} <span className="font-normal text-muted-foreground">· {c.hora}</span></p>
+              <p className="truncate text-xs text-muted-foreground sm:text-sm">{c.msg}</p></div>
+            <span className={cn("max-w-[72px] shrink-0 truncate rounded-full px-1.5 py-1 text-[9px] font-bold sm:max-w-none sm:px-2.5 sm:text-[10px]", c.status === "Resolvida" ? "bg-accent text-accent-foreground" : "bg-warning/15 text-warning")}>{c.status}</span>
           </li>))}</ul>
       </Card>
     </div>
     <section className="mt-5">
       <div className="mb-2 flex items-center gap-2"><Zap className="h-4 w-4 text-primary" /><h2 className="font-display text-base font-bold">Acesso rápido</h2></div>
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid min-w-0 grid-cols-1 gap-2 min-[430px]:grid-cols-2 xl:grid-cols-5">
         {atalhos.map(({ to, label, icon: Icon, color }) => <Link key={to} to={to} className="group flex min-w-0 items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 shadow-soft transition-all hover:border-emerald-400/40 hover:bg-white/[0.05] light:border-slate-200 light:bg-white light:hover:border-emerald-500/40 light:hover:bg-emerald-50">
           <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg", color)}><Icon className="h-4 w-4" /></span>
           <span className="min-w-0 flex-1 truncate text-xs font-semibold">{label}</span>
