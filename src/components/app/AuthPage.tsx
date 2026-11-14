@@ -64,7 +64,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <div className="absolute left-[-30%] top-[68%] h-px w-[160%] -rotate-[34deg] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.65)_100%)]" />
       {/* Stylized robot inspired by the provided reference, drawn as SVG to avoid external assets. */}
-      <svg className="zyon-robot-float absolute bottom-[-35px] right-[-85px] h-[310px] w-[310px] opacity-35 sm:bottom-[-80px] sm:right-[3%] sm:h-[490px] sm:w-[490px] sm:opacity-60 lg:right-[8%]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg className="zyon-robot-float absolute bottom-[2%] right-[-110px] h-[280px] w-[280px] opacity-50 sm:bottom-[4%] sm:right-[1%] sm:h-[370px] sm:w-[370px] sm:opacity-80 lg:right-[5%] lg:h-[430px] lg:w-[430px]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="zyonRobotMetal" x1="50" y1="40" x2="340" y2="390" gradientUnits="userSpaceOnUse"><stop stopColor="#F0F8FF"/><stop offset=".45" stopColor="#8295B4"/><stop offset="1" stopColor="#283E60"/></linearGradient>
           <linearGradient id="zyonRobotBody" x1="160" y1="215" x2="250" y2="395" gradientUnits="userSpaceOnUse"><stop stopColor="#E2ECFF"/><stop offset="1" stopColor="#546B8B"/></linearGradient>
