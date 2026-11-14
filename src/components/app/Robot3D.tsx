@@ -5,10 +5,12 @@ export function Robot3D() {
   const mount = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const host = mount.current;
-    if (!host || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!host) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let stopped = false;
     let dispose = () => {};
     import("three").then((THREE) => {
+      try {
       if (stopped || !host) return;
       const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "low-power" });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
@@ -61,7 +63,8 @@ export function Robot3D() {
         rightArm.rotation.z = -Math.sin(t * 1.7 + .8) * .13;
         renderer.render(scene, camera);
       };
-      animate();
+      if (reducedMotion) { renderer.render(scene, camera); } else { animate(); }
+      host.dataset.webgl = "ready";
       const resize = new ResizeObserver(() => {
         if (!host.clientWidth || !host.clientHeight) return;
         camera.aspect = host.clientWidth / host.clientHeight; camera.updateProjectionMatrix();
@@ -74,8 +77,22 @@ export function Robot3D() {
         for (const mat of [metal, dark, glow, line]) mat.dispose();
         renderer.dispose(); renderer.domElement.remove();
       };
-    }).catch(() => { /* Login stays functional without WebGL. */ });
+      } catch (error) { console.warn("Zyon Robot3D: WebGL indisponível; usando robô de reserva.", error); }
+    }).catch((error) => { console.warn("Zyon Robot3D: biblioteca 3D não carregou; usando reserva.", error); });
     return () => { stopped = true; dispose(); };
   }, []);
-  return <div ref={mount} aria-hidden="true" className="pointer-events-none absolute bottom-[2%] right-[-80px] h-[330px] w-[330px] opacity-75 sm:bottom-[5%] sm:right-[1%] sm:h-[460px] sm:w-[460px] lg:right-[5%] lg:h-[520px] lg:w-[520px]" />;
+  return <div ref={mount} aria-hidden="true" className="zyon-robot-container pointer-events-none absolute bottom-[2%] right-[-80px] h-[330px] w-[330px] opacity-85 sm:bottom-[5%] sm:right-[1%] sm:h-[460px] sm:w-[460px] lg:right-[5%] lg:h-[520px] lg:w-[520px]">
+    <svg className="zyon-robot-fallback h-full w-full" viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="robotFallbackMetal" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#eef8ff"/><stop offset=".55" stopColor="#8298b8"/><stop offset="1" stopColor="#405372"/></linearGradient><filter id="robotFallbackGlow"><feGaussianBlur stdDeviation="7"/></filter></defs>
+      <g className="zyon-robot-float"><ellipse cx="200" cy="390" rx="92" ry="14" fill="#168cff" opacity=".35" filter="url(#robotFallbackGlow)"/>
+      <path d="M105 243Q75 225 66 258L46 324Q45 354 75 358Q103 361 114 331L136 277Z" fill="url(#robotFallbackMetal)" stroke="#a5bfdc" strokeWidth="3"/>
+      <path d="M295 243Q325 225 334 258L354 324Q355 354 325 358Q297 361 286 331L264 277Z" fill="url(#robotFallbackMetal)" stroke="#a5bfdc" strokeWidth="3"/>
+      <path d="M142 227Q200 207 258 227Q282 260 268 342Q251 389 200 398Q149 389 132 342Q118 260 142 227Z" fill="url(#robotFallbackMetal)" stroke="#a5bfdc" strokeWidth="3"/>
+      <path d="M139 335Q200 375 261 335" stroke="#59e8ff" strokeWidth="4" fill="none"/>
+      <g className="zyon-robot-head"><ellipse cx="200" cy="125" rx="125" ry="101" fill="url(#robotFallbackMetal)" stroke="#d5e7fa" strokeWidth="4"/>
+      <ellipse cx="78" cy="135" rx="19" ry="46" fill="#91a9c7"/><ellipse cx="322" cy="135" rx="19" ry="46" fill="#91a9c7"/>
+      <rect x="102" y="86" width="196" height="111" rx="51" fill="#030918" stroke="#6c8db4" strokeWidth="4"/>
+      <ellipse cx="158" cy="143" rx="22" ry="27" fill="#5deaff"/><ellipse cx="242" cy="143" rx="22" ry="27" fill="#5deaff"/></g></g>
+    </svg>
+  </div>;
 }
