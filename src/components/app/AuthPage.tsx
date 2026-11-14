@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bot, Eye, EyeOff, LockKeyhole, Mail, UserRound, ArrowRight } from "lucide-react";
-import { authConfigured, supabase } from "@/lib/auth-client";
+import { authConfigured, getRememberMe, setRememberMe, supabase } from "@/lib/auth-client";
 
 type Mode = "login" | "cadastro" | "recuperar";
 const validarSenha = (valor: string) => valor.length >= 6 && /[a-z]/.test(valor) && /[^A-Za-z0-9]/.test(valor);
@@ -19,6 +19,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
   const [senha, setSenha] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
   const [mostrar, setMostrar] = useState(false);
+  const [lembrar, setLembrar] = useState(() => typeof window !== "undefined" && getRememberMe());
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -44,6 +45,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         if (data.session) await navigate({ to: "/" });
         else setSucesso("Se este e-mail puder ser cadastrado, você receberá uma confirmação. Se já possui conta, entre pelo login ou recupere sua senha.");
       } else {
+        setRememberMe(lembrar);
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
         if (error) throw error;
         await navigate({ to: "/" });
@@ -102,10 +104,17 @@ export function AuthPage({ mode }: { mode: Mode }) {
         {erro && <p role="alert" className="rounded-xl bg-red-500/10 p-3 text-sm text-red-300">{erro}</p>}
         {sucesso && <p role="status" className="rounded-xl bg-sky-500/10 p-3 text-sm text-sky-300">{sucesso}</p>}
         {mode === "cadastro" && (sucesso || erro.toLowerCase().includes("já ter uma conta")) && <div className="flex flex-wrap gap-4 text-sm"><Link to="/login" className="font-semibold text-sky-300 underline">Fazer login</Link><Link to="/recuperar-senha" className="text-sky-300 underline">Esqueci minha senha</Link></div>}
+        {mode === "login" && <div className="flex items-center justify-between gap-3 text-sm">
+          <label className="flex cursor-pointer items-center gap-2 text-slate-200">
+            <input type="checkbox" checked={lembrar} onChange={e => setLembrar(e.target.checked)} className="h-4 w-4 cursor-pointer rounded border-blue-300/40 accent-sky-400" />
+            Lembrar de mim
+          </label>
+          <Link to="/recuperar-senha" className="text-sky-300 hover:underline">Esqueceu a senha?</Link>
+        </div>}
         <button disabled={enviando || !authConfigured} className="flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-3 font-bold text-[#071124] shadow-[0_8px_30px_rgba(255,255,255,.12)] transition hover:bg-sky-100 disabled:opacity-50">{enviando?"Aguarde...":mode==="cadastro"?"Criar conta":mode==="recuperar"?"Enviar link":"Entrar"}<ArrowRight className="h-4 w-4"/></button>
       </form>
       <div className="mt-6 space-y-3 text-center text-sm text-slate-300">
-        {mode==="login" && <><Link to="/recuperar-senha" className="block text-sky-300 hover:underline">Esqueci minha senha?</Link><p>Não tem uma conta? <Link to="/cadastro" className="font-semibold text-white hover:text-sky-300">Cadastre-se</Link></p></>}
+        {mode==="login" && <><p>Não tem uma conta? <Link to="/cadastro" className="font-semibold text-white hover:text-sky-300">Cadastre-se</Link></p></>}
         {mode==="cadastro" && <p>Já tem uma conta? <Link to="/login" className="font-semibold text-sky-300 hover:underline">Entrar</Link></p>}
         {mode==="recuperar" && <Link to="/login" className="text-sky-300 hover:underline">Voltar ao login</Link>}
       </div>
