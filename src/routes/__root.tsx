@@ -10,7 +10,8 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { supabase } from "../lib/auth-client";
 
 import { Toaster } from "sonner";
 import { AppShell } from "../components/app/AppShell";
@@ -126,6 +127,61 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+type AccessState = "loading" | "admin" | "active" | "pending" | "suspended" | "none" | "error";
+
+function CompanyAccess({ children, path, userId }: { children: ReactNode; path: string; userId: string }) {
+  const [access, setAccess] = useState<AccessState>("loading");
+  const [companyName, setCompanyName] = useState("");
+  const [retry, setRetry] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function check() {
+      setAccess("loading");
+      if (!supabase) { setAccess("error"); return; }
+      const admin = await supabase.from("admins_plataforma").select("usuario_id").eq("usuario_id", userId).maybeSingle();
+      if (cancelled) return;
+      if (admin.error) { setAccess("error"); return; }
+      if (admin.data) { setAccess("admin"); return; }
+      const membership = await supabase.from("empresa_usuarios").select("empresa_id").eq("usuario_id", userId);
+      if (cancelled) return;
+      if (membership.error) { setAccess("error"); return; }
+      if (!membership.data?.length) { setAccess("none"); return; }
+      const ids = membership.data.map((m) => m.empresa_id);
+      const companies = await supabase.from("empresas").select("id,nome,status").in("id", ids);
+      if (cancelled) return;
+      if (companies.error) { setAccess("error"); return; }
+      const selected = companies.data?.find((e) => e.status === "ativa") ?? companies.data?.[0];
+      if (!selected) { setAccess("error"); return; }
+      setCompanyName(selected.nome);
+      setAccess(selected.status === "ativa" ? "active" : selected.status === "suspensa" ? "suspended" : "pending");
+    }
+    void check();
+    return () => { cancelled = true; };
+  }, [userId, retry, path]);
+
+  if (access === "admin" || access === "active" || (path === "/empresas" && access === "none")) return <>{children}</>;
+  const messages: Record<Exclude<AccessState, "admin" | "active">, string> = {
+    loading: "Verificando sua empresa no Supabase...",
+    pending: "Sua empresa ainda aguarda aprovação do administrador.",
+    suspended: "O acesso desta empresa está suspenso. Entre em contato com o administrador.",
+    none: "Você ainda não possui uma empresa vinculada à sua conta.",
+    error: "Não foi possível verificar sua empresa. Por segurança, o painel está temporariamente bloqueado.",
+  };
+  return <main className="flex min-h-screen items-center justify-center bg-[#030611] px-4 text-white">
+    <div className="w-full max-w-lg space-y-5 rounded-2xl border border-sky-500/25 bg-[#0b1430] p-8 text-center shadow-2xl">
+      <h1 className="text-2xl font-bold">Zyon Chat — Acesso à empresa</h1>
+      {companyName && <p className="font-semibold text-sky-300">{companyName}</p>}
+      <p role="status" className="text-slate-300">{messages[access]}</p>
+      <div className="flex flex-wrap justify-center gap-3">
+        {access === "none" && <Link to="/empresas" className="rounded-xl bg-sky-500 px-4 py-2 font-semibold text-slate-950">Cadastrar empresa</Link>}
+        <button type="button" onClick={() => setRetry((n) => n + 1)} className="rounded-xl border border-sky-400/40 px-4 py-2">Verificar novamente</button>
+        <button type="button" onClick={() => void supabase?.auth.signOut()} className="rounded-xl border border-white/20 px-4 py-2">Sair da conta</button>
+      </div>
+    </div>
+  </main>;
+}
+
 function ProtectedContent() {
   const path = useRouterState({ select: s => s.location.pathname });
   const { session, loading } = useAuth();
@@ -136,7 +192,7 @@ function ProtectedContent() {
     return <Outlet />;
   }
   if (!session) return <Navigate to="/login" replace />;
-  return <StoreProvider><AppShell><Outlet /></AppShell></StoreProvider>;
+  return <CompanyAccess userId={session.user.id} path={path}><StoreProvider><AppShell><Outlet /></AppShell></StoreProvider></CompanyAccess>;
 }
 
 function RootComponent() {
