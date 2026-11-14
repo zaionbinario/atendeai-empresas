@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Building2, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
+import { Building2, CheckCircle2, Clock3, ShieldCheck, ArrowRight, Store } from "lucide-react";
+import { useStore } from "@/lib/store";
 import { supabase } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/empresas")({
-  head: () => ({ meta: [{ title: "Minha empresa — Zyon Chat" }] }),
+  head: () => ({ meta: [{ title: "Minhas empresas — Zyon Chat" }] }),
   component: MinhaEmpresa,
 });
 
@@ -12,6 +13,7 @@ type EmpresaVinculada = { id: string; nome: string; status: string };
 
 function MinhaEmpresa() {
   const [nome, setNome] = useState("");
+  const { empresaSelecionadaId, setEmpresaSelecionadaId } = useStore();
   const [empresas, setEmpresas] = useState<EmpresaVinculada[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [enviando, setEnviando] = useState(false);
@@ -62,9 +64,29 @@ function MinhaEmpresa() {
 
   return <div className="mx-auto max-w-3xl space-y-6">
     <div>
-      <h1 className="flex items-center gap-3 text-2xl font-bold"><Building2 className="h-7 w-7 text-primary" /> Minha empresa</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Cadastre seu negócio para começar a configurar o atendimento no Zyon Chat.</p>
+      <h1 className="flex items-center gap-3 text-2xl font-bold"><Building2 className="h-7 w-7 text-primary" /> Minhas empresas</h1>
+      <p className="mt-2 text-sm text-muted-foreground">Escolha qual negócio deseja administrar ou cadastre uma nova empresa no Zyon Chat.</p>
     </div>
+    <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+      <div className="flex items-center gap-2"><Store className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Selecionar empresa</h2></div>
+      <p className="mt-2 text-sm text-muted-foreground">Selecione uma empresa ativa para gerenciar seus produtos, horários, perguntas frequentes e testar o simulador. Os dados de cada negócio são separados.</p>
+      {carregando ? <p className="mt-4 text-sm text-muted-foreground">Carregando empresas...</p> : empresas.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Você ainda não possui empresas cadastradas.</p> :
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">{empresas.map((empresa) => {
+          const ativa = empresa.status === "ativa";
+          const selecionada = ativa && empresaSelecionadaId === empresa.id;
+          return <article key={empresa.id} className={`flex flex-col gap-4 rounded-2xl border p-5 transition-colors ${selecionada ? "border-emerald-500/60 bg-emerald-500/5" : "border-border bg-background"}`}>
+            <div className="flex items-start gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Building2 className="h-6 w-6" /></span>
+              <div className="min-w-0"><h3 className="break-words font-semibold">{empresa.nome}</h3><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">{ativa ? <ShieldCheck className="h-4 w-4 text-emerald-400" /> : <Clock3 className="h-4 w-4 text-amber-400" />}{ativa ? "Empresa ativa" : empresa.status === "pendente" ? "Aguardando aprovação" : "Empresa suspensa"}</p></div>
+            </div>
+            <div className="mt-auto">
+              {selecionada ? <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-400"><CheckCircle2 className="h-4 w-4" />Empresa selecionada</div> :
+                <button type="button" disabled={!ativa} onClick={() => setEmpresaSelecionadaId(empresa.id)} className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">{ativa ? <>Usar esta empresa <ArrowRight className="h-4 w-4" /></> : "Indisponível para seleção"}</button>}
+              {selecionada && <Link to="/" className="mt-3 flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:underline">Ir para o painel <ArrowRight className="h-4 w-4" /></Link>}
+            </div>
+          </article>;
+        })}</div>}
+    </section>
     <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
       <h2 className="text-lg font-semibold">Cadastrar nova empresa</h2>
       <p className="mt-1 text-sm text-muted-foreground">Após o envio, o administrador analisará o cadastro. Você será registrado como dono da empresa.</p>
@@ -78,14 +100,6 @@ function MinhaEmpresa() {
         <button type="submit" disabled={enviando || carregando} className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">{enviando ? "Enviando..." : "Enviar para aprovação"}</button>
       </form>
     </section>
-    <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
-      <h2 className="text-lg font-semibold">Empresas vinculadas à sua conta</h2>
-      {carregando ? <p className="mt-4 text-sm text-muted-foreground">Carregando...</p> : empresas.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Você ainda não possui empresas cadastradas.</p> :
-        <div className="mt-4 space-y-3">{empresas.map((empresa) => <div key={empresa.id} className="flex items-center justify-between gap-3 rounded-xl border p-4">
-          <span className="font-medium">{empresa.nome}</span>
-          <span className="flex items-center gap-1.5 text-xs font-semibold">{empresa.status === "ativa" ? <ShieldCheck className="h-4 w-4 text-emerald-400" /> : <Clock3 className="h-4 w-4 text-amber-400" />}{empresa.status === "ativa" ? "Ativa" : empresa.status === "pendente" ? "Aguardando aprovação" : "Suspensa"}</span>
-        </div>)}</div>}
-    </section>
-    <p className="text-xs text-muted-foreground">A aprovação e a liberação do painel da empresa serão configuradas na próxima etapa. <Link to="/" className="underline">Voltar ao painel</Link></p>
+    <p className="text-xs text-muted-foreground">Empresas pendentes ou suspensas não podem ser selecionadas. <Link to="/" className="underline">Voltar ao painel</Link></p>
   </div>;
 }
