@@ -46,8 +46,8 @@ export function Robot3D() {
       sphere(leftArm, -.23, -.5, 0, .37, .73, .42, metal);
       const rightArm = new THREE.Group(); rightArm.position.set(1.25, -.5, 0); robot.add(rightArm);
       sphere(rightArm, .23, -.5, 0, .37, .73, .42, metal);
-      const mouse = { x: 0, y: 0 };
-      const move = (e: PointerEvent) => { mouse.x = Math.max(-1, Math.min(1, (e.clientX / window.innerWidth - .5) * 2)); mouse.y = Math.max(-1, Math.min(1, (e.clientY / window.innerHeight - .5) * 2)); };
+      const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const move = (e: PointerEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; };
       window.addEventListener("pointermove", move, { passive: true });
       const clock = new THREE.Clock();
       let frame = 0;
@@ -55,12 +55,21 @@ export function Robot3D() {
         frame = requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
         robot.position.y = reducedMotion ? 0 : Math.sin(t * 1.7) * .18;
-        robot.rotation.y += ((mouse.x * .15 + (reducedMotion ? 0 : Math.sin(t * .4) * .08)) - robot.rotation.y) * .045;
+        // Track the actual pointer position, including when it is over the login form.
+        // Project the robot's head to screen coordinates instead of using viewport center.
+        const headCenter = head.getWorldPosition(new THREE.Vector3()).project(camera);
+        const bounds = host.getBoundingClientRect();
+        const headScreenX = bounds.left + (headCenter.x + 1) * bounds.width / 2;
+        const headScreenY = bounds.top + (1 - headCenter.y) * bounds.height / 2;
+        const dx = mouse.x - headScreenX;
+        const dy = mouse.y - headScreenY;
+        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 230), -1.05, 1.05);
+        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 330), -.68, .68);
+        robot.rotation.y += (0 - robot.rotation.y) * .045;
         robot.rotation.x += (0 - robot.rotation.x) * .045;
-        head.rotation.z += ((-mouse.x * .08 + (reducedMotion ? 0 : Math.sin(t * .9) * .025)) - head.rotation.z) * .09;
-        head.rotation.y += ((mouse.x * .62) - head.rotation.y) * .09;
-        // Screen Y grows downward; for a face oriented toward +Z, positive X pitches downward.
-        head.rotation.x += ((mouse.y * .5) - head.rotation.x) * .12;
+        head.rotation.z += (0 - head.rotation.z) * .09;
+        head.rotation.y += (targetYaw - head.rotation.y) * .12;
+        head.rotation.x += (targetPitch - head.rotation.x) * .12;
         leftArm.rotation.z = reducedMotion ? 0 : Math.sin(t * 1.7) * .13;
         rightArm.rotation.z = reducedMotion ? 0 : -Math.sin(t * 1.7 + .8) * .13;
         renderer.render(scene, camera);
