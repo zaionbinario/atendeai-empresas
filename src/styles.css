@@ -318,3 +318,12 @@ html:not([data-zyon-accent="custom"]) [class*="focus\\:border-emerald-"]:focus {
 @media (prefers-reduced-motion: reduce) {
   .zyon-robot-float, .zyon-robot-head { animation: none !important; will-change: auto; }
 }
+
+/* Keep a visible animated robot if WebGL is blocked or Three.js fails to load. */
+.zyon-robot-container { isolation: isolate; }
+.zyon-robot-container canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+.zyon-robot-container[data-webgl="ready"] .zyon-robot-fallback { display: none; }
+.zyon-robot-fallback { filter: drop-shadow(0 14px 25px rgba(15, 138, 255, .35)); }
+@media (prefers-reduced-motion: reduce) {
+  .zyon-robot-fallback, .zyon-robot-fallback * { animation: none !important; }
+}
