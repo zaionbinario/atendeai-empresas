@@ -47,23 +47,25 @@ export function Robot3D() {
       const rightArm = new THREE.Group(); rightArm.position.set(1.25, -.5, 0); robot.add(rightArm);
       sphere(rightArm, .23, -.5, 0, .37, .73, .42, metal);
       const mouse = { x: 0, y: 0 };
-      const move = (e: PointerEvent) => { mouse.x = (e.clientX / window.innerWidth - .5) * 2; mouse.y = (e.clientY / window.innerHeight - .5) * 2; };
+      const move = (e: PointerEvent) => { mouse.x = Math.max(-1, Math.min(1, (e.clientX / window.innerWidth - .5) * 2)); mouse.y = Math.max(-1, Math.min(1, (e.clientY / window.innerHeight - .5) * 2)); };
       window.addEventListener("pointermove", move, { passive: true });
       const clock = new THREE.Clock();
       let frame = 0;
       const animate = () => {
         frame = requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
-        robot.position.y = Math.sin(t * 1.7) * .18;
-        robot.rotation.y += ((mouse.x * .42 + Math.sin(t * .4) * .12) - robot.rotation.y) * .045;
-        robot.rotation.x += ((-mouse.y * .16) - robot.rotation.x) * .045;
-        head.rotation.z = Math.sin(t * .9) * .075;
-        head.rotation.y = Math.sin(t * .7) * .13;
-        leftArm.rotation.z = Math.sin(t * 1.7) * .13;
-        rightArm.rotation.z = -Math.sin(t * 1.7 + .8) * .13;
+        robot.position.y = reducedMotion ? 0 : Math.sin(t * 1.7) * .18;
+        robot.rotation.y += ((mouse.x * .15 + (reducedMotion ? 0 : Math.sin(t * .4) * .08)) - robot.rotation.y) * .045;
+        robot.rotation.x += ((-mouse.y * .08) - robot.rotation.x) * .045;
+        head.rotation.z += ((-mouse.x * .08 + (reducedMotion ? 0 : Math.sin(t * .9) * .025)) - head.rotation.z) * .09;
+        head.rotation.y += ((mouse.x * .62) - head.rotation.y) * .09;
+        head.rotation.x += ((-mouse.y * .36) - head.rotation.x) * .09;
+        leftArm.rotation.z = reducedMotion ? 0 : Math.sin(t * 1.7) * .13;
+        rightArm.rotation.z = reducedMotion ? 0 : -Math.sin(t * 1.7 + .8) * .13;
         renderer.render(scene, camera);
       };
-      if (reducedMotion) { renderer.render(scene, camera); } else { animate(); }
+      // Reduced-motion users keep mouse tracking, without idle bobbing.
+      animate();
       host.dataset.webgl = "ready";
       const resize = new ResizeObserver(() => {
         if (!host.clientWidth || !host.clientHeight) return;
