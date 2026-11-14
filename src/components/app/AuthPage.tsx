@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bot, Eye, EyeOff, LockKeyhole, Mail, UserRound, ArrowRight } from "lucide-react";
 import { authConfigured, getRememberMe, setRememberMe, supabase } from "@/lib/auth-client";
+import { Robot3D } from "./Robot3D";
 
 type Mode = "login" | "cadastro" | "recuperar";
 const validarSenha = (valor: string) => valor.length >= 6 && /[a-z]/.test(valor) && /[^A-Za-z0-9]/.test(valor);
@@ -63,30 +64,9 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <div className="absolute left-1/2 top-1/2 h-[min(115vw,920px)] w-[min(115vw,920px)] -translate-x-1/2 -translate-y-1/2 rounded-full border-[10px] border-[#168cff] opacity-80 shadow-[0_0_40px_rgba(18,132,255,.55),inset_0_0_30px_rgba(18,132,255,.15)] sm:border-[14px]" />
       <div className="absolute left-[-30%] top-[68%] h-px w-[160%] -rotate-[34deg] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.65)_100%)]" />
-      {/* Stylized robot inspired by the provided reference, drawn as SVG to avoid external assets. */}
-      <svg className="zyon-robot-float absolute bottom-[2%] right-[-110px] h-[280px] w-[280px] opacity-50 sm:bottom-[4%] sm:right-[1%] sm:h-[370px] sm:w-[370px] sm:opacity-80 lg:right-[5%] lg:h-[430px] lg:w-[430px]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="zyonRobotMetal" x1="50" y1="40" x2="340" y2="390" gradientUnits="userSpaceOnUse"><stop stopColor="#F0F8FF"/><stop offset=".45" stopColor="#8295B4"/><stop offset="1" stopColor="#283E60"/></linearGradient>
-          <linearGradient id="zyonRobotBody" x1="160" y1="215" x2="250" y2="395" gradientUnits="userSpaceOnUse"><stop stopColor="#E2ECFF"/><stop offset="1" stopColor="#546B8B"/></linearGradient>
-          <filter id="zyonRobotGlow"><feGaussianBlur stdDeviation="5"/></filter>
-        </defs>
-        <ellipse cx="200" cy="402" rx="90" ry="11" fill="#008DFF" opacity=".25" filter="url(#zyonRobotGlow)"/>
-        <path d="M93 95C53 55 52 158 104 178L118 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
-        <path d="M307 95C347 55 348 158 296 178L282 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
-        <g className="zyon-robot-head"><rect x="89" y="39" width="222" height="178" rx="83" fill="url(#zyonRobotMetal)" stroke="#C3D8EF" strokeWidth="3"/>
-        <path d="M113 123C113 88 140 75 171 75H230C265 75 288 89 288 124V150C288 181 268 193 235 193H165C133 193 113 177 113 150V123Z" fill="#030817" stroke="#78A9DA" strokeWidth="3"/>
-        <ellipse cx="161" cy="137" rx="21" ry="27" transform="rotate(-13 161 137)" fill="#62E8FF"/>
-        <ellipse cx="239" cy="137" rx="21" ry="27" transform="rotate(13 239 137)" fill="#62E8FF"/>
-        <ellipse cx="161" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/>
-        <ellipse cx="239" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/></g>
-        <path d="M143 226C159 212 240 212 257 226C274 241 277 322 255 362C239 392 217 403 200 403C183 403 161 392 145 362C123 322 126 241 143 226Z" fill="url(#zyonRobotBody)" stroke="#BCD2EC" strokeWidth="3"/>
-        <path d="M142 328C181 355 218 355 258 328" stroke="#60E6FF" strokeWidth="3" opacity=".9"/>
-        <rect className="zyon-robot-arm-left" x="77" y="239" width="57" height="100" rx="28" transform="rotate(17 77 239)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
-        <rect className="zyon-robot-arm-right" x="267" y="256" width="57" height="100" rx="28" transform="rotate(-17 267 256)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
-        <path d="M88 312L126 324M275 324L312 312" stroke="#6FEAFF" strokeWidth="3"/>
-      </svg>
       <div className="absolute left-[8%] top-[12%] h-24 w-24 rounded-full bg-blue-500/15 blur-3xl" />
     </div>
+    <Robot3D />
     <div className="relative z-10 w-full max-w-[440px] rounded-[24px] border border-white/20 bg-[#070e2a]/65 px-6 py-8 shadow-[0_25px_90px_rgba(0,0,0,.65),0_0_60px_rgba(25,82,225,.16)] backdrop-blur-2xl sm:px-10 sm:py-10">
       <div className="mb-6 flex items-center justify-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl border border-sky-300/40 bg-sky-400/10 text-sky-300 shadow-[0_0_25px_rgba(56,189,248,.18)]"><Bot className="h-6 w-6" /></span>
