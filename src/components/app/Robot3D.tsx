@@ -56,10 +56,10 @@ export function Robot3D() {
         const t = clock.getElapsedTime();
         robot.position.y = reducedMotion ? 0 : Math.sin(t * 1.7) * .18;
         robot.rotation.y += ((mouse.x * .15 + (reducedMotion ? 0 : Math.sin(t * .4) * .08)) - robot.rotation.y) * .045;
-        robot.rotation.x += ((-mouse.y * .08) - robot.rotation.x) * .045;
+        robot.rotation.x += ((mouse.y * .08) - robot.rotation.x) * .045;
         head.rotation.z += ((-mouse.x * .08 + (reducedMotion ? 0 : Math.sin(t * .9) * .025)) - head.rotation.z) * .09;
         head.rotation.y += ((mouse.x * .62) - head.rotation.y) * .09;
-        head.rotation.x += ((-mouse.y * .36) - head.rotation.x) * .09;
+        head.rotation.x += ((mouse.y * .36) - head.rotation.x) * .09;
         leftArm.rotation.z = reducedMotion ? 0 : Math.sin(t * 1.7) * .13;
         rightArm.rotation.z = reducedMotion ? 0 : -Math.sin(t * 1.7 + .8) * .13;
         renderer.render(scene, camera);
@@ -83,7 +83,7 @@ export function Robot3D() {
     }).catch((error) => { console.warn("Zyon Robot3D: biblioteca 3D não carregou; usando reserva.", error); });
     return () => { stopped = true; dispose(); };
   }, []);
-  return <div ref={mount} aria-hidden="true" className="zyon-robot-container pointer-events-none absolute bottom-[2%] right-[-80px] h-[330px] w-[330px] opacity-85 sm:bottom-[5%] sm:right-[1%] sm:h-[460px] sm:w-[460px] lg:right-[5%] lg:h-[520px] lg:w-[520px]">
+  return <div ref={mount} aria-hidden="true" className="zyon-robot-container pointer-events-none absolute bottom-[4%] right-[-110px] h-[290px] w-[290px] opacity-85 sm:bottom-[8%] sm:right-[-50px] sm:h-[380px] sm:w-[380px] lg:bottom-[10%] lg:right-[-35px] lg:h-[400px] lg:w-[400px]">
     <svg className="zyon-robot-fallback h-full w-full" viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="robotFallbackMetal" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#eef8ff"/><stop offset=".55" stopColor="#8298b8"/><stop offset="1" stopColor="#405372"/></linearGradient><filter id="robotFallbackGlow"><feGaussianBlur stdDeviation="7"/></filter></defs>
       <g className="zyon-robot-float"><ellipse cx="200" cy="390" rx="92" ry="14" fill="#168cff" opacity=".35" filter="url(#robotFallbackGlow)"/>
