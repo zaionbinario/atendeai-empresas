@@ -130,7 +130,7 @@ function ProtectedContent() {
   const path = useRouterState({ select: s => s.location.pathname });
   const { session, loading } = useAuth();
   const publicRoute = ["/login", "/cadastro", "/recuperar-senha", "/redefinir-senha"].includes(path);
-  if (loading) return <main className="flex min-h-screen items-center justify-center bg-[#071310] text-emerald-300">Carregando sessão...</main>;
+  if (loading) return <main className="flex min-h-screen items-center justify-center bg-[#07111F] text-sky-300">Carregando sessão...</main>;
   if (publicRoute) {
     if (session && path !== "/redefinir-senha") return <Navigate to="/" replace />;
     return <Outlet />;
