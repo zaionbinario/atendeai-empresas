@@ -63,8 +63,8 @@ export function Robot3D() {
         const headScreenY = bounds.top + (1 - headCenter.y) * bounds.height / 2;
         const dx = mouse.x - headScreenX;
         const dy = mouse.y - headScreenY;
-        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 230), -1.05, 1.05);
-        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 330), -.68, .68);
+        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 850), -.38, .38);
+        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 950), -.3, .3);
         robot.rotation.y += (0 - robot.rotation.y) * .045;
         robot.rotation.x += (0 - robot.rotation.x) * .045;
         head.rotation.z += (0 - head.rotation.z) * .09;
