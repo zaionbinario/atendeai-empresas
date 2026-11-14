@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { supabase } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { Btn, Card, Field, Input, PageHeader, QuickAccess, Textarea, Toggle } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
@@ -16,6 +18,7 @@ const tons: { v: Instrucoes["tom"]; l: string; d: string }[] = [
 ];
 function Atendente() {
   const { empresas, empresaSelecionadaId, setEmpresaSelecionadaId, instrucoesPorEmpresa, setInstrucoesPorEmpresa, instrucoes: padrao } = useStore();
+  const [salvando, setSalvando] = useState(false);
   const empresa = empresas.find((e) => e.id === empresaSelecionadaId) ?? empresas[0];
   const i = empresa ? (instrucoesPorEmpresa[empresa.id] ?? {
     nomeAtendente: "Atendente virtual",
@@ -27,8 +30,22 @@ function Atendente() {
   const set = (valor: Instrucoes) => {
     if (empresa) setInstrucoesPorEmpresa((atuais) => ({ ...atuais, [empresa.id]: valor }));
   };
+  const salvar = async () => {
+    if (!empresa || !supabase) { toast.error("Empresa não carregada."); return; }
+    setSalvando(true);
+    try {
+      const { error } = await supabase.from("empresa_dados").upsert({
+        empresa_id: empresa.id, secao: "instrucoes", conteudo: i,
+        atualizado_em: new Date().toISOString(),
+      }, { onConflict: "empresa_id,secao" });
+      if (error) throw error;
+      toast.success("Atendente salvo no Supabase!");
+    } catch (error) {
+      toast.error("Não foi possível salvar: " + (error instanceof Error ? error.message : "tente novamente"));
+    } finally { setSalvando(false); }
+  };
   return (<>
-    <PageHeader title="Atendente virtual" desc="Diga como o seu atendente deve se comportar com os clientes." action={<Btn onClick={() => toast.success("Configurações salvas!")}>Salvar</Btn>} />
+    <PageHeader title="Atendente virtual" desc="Diga como o seu atendente deve se comportar com os clientes." action={<Btn onClick={() => void salvar()} disabled={salvando}>{salvando ? "Salvando..." : "Salvar"}</Btn>} />
     <div className="grid max-w-3xl gap-4">
       <Card className="space-y-2">
         <Field label="Empresa deste atendente">
