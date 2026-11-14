@@ -34,17 +34,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [erroSaida, setErroSaida] = useState("");
   const [temaClaro, setTemaClaro] = useState(false);
   const [emailConta, setEmailConta] = useState<string | null>(null);
+  const [isAdminPlataforma, setIsAdminPlataforma] = useState(false);
   const inicialConta = emailConta?.trim().charAt(0).toLocaleUpperCase("pt-BR") || "Z";
   useEffect(() => {
     if (!supabase) return;
     let ativo = true;
-    void supabase.auth.getUser().then(({ data }) => {
-      if (ativo) setEmailConta(data.user?.email ?? null);
-    }).catch(() => { if (ativo) setEmailConta(null); });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (ativo) setEmailConta(session?.user?.email ?? null);
+    let revisao = 0;
+    const atualizarUsuarioEPermissao = async () => {
+      const atual = ++revisao;
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (!ativo || atual !== revisao) return;
+      setEmailConta(authError ? null : user?.email ?? null);
+      if (authError || !user) { setIsAdminPlataforma(false); return; }
+      const { data, error } = await supabase
+        .from("admins_plataforma")
+        .select("usuario_id")
+        .eq("usuario_id", user.id)
+        .maybeSingle();
+      if (!ativo || atual !== revisao) return;
+      setIsAdminPlataforma(!error && Boolean(data));
+    };
+    void atualizarUsuarioEPermissao();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      // Executa após o callback de autenticação para evitar concorrência com o lock interno do Supabase.
+      setTimeout(() => { if (ativo) void atualizarUsuarioEPermissao(); }, 0);
     });
-    return () => { ativo = false; subscription.unsubscribe(); };
+    return () => { ativo = false; revisao++; subscription.unsubscribe(); };
   }, []);
   const { botAtivo, setBotAtivo, conversas } = useStore();
   useEffect(() => { applyAppearance(loadAppearance()); }, []);
@@ -83,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
   const side = (
     <nav className="flex flex-col gap-1" aria-label="Navegação principal">
-      {nav.map(({ to, label, icon: Icon }) => (
+      {nav.filter(({ to }) => to !== "/administracao" || isAdminPlataforma).map(({ to, label, icon: Icon }) => (
         <Link key={to} to={to} preload="intent" preloadDelay={50} onClick={() => setOpen(false)}
           className={cn("group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all",
             path === to ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300 shadow-[0_0_22px_-12px_rgba(16,185,129,.8)] light:border-emerald-500/30 light:bg-emerald-50 light:text-emerald-800" : "text-slate-400 hover:bg-white/5 hover:text-white light:text-slate-600 light:hover:bg-slate-100 light:hover:text-slate-900")}>
