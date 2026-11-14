@@ -25,7 +25,6 @@ function Painel() {
     { l: "Status do atendente", v: botAtivo ? "Ativo" : "Pausado", i: botAtivo ? Bot : Timer, hint: "Controle no topo do painel", color: botAtivo ? "text-emerald-300 bg-emerald-400/10 light:text-emerald-800 light:bg-emerald-50" : "text-amber-300 bg-amber-400/10 light:text-amber-800 light:bg-amber-50" },
   ];
   const atalhos = [
-    { to: "/empresas", label: "Cadastrar empresa", desc: "Gerencie seus negócios", icon: Building2, color: "bg-sky-500/10 text-sky-600" },
     { to: "/produtos", label: "Adicionar produtos", desc: "Atualize preços e descrições", icon: Package, color: "bg-violet-500/10 text-violet-600" },
     { to: "/horarios", label: "Configurar horários", desc: "Informe quando abre e fecha", icon: Clock3, color: "bg-amber-500/10 text-amber-600" },
     { to: "/perguntas", label: "Perguntas frequentes", desc: "Cadastre respostas para a IA", icon: CircleHelp, color: "bg-amber-500/15 text-amber-300 light:bg-amber-50 light:text-amber-800" },
