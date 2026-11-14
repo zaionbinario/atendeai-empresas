@@ -37,9 +37,9 @@ export function Robot3D() {
       sphere(body, 0, -.7, .72, .72, .018, .025, line);
       const head = new THREE.Group(); head.position.y = 1.05; robot.add(head);
       sphere(head, 0, .18, 0, 1.45, 1.08, 1.05, metal);
-      sphere(head, 0, .05, .79, 1.18, .73, .32, dark);
-      sphere(head, -.48, .07, 1.075, .23, .31, .055, glow);
-      sphere(head, .48, .07, 1.075, .23, .31, .055, glow);
+      sphere(head, 0, .05, 1.065, 1.18, .73, .22, dark);
+      sphere(head, -.48, .07, 1.28, .23, .31, .075, glow);
+      sphere(head, .48, .07, 1.28, .23, .31, .075, glow);
       sphere(head, -1.45, .15, 0, .22, .62, .48, metal);
       sphere(head, 1.45, .15, 0, .22, .62, .48, metal);
       const leftArm = new THREE.Group(); leftArm.position.set(-1.25, -.5, 0); robot.add(leftArm);
@@ -63,8 +63,8 @@ export function Robot3D() {
         const headScreenY = bounds.top + (1 - headCenter.y) * bounds.height / 2;
         const dx = mouse.x - headScreenX;
         const dy = mouse.y - headScreenY;
-        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 850), -.38, .38);
-        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 950), -.3, .3);
+        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 1100), -.28, .28);
+        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 1200), -.22, .22);
         robot.rotation.y += (0 - robot.rotation.y) * .045;
         robot.rotation.x += (0 - robot.rotation.x) * .045;
         head.rotation.z += (0 - head.rotation.z) * .09;
