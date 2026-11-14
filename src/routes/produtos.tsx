@@ -11,7 +11,8 @@ export const Route = createFileRoute("/produtos")({
 });
 const vazio: Produto = { id: "", nome: "", preco: 0, descricao: "", categoria: "" };
 function Produtos() {
-  const { produtos, setProdutos } = useStore();
+  const { produtos, salvarProdutos } = useStore();
+  const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState<Produto | null>(null);
   const [precoTexto, setPrecoTexto] = useState("");
   const [erroPreco, setErroPreco] = useState("");
@@ -31,7 +32,7 @@ function Produtos() {
     } catch { /* A página continua acessível sem sessionStorage. */ }
   }, []);
   const lista = produtos.filter((p) => p.nome.toLowerCase().includes(busca.toLowerCase()));
-  const salvar = () => {
+  const salvar = async () => {
     if (!form?.nome.trim()) return;
     const texto = precoTexto.trim().replace(/^R\$\s*/i, "").replace(/\s/g, "");
     const valido = /^\d+(?:[.,]\d{1,2})?$/.test(texto);
@@ -46,8 +47,17 @@ function Produtos() {
     }
     setErroPreco("");
     const produto = { ...form, preco };
-    setProdutos(form.id ? produtos.map((p) => (p.id === form.id ? produto : p)) : [...produtos, { ...produto, id: novoId() }]);
-    setForm(null);
+    setSalvando(true);
+    try {
+      const ok = await salvarProdutos(form.id ? produtos.map((p) => (p.id === form.id ? produto : p)) : [...produtos, { ...produto, id: novoId() }]);
+      if (ok) setForm(null);
+    } finally { setSalvando(false); }
+  };
+  const excluir = async (id: string) => {
+    if (salvando) return;
+    setSalvando(true);
+    try { await salvarProdutos(produtos.filter((p) => p.id !== id)); }
+    finally { setSalvando(false); }
   };
   return (<>
     <PageHeader title="Produtos" desc="O atendente usa estas informações para responder sobre preços." action={<Btn onClick={() => abrirFormulario(vazio)}><Plus className="h-4 w-4" />Novo produto</Btn>} />
@@ -59,7 +69,7 @@ function Produtos() {
             <p className="text-sm text-muted-foreground">{p.descricao}</p></div>
           <span className="font-display text-lg font-bold text-primary">{brl(p.preco)}</span>
           <div className="flex gap-1"><Btn variant="ghost" aria-label="Editar" onClick={() => abrirFormulario(p)}><Pencil className="h-4 w-4" /></Btn>
-            <Btn variant="danger" aria-label="Excluir" onClick={() => setProdutos(produtos.filter((x) => x.id !== p.id))}><Trash2 className="h-4 w-4" /></Btn></div>
+            <Btn variant="danger" aria-label="Excluir" onClick={() => void excluir(p.id)} disabled={salvando}><Trash2 className="h-4 w-4" /></Btn></div>
         </li>))}
         {!lista.length && <li className="p-8 text-center text-muted-foreground">Nenhum produto encontrado.</li>}</ul>
     </Card>
@@ -70,7 +80,7 @@ function Produtos() {
         <div className="grid gap-4 sm:grid-cols-2"><Field label="Preço (R$)"><Input type="text" inputMode="decimal" placeholder="Ex.: 59,90" value={precoTexto} onChange={(e) => { setPrecoTexto(e.target.value); setErroPreco(""); }} />{erroPreco && <p role="alert" className="mt-1 text-xs text-red-400">{erroPreco}</p>}</Field>
           <Field label="Categoria"><Input value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} /></Field></div>
         <Field label="Descrição"><Textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} /></Field>
-        <div className="flex justify-end gap-2"><Btn variant="ghost" onClick={() => setForm(null)}>Cancelar</Btn><Btn onClick={salvar}>Salvar</Btn></div>
+        <div className="flex justify-end gap-2"><Btn variant="ghost" onClick={() => setForm(null)}>Cancelar</Btn><Btn onClick={() => void salvar()} disabled={salvando}>{salvando ? "Salvando..." : "Salvar"}</Btn></div>
       </div>}
     </Modal>
   </>);
