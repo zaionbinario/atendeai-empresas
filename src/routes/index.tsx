@@ -32,17 +32,17 @@ function Painel() {
   ];
   return (<>
     <PageHeader title="Visão geral" desc="Acompanhe o desempenho do atendimento da sua empresa." />
-    <section className="relative mb-5 overflow-hidden rounded-3xl border border-blue-400/25 bg-gradient-to-r from-[#091629] via-[#12365e] to-[#195da0] p-6 text-white shadow-[0_18px_55px_-30px_rgba(37,131,216,.45)] sm:p-8">
+    <section className="relative mb-5 overflow-hidden rounded-3xl border border-primary/30 bg-[linear-gradient(110deg,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_12%,#090f1b)_0%,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_45%,#101827)_55%,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_75%,#101827)_100%)] p-6 text-white shadow-[0_18px_55px_-30px_color-mix(in_oklch,var(--zyon-accent,#3b82f6)_40%,transparent)] sm:p-8">
       <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full border-[28px] border-white/5" />
       <div className="pointer-events-none absolute -bottom-24 right-36 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
-      <Rocket className="pointer-events-none absolute -right-2 -top-1 hidden h-44 w-44 rotate-45 text-blue-200/20 sm:block" />
+      <Rocket className="pointer-events-none absolute -right-2 -top-1 hidden h-44 w-44 rotate-45 text-white/15 sm:block" />
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold"><Sparkles className="h-3.5 w-3.5" /> Seu atendimento em um só lugar</div>
           <h2 className="font-display text-2xl font-bold sm:text-3xl">Olá! Vamos cuidar dos seus clientes?</h2>
           <p className="mt-2 text-sm leading-relaxed text-white/75">Configure sua empresa, deixe a IA preparada e acompanhe as conversas em tempo real.</p>
         </div>
-        <Link to="/simulador" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-blue-900 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">Testar meu atendente <ArrowUpRight className="h-4 w-4" /></Link>
+        <Link to="/simulador" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-slate-900 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">Testar meu atendente <ArrowUpRight className="h-4 w-4" /></Link>
       </div>
     </section>
     <div className="mb-3 flex items-center justify-between"><h2 className="font-display text-lg font-bold">Resumo do atendimento</h2><span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Dados do histórico local</span></div>
