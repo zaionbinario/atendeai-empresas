@@ -32,7 +32,7 @@ function Painel() {
   ];
   return (<>
     <PageHeader title="Visão geral" desc="Acompanhe o desempenho do atendimento da sua empresa." />
-    <section className="relative mb-5 overflow-hidden rounded-3xl border border-primary/30 bg-[linear-gradient(110deg,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_12%,#090f1b)_0%,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_45%,#101827)_55%,color-mix(in_oklch,var(--zyon-accent,#3b82f6)_75%,#101827)_100%)] p-6 text-white shadow-[0_18px_55px_-30px_color-mix(in_oklch,var(--zyon-accent,#3b82f6)_40%,transparent)] sm:p-8">
+    <section className="relative mb-5 overflow-hidden rounded-3xl border border-primary/30 bg-[linear-gradient(110deg,color-mix(in_srgb,var(--zyon-accent,#3b82f6)_12%,#090d13)_0%,color-mix(in_srgb,var(--zyon-accent,#3b82f6)_42%,#090d13)_55%,color-mix(in_srgb,var(--zyon-accent,#3b82f6)_75%,#090d13)_100%)] p-6 text-white shadow-[0_18px_55px_-30px_color-mix(in_srgb,var(--zyon-accent,#3b82f6)_40%,transparent)] sm:p-8">
       <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full border-[28px] border-white/5" />
       <div className="pointer-events-none absolute -bottom-24 right-36 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
       <Rocket className="pointer-events-none absolute -right-2 -top-1 hidden h-44 w-44 rotate-45 text-white/15 sm:block" />
