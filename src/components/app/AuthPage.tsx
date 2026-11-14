@@ -64,7 +64,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
       <div className="absolute left-[-30%] top-[68%] h-px w-[160%] -rotate-[34deg] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.65)_100%)]" />
       {/* Stylized robot inspired by the provided reference, drawn as SVG to avoid external assets. */}
-      <svg className="absolute bottom-[-35px] right-[-85px] h-[310px] w-[310px] rotate-[-8deg] opacity-25 blur-[.2px] sm:bottom-[-80px] sm:right-[3%] sm:h-[490px] sm:w-[490px] sm:opacity-45 lg:right-[8%]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg className="zyon-robot-float absolute bottom-[-35px] right-[-85px] h-[310px] w-[310px] opacity-35 sm:bottom-[-80px] sm:right-[3%] sm:h-[490px] sm:w-[490px] sm:opacity-60 lg:right-[8%]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="zyonRobotMetal" x1="50" y1="40" x2="340" y2="390" gradientUnits="userSpaceOnUse"><stop stopColor="#F0F8FF"/><stop offset=".45" stopColor="#8295B4"/><stop offset="1" stopColor="#283E60"/></linearGradient>
           <linearGradient id="zyonRobotBody" x1="160" y1="215" x2="250" y2="395" gradientUnits="userSpaceOnUse"><stop stopColor="#E2ECFF"/><stop offset="1" stopColor="#546B8B"/></linearGradient>
@@ -73,16 +73,16 @@ export function AuthPage({ mode }: { mode: Mode }) {
         <ellipse cx="200" cy="402" rx="90" ry="11" fill="#008DFF" opacity=".25" filter="url(#zyonRobotGlow)"/>
         <path d="M93 95C53 55 52 158 104 178L118 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
         <path d="M307 95C347 55 348 158 296 178L282 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
-        <rect x="89" y="39" width="222" height="178" rx="83" fill="url(#zyonRobotMetal)" stroke="#C3D8EF" strokeWidth="3"/>
+        <g className="zyon-robot-head"><rect x="89" y="39" width="222" height="178" rx="83" fill="url(#zyonRobotMetal)" stroke="#C3D8EF" strokeWidth="3"/>
         <path d="M113 123C113 88 140 75 171 75H230C265 75 288 89 288 124V150C288 181 268 193 235 193H165C133 193 113 177 113 150V123Z" fill="#030817" stroke="#78A9DA" strokeWidth="3"/>
         <ellipse cx="161" cy="137" rx="21" ry="27" transform="rotate(-13 161 137)" fill="#62E8FF"/>
         <ellipse cx="239" cy="137" rx="21" ry="27" transform="rotate(13 239 137)" fill="#62E8FF"/>
         <ellipse cx="161" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/>
-        <ellipse cx="239" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/>
+        <ellipse cx="239" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/></g>
         <path d="M143 226C159 212 240 212 257 226C274 241 277 322 255 362C239 392 217 403 200 403C183 403 161 392 145 362C123 322 126 241 143 226Z" fill="url(#zyonRobotBody)" stroke="#BCD2EC" strokeWidth="3"/>
         <path d="M142 328C181 355 218 355 258 328" stroke="#60E6FF" strokeWidth="3" opacity=".9"/>
-        <rect x="77" y="239" width="57" height="100" rx="28" transform="rotate(17 77 239)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
-        <rect x="267" y="256" width="57" height="100" rx="28" transform="rotate(-17 267 256)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
+        <rect className="zyon-robot-arm-left" x="77" y="239" width="57" height="100" rx="28" transform="rotate(17 77 239)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
+        <rect className="zyon-robot-arm-right" x="267" y="256" width="57" height="100" rx="28" transform="rotate(-17 267 256)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
         <path d="M88 312L126 324M275 324L312 312" stroke="#6FEAFF" strokeWidth="3"/>
       </svg>
       <div className="absolute left-[8%] top-[12%] h-24 w-24 rounded-full bg-blue-500/15 blur-3xl" />
