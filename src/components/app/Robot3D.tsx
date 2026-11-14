@@ -56,10 +56,10 @@ export function Robot3D() {
         const t = clock.getElapsedTime();
         robot.position.y = reducedMotion ? 0 : Math.sin(t * 1.7) * .18;
         robot.rotation.y += ((mouse.x * .15 + (reducedMotion ? 0 : Math.sin(t * .4) * .08)) - robot.rotation.y) * .045;
-        robot.rotation.x += ((mouse.y * .08) - robot.rotation.x) * .045;
+        robot.rotation.x += (0 - robot.rotation.x) * .045;
         head.rotation.z += ((-mouse.x * .08 + (reducedMotion ? 0 : Math.sin(t * .9) * .025)) - head.rotation.z) * .09;
         head.rotation.y += ((mouse.x * .62) - head.rotation.y) * .09;
-        head.rotation.x += ((mouse.y * .36) - head.rotation.x) * .09;
+        head.rotation.x += ((-mouse.y * .5) - head.rotation.x) * .12;
         leftArm.rotation.z = reducedMotion ? 0 : Math.sin(t * 1.7) * .13;
         rightArm.rotation.z = reducedMotion ? 0 : -Math.sin(t * 1.7 + .8) * .13;
         renderer.render(scene, camera);
