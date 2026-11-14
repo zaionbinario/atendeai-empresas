@@ -415,6 +415,36 @@ function responderBase(
 
   const acompanhamento = responderSobreUltimoProduto(texto, historico, ctx.produtos);
   if (acompanhamento) return acompanhamento;
+  // Acompanha referências a itens citados na resposta anterior de uma FAQ.
+  // Ex.: "Temos pizza vegetariana por R$ 42" -> "Quanto ela custa?"
+  // Só reutiliza informações que constam explicitamente na FAQ da empresa.
+  const perguntaSeguimento = /\\b(?:ela|ele|essa|esse|isso|dela|dele|quanto|preco|valor|custa|ingredientes|composicao|feito|leva)\\b/.test(norm(texto));
+  if (perguntaSeguimento && historico.length) {
+    const ultimaResposta = [...historico].reverse().find((m) =>
+      ctx.faqs.some((f) => normalizarTextoResposta(f.resposta) === normalizarTextoResposta(m))
+    );
+    const faqAnterior = ultimaResposta
+      ? ctx.faqs.find((f) => normalizarTextoResposta(f.resposta) === normalizarTextoResposta(ultimaResposta))
+      : null;
+    if (faqAnterior) {
+      const perguntaAtual = norm(texto);
+      const consultaPreco = /\\b(?:quanto|preco|valor|custa|custam|sai)\\b/.test(perguntaAtual);
+      if (consultaPreco) {
+        const valor = faqAnterior.resposta.match(/R\\$\\s*\\d+(?:[.,]\\d{1,2})?/i);
+        if (valor) {
+          const item = norm(faqAnterior.pergunta)
+            .replace(/^.*?\\b(?:pizza|produto|servico)\\b/, (match) => match.slice(match.lastIndexOf(" ") + 1))
+            .replace(/[?!.]+$/, "").trim();
+          return (item ? "O preço de " + item + " é " : "O preço informado é ") + valor[0] + ". 😊";
+        }
+        return "Ainda não tenho um preço confirmado para esse item no cadastro. 😊";
+      }
+      if (/\\b(?:ingredientes|composicao|feito|leva)\\b/.test(perguntaAtual)) {
+        return "Ainda não tenho os ingredientes ou a composição desse item cadastrados. Vou pedir para a equipe confirmar. 😊";
+      }
+    }
+  }
+
 
   const foraDoRamo = respostaForaDoRamo(conversa, ctx);
   if (foraDoRamo) return foraDoRamo;
