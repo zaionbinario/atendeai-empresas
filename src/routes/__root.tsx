@@ -160,7 +160,9 @@ function CompanyAccess({ children, path, userId }: { children: ReactNode; path: 
     return () => { cancelled = true; };
   }, [userId, retry]);
 
-  if (access === "admin" || access === "active" || (path === "/empresas" && access === "none")) return <>{children}</>;
+  // O cadastro de empresa deve ficar acessível a qualquer usuário autenticado,
+  // inclusive quando ainda não tem vínculo ou aguarda aprovação.
+  if (path === "/empresas" || access === "admin" || access === "active") return <>{children}</>;
   const messages: Record<Exclude<AccessState, "admin" | "active">, string> = {
     loading: "Verificando sua empresa no Supabase...",
     pending: "Sua empresa ainda aguarda aprovação do administrador.",
