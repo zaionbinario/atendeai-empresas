@@ -295,26 +295,25 @@ html:not([data-zyon-accent="custom"]) [class*="to-emerald-"] { --tw-gradient-to:
 html:not([data-zyon-accent="custom"]) [class*="hover\\:bg-emerald-"]:hover { background-color: color-mix(in oklch, #2583D8 28%, transparent) !important; }
 html:not([data-zyon-accent="custom"]) [class*="focus\\:border-emerald-"]:focus { border-color: #75C8FF !important; }
 
-/* Zyon Chat login robot: lightweight dimensional motion, with reduced-motion support. */
+/* Robot background animation: large, visible floating/tilting motion. */
 .zyon-robot-float {
-  transform-origin: 50% 52%;
-  animation: zyonRobotFloat 6s ease-in-out infinite;
-  filter: drop-shadow(0 24px 32px rgba(0, 95, 255, .3));
+  transform-origin: center;
+  animation: zyonRobotFloat 3.8s ease-in-out infinite !important;
+  filter: drop-shadow(0 22px 30px rgba(0, 133, 255, .45));
   will-change: transform;
 }
 .zyon-robot-head {
   transform-box: fill-box;
   transform-origin: 50% 75%;
-  animation: zyonRobotLook 7s ease-in-out infinite;
+  animation: zyonRobotLook 3.1s ease-in-out infinite !important;
 }
 @keyframes zyonRobotFloat {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-7deg) scale(1); }
-  50% { transform: translate3d(-7px, -22px, 0) rotate(-2deg) scale(1.025); }
+  0%, 100% { transform: translate3d(0, 10px, 0) rotate(-12deg) scale(.98); }
+  50% { transform: translate3d(-26px, -45px, 0) rotate(7deg) scale(1.06); }
 }
 @keyframes zyonRobotLook {
-  0%, 100% { transform: rotate(-3deg); }
-  45% { transform: rotate(5deg); }
-  70% { transform: rotate(1deg); }
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(12deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .zyon-robot-float, .zyon-robot-head { animation: none !important; will-change: auto; }
