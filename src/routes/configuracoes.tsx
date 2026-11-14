@@ -19,7 +19,7 @@ type Preferences = { nome: string; email: string; notificacoes: boolean; avisosA
 const defaults: Preferences = { nome: "Minha empresa", email: "", notificacoes: true, avisosAtendimento: true, respostasAutomaticas: true };
 
 function Configuracoes() {
-  const { botAtivo, setBotAtivo, zerarIndicadores } = useStore();
+  const { botAtivo, setBotAtivo, zerarIndicadores, empresas } = useStore();
   const [prefs, setPrefs] = useState<Preferences>(defaults);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
@@ -29,6 +29,7 @@ function Configuracoes() {
     } catch { /* Mantém as preferências padrão se o armazenamento estiver indisponível. */ }
     setLoaded(true);
   }, []);
+  useEffect(() => { if (empresas[0]) setPrefs(current => ({ ...current, nome: empresas[0].nome })); }, [empresas]);
   // O botão do cabeçalho, o painel e o Simulador usam este mesmo estado.
   useEffect(() => {
     setPrefs((current) => current.respostasAutomaticas === botAtivo ? current : { ...current, respostasAutomaticas: botAtivo });
@@ -57,7 +58,7 @@ function Configuracoes() {
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <Card className="space-y-5">
           <div className="flex items-center gap-3"><div className="rounded-xl bg-muted p-3"><Building2 className="h-5 w-5" /></div><div><h2 className="font-semibold">Informações do negócio</h2><p className="text-sm text-muted-foreground">Dados básicos exibidos nas configurações.</p></div></div>
-          <Field label="Nome do negócio"><Input value={prefs.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Nome da sua empresa" /></Field>
+          <Field label="Nome do negócio"><Input value={empresas[0]?.nome ?? prefs.nome} readOnly placeholder="Nome da sua empresa" /></Field>
           <Field label="E-mail de contato"><Input type="email" value={prefs.email} onChange={(e) => update({ email: e.target.value })} placeholder="contato@empresa.com" /></Field>
         </Card>
         <Card className="space-y-5">
