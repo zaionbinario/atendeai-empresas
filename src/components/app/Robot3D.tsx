@@ -35,13 +35,13 @@ export function Robot3D() {
       const body = new THREE.Group(); robot.add(body);
       sphere(body, 0, -.85, 0, 1.08, 1.28, .78, metal);
       sphere(body, 0, -.7, .72, .72, .018, .025, line);
-      const head = new THREE.Group(); head.position.y = 1.05; robot.add(head);
-      sphere(head, 0, .18, 0, 1.45, 1.08, 1.05, metal);
+      const head = new THREE.Group(); head.position.y = 1.35; robot.add(head);
+      sphere(head, 0, .18, 0, 1.45, 1.08, .66, metal);
       // The front face must sit completely outside the metallic head shell.
       // Use a flattened faceplate with eyes on top so depth testing cannot hide them.
-      sphere(head, 0, .08, 1.23, 1.13, .70, .26, dark);
-      sphere(head, -.46, .09, 1.515, .22, .27, .065, glow);
-      sphere(head, .46, .09, 1.515, .22, .27, .065, glow);
+      sphere(head, 0, .08, .73, 1.13, .70, .20, dark);
+      sphere(head, -.46, .09, .96, .22, .27, .075, glow);
+      sphere(head, .46, .09, .96, .22, .27, .075, glow);
       sphere(head, -1.45, .15, 0, .22, .62, .48, metal);
       sphere(head, 1.45, .15, 0, .22, .62, .48, metal);
       const leftArm = new THREE.Group(); leftArm.position.set(-1.25, -.5, 0); robot.add(leftArm);
@@ -65,8 +65,8 @@ export function Robot3D() {
         const headScreenY = bounds.top + (1 - headCenter.y) * bounds.height / 2;
         const dx = mouse.x - headScreenX;
         const dy = mouse.y - headScreenY;
-        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 1100), -.28, .28);
-        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 1200), -.22, .22);
+        const targetYaw = THREE.MathUtils.clamp(Math.atan2(dx, 1400), -.22, .22);
+        const targetPitch = THREE.MathUtils.clamp(Math.atan2(dy, 1500), -.18, .18);
         robot.rotation.y += (0 - robot.rotation.y) * .045;
         robot.rotation.x += (0 - robot.rotation.x) * .045;
         head.rotation.z += (0 - head.rotation.z) * .09;
