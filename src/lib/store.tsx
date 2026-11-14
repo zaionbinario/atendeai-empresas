@@ -41,6 +41,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [horarios, setHorariosState] = useState<Horario[]>([]);
   const [faqs, setFaqsState] = useState<Faq[]>([]);
   const [empresaDadosId, setEmpresaDadosId] = useState("");
+  const [empresaSelecionadaId, setEmpresaSelecionadaId] = useState("");
   const [dadosProntos, setDadosProntos] = useState(false);
   const empresaDadosIdRef = useRef("");
   const dadosProntosRef = useRef(false);
@@ -58,10 +59,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (cancelled || authError || !auth.user) return;
       const { data: vinculos, error: vinculosError } = await supabase.from("empresa_usuarios").select("empresa_id").eq("usuario_id", auth.user.id);
       if (cancelled || vinculosError || !vinculos?.length) return;
-      const { data: ativas, error: empresasError } = await supabase.from("empresas").select("id,nome").in("id", vinculos.map(v => v.empresa_id)).eq("status", "ativa").order("criado_em", { ascending: true }).limit(1);
+      const { data: ativas, error: empresasError } = await supabase.from("empresas").select("id,nome").in("id", vinculos.map(v => v.empresa_id)).eq("status", "ativa").order("criado_em", { ascending: true });
       if (cancelled || empresasError || !ativas?.length) return;
-      const id = ativas[0].id;
-      setEmpresas(ativas.map(e => ({ id: e.id, nome: e.nome, segmento: "", telefone: "", cidade: "", ativa: true })));
+      const lista = ativas.map(e => ({ id: e.id, nome: e.nome, segmento: "", telefone: "", cidade: "", ativa: true }));
+      setEmpresas(lista);
+      const id = lista.some(e => e.id === empresaSelecionadaId) ? empresaSelecionadaId : lista[0].id;
       const { data, error } = await supabase.from("empresa_dados").select("secao,conteudo").eq("empresa_id", id);
       if (cancelled) return;
       if (error) { toast.error("Não foi possível carregar os dados da empresa: " + error.message); return; }
@@ -71,7 +73,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setFaqsState(Array.isArray(sections.get("faqs")) ? sections.get("faqs") as Faq[] : []);
       const savedAssistant = sections.get("instrucoes");
       setInstrucoesPorEmpresaState(savedAssistant && typeof savedAssistant === "object" && !Array.isArray(savedAssistant) ? { [id]: savedAssistant as Instrucoes } : {});
-      setEmpresaSelecionadaId(id);
+      if (id !== empresaSelecionadaId) setEmpresaSelecionadaId(id);
       empresaDadosIdRef.current = id;
       dadosProntosRef.current = true;
       setEmpresaDadosId(id);
@@ -79,10 +81,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
     void carregarDados();
     return () => { cancelled = true; };
-  }, []);
+  }, [empresaSelecionadaId]);
   async function salvarSecao(secao: "produtos" | "horarios" | "faqs", conteudo: Produto[] | Horario[] | Faq[]): Promise<boolean> {
     const id = empresaDadosIdRef.current;
-    if (!supabase || !id || !dadosProntosRef.current) { toast.error("Aguarde o carregamento da empresa."); return false; }
+    if (!supabase || !id || id !== empresaSelecionadaId || !dadosProntosRef.current) { toast.error("Aguarde o carregamento da empresa."); return false; }
     const { error } = await supabase.from("empresa_dados").upsert({
       empresa_id: id, secao, conteudo, atualizado_em: new Date().toISOString(),
     }, { onConflict: "empresa_id,secao" });
@@ -100,13 +102,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const salvarFaqs = (v: Faq[]) => salvarSecao("faqs", v);
   const setFaqs = (v: Faq[]) => { void salvarFaqs(v); };
   const [instrucoes, setInstrucoes] = useState<Instrucoes>({ nomeAtendente: "Atendente virtual", tom: "amigavel", boasVindas: "", regras: "", transferirHumano: true });
-  const [empresaSelecionadaId, setEmpresaSelecionadaId] = useState("");
   const [instrucoesPorEmpresa, setInstrucoesPorEmpresaState] = useState<Record<string, Instrucoes>>({});
   const setInstrucoesPorEmpresa: Dispatch<SetStateAction<Record<string, Instrucoes>>> = (action) => {
     setInstrucoesPorEmpresaState(previous => {
       const next = typeof action === "function" ? action(previous) : action;
       const id = empresaDadosIdRef.current;
-      if (id && next[id] && supabase) {
+      if (id && id === empresaSelecionadaId && dadosProntosRef.current && next[id] && supabase) {
         void supabase.from("empresa_dados").upsert({
           empresa_id: id, secao: "instrucoes", conteudo: next[id], atualizado_em: new Date().toISOString()
         }, { onConflict: "empresa_id,secao" }).then(({ error }) => {
