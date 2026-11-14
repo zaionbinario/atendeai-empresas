@@ -37,9 +37,11 @@ export function Robot3D() {
       sphere(body, 0, -.7, .72, .72, .018, .025, line);
       const head = new THREE.Group(); head.position.y = 1.05; robot.add(head);
       sphere(head, 0, .18, 0, 1.45, 1.08, 1.05, metal);
-      sphere(head, 0, .05, 1.065, 1.18, .73, .22, dark);
-      sphere(head, -.48, .07, 1.28, .23, .31, .075, glow);
-      sphere(head, .48, .07, 1.28, .23, .31, .075, glow);
+      // The front face must sit completely outside the metallic head shell.
+      // Use a flattened faceplate with eyes on top so depth testing cannot hide them.
+      sphere(head, 0, .08, 1.23, 1.13, .70, .26, dark);
+      sphere(head, -.46, .09, 1.515, .22, .27, .065, glow);
+      sphere(head, .46, .09, 1.515, .22, .27, .065, glow);
       sphere(head, -1.45, .15, 0, .22, .62, .48, metal);
       sphere(head, 1.45, .15, 0, .22, .62, .48, metal);
       const leftArm = new THREE.Group(); leftArm.position.set(-1.25, -.5, 0); robot.add(leftArm);
