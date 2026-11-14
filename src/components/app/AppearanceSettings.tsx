@@ -3,15 +3,14 @@ import { Palette, RotateCcw } from "lucide-react";
 
 const KEY = "zyon-chat-aparencia";
 const colors = [
-  { name: "Verde", value: "oklch(0.76 0.17 155)", hex: "#34d399" },
-  { name: "Vermelho", value: "oklch(0.65 0.22 25)", hex: "#ef4444" },
+  { name: "Azul", value: "oklch(0.67 0.18 255)", hex: "#3b82f6" },
   { name: "Roxo", value: "oklch(0.68 0.20 300)", hex: "#a855f7" },
   { name: "Rosa", value: "oklch(0.72 0.19 350)", hex: "#ec4899" },
-  { name: "Azul", value: "oklch(0.67 0.18 255)", hex: "#3b82f6" },
+  { name: "Vermelho", value: "oklch(0.65 0.22 25)", hex: "#ef4444" },
   { name: "Branco", value: "oklch(0.95 0 0)", hex: "#f5f5f5" },
 ] as const;
 export type Appearance = { color: string; fontSize: number; font: string };
-export const defaultAppearance: Appearance = { color: colors[0].value, fontSize: 100, font: "Figtree" };
+export const defaultAppearance: Appearance = { color: "oklch(0.67 0.18 255)", fontSize: 100, font: "Figtree" };
 const fonts = ["Figtree", "Outfit", "Arial", "Georgia"] as const;
 export function applyAppearance(settings: Appearance) {
   if (typeof document === "undefined") return;
@@ -22,12 +21,12 @@ export function applyAppearance(settings: Appearance) {
   root.dataset["zyonAccent"] = "custom";
   root.style.setProperty("--zyon-accent", color);
   // Fundos discretamente tingidos na cor escolhida, preservando contraste.
-  const hue = settings.color === colors[1].value ? 25
-    : settings.color === colors[2].value ? 300
-    : settings.color === colors[3].value ? 350
-    : settings.color === colors[4].value ? 255
-    : settings.color === colors[5].value ? 0 : 155;
-  const chroma = settings.color === colors[5].value ? 0 : 0.018;
+  const selectedColor = colors.find(c => c.value === color);
+  const hue = selectedColor?.name === "Roxo" ? 300
+    : selectedColor?.name === "Rosa" ? 350
+    : selectedColor?.name === "Vermelho" ? 25
+    : selectedColor?.name === "Branco" ? 0 : 255;
+  const chroma = selectedColor?.name === "Branco" ? 0 : 0.018;
   const tint = (lightness: number) => `oklch(${lightness} ${chroma} ${hue})`;
   const isLight = root.classList.contains("light");
   root.style.setProperty("--background", tint(isLight ? 0.98 : 0.12));
