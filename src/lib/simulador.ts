@@ -82,7 +82,7 @@ function formatarHorarios(horarios: Horario[]): string {
 
 function responderHorario(texto: string, horarios: Horario[]): string | null {
   const t = norm(texto);
-  const perguntaHorario = /(horario|abre|abrem|aberto|aberta|fecha|fecham|funciona|funcionam|funcionamento)/.test(t);
+  const perguntaHorario = /\b(?:horarios?|abre|abrem|aberto|aberta|fecha|fecham|funciona|funcionam|funcionamento)\b/.test(t);
   if (!perguntaHorario) return null;
 
   const dia = DIAS.find((d) => d.aliases.some((alias) => new RegExp(`(^|\\s)${alias}($|\\s)`).test(t)));
@@ -93,7 +93,7 @@ function responderHorario(texto: string, horarios: Horario[]): string | null {
     return `Sim! Abrimos ${dia.dia.toLowerCase()}, das ${horario.abre} às ${horario.fecha}. 😊`;
   }
 
-  const perguntaGeral = /(horario|funcionamento|funcionam|abrem|abre|expediente)/.test(t);
+  const perguntaGeral = /\b(?:horarios?|funcionamento|funcionam|abrem|abre|expediente)\b/.test(t);
   if (perguntaGeral) {
     return `Claro! 😊 Nosso horário de funcionamento é:\n\n${formatarHorarios(horarios)}\n\nSe precisar de mais alguma informação, estou à disposição! 😊`;
   }
