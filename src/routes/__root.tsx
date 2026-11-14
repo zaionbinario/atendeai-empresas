@@ -158,7 +158,7 @@ function CompanyAccess({ children, path, userId }: { children: ReactNode; path: 
     }
     void check();
     return () => { cancelled = true; };
-  }, [userId, retry, path]);
+  }, [userId, retry]);
 
   if (access === "admin" || access === "active" || (path === "/empresas" && access === "none")) return <>{children}</>;
   const messages: Record<Exclude<AccessState, "admin" | "active">, string> = {
