@@ -133,11 +133,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
   return (
     <div className="min-h-screen w-full min-w-0 overflow-x-clip bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col gap-8 border-r border-white/10 bg-[#090f12] p-4 lg:flex light:border-slate-200 light:bg-white">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden h-dvh w-64 flex-col gap-3 overflow-hidden border-r border-white/10 bg-[#090f12] p-4 lg:flex light:border-slate-200 light:bg-white">
         {logo}
-        <div><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Menu principal</p>{side}</div>
-        {helpCard}
-        <div className="flex items-center gap-3 border-t border-white/10 px-2 pt-4 light:border-slate-200"><div className="grid h-10 w-10 place-items-center rounded-full bg-violet-500 text-lg font-bold text-white">{inicialConta}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white light:text-slate-900">Minha conta</p><p className="text-xs text-emerald-400 light:text-emerald-700">Plano demonstração</p></div><Users className="h-4 w-4 text-slate-500" /></div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:#64748b_transparent] [scrollbar-width:thin]"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Menu principal</p>{side}</div>
+        <div className="shrink-0">{helpCard}</div>
+        <div className="flex shrink-0 items-center gap-3 border-t border-white/10 px-2 pt-4 light:border-slate-200"><div className="grid h-10 w-10 place-items-center rounded-full bg-violet-500 text-lg font-bold text-white">{inicialConta}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white light:text-slate-900">Minha conta</p><p className="text-xs text-emerald-400 light:text-emerald-700">Plano demonstração</p></div><Users className="h-4 w-4 text-slate-500" /></div>
       </aside>
       <header className="sticky top-0 z-30 min-w-0 border-b border-white/10 bg-[#090f12]/95 px-3 py-2 lg:ml-64 lg:px-8 light:border-slate-200 light:bg-white/95">
         <div className="flex min-h-12 items-center justify-between gap-1 sm:min-h-14 sm:gap-2">
