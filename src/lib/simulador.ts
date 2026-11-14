@@ -433,8 +433,11 @@ function responderBase(
     const escolhido = candidatos[0]!.item;
     if (escolhido.tipo === "produto") return respostaProdutoPorIntencao(texto, escolhido.produto);
     const preco = escolhido.faq.resposta.match(/R\$\s*\d+(?:[.,]\d{1,2})?/i);
-    if (/\b(?:quanto|custa|preco|valor)\b/.test(norm(texto)) && preco)
-      return "O preço informado é " + preco[0] + ". 😊";
+    if (/\b(?:quanto|custa|preco|valor)\b/.test(norm(texto)) && preco) {
+      const nomeItem = norm(escolhido.faq.pergunta).match(/\b(?:pizza|produto|servico)\s+(?:de\s+)?([a-z0-9]+(?:\s+[a-z0-9]+)?)/);
+      const nome = nomeItem ? nomeItem[0] : "esse item";
+      return (nomeItem ? "A " + nome : "O preço de " + nome) + (nomeItem ? " custa " : " é ") + preco[0] + "! 😊";
+    }
     if (/\b(?:quanto|custa|preco|valor)\b/.test(norm(texto)))
       return "Não tenho um preço confirmado para esse item no cadastro.";
   }
