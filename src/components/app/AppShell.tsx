@@ -12,7 +12,7 @@ import { LogOut } from "lucide-react";
 const nav = [
   { to: "/", label: "Painel", icon: LayoutDashboard },
   { to: "/simulador", label: "Simulador", icon: Bot },
-  { to: "/empresas", label: "Cadastrar empresa", icon: Building2 },
+  { to: "/empresas", label: "Minhas empresas", icon: Building2 },
   { to: "/conversas", label: "Histórico de conversas", icon: MessagesSquare },
   { to: "/notificacoes", label: "Notificações", icon: Bell },
   { to: "/respostas-rapidas", label: "Respostas rápidas", icon: MessageSquareText },
