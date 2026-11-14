@@ -54,28 +54,60 @@ export function AuthPage({ mode }: { mode: Mode }) {
       setErro(rateLimited ? "Limite de envio de e-mails atingido. Aguarde antes de tentar novamente. Se persistir, o administrador deve configurar SMTP no Supabase." : mode === "cadastro" && (msg === "User already registered" || msg.toLowerCase().includes("already registered")) ? "Este e-mail pode já ter uma conta. Tente entrar ou recuperar sua senha." : (errors[msg] || msg));
     } finally { setEnviando(false); }
   }
-  return <main className="min-h-screen bg-[#07111F] text-white flex items-center justify-center p-4 sm:p-8">
-    <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,131,216,.22),transparent_55%)]" />
-    <div className="relative w-full max-w-md rounded-3xl border border-sky-400/25 bg-[#0D1B2D] p-6 shadow-2xl shadow-black/30 sm:p-9">
-      <div className="mb-7 flex items-center justify-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-400 text-slate-950"><Bot /></span><span className="font-display text-2xl font-bold">Zyon <span className="text-sky-300">Chat</span></span></div>
-      <h1 className="text-center font-display text-2xl font-bold">{titulo}</h1>
-      <p className="mt-2 mb-7 text-center text-sm text-slate-400">{mode === "cadastro" ? "Comece a transformar seu atendimento." : mode === "recuperar" ? "Enviaremos um link para seu e-mail." : "Acesse seu painel de atendimento."}</p>
-      {!authConfigured && <p role="alert" className="mb-4 rounded-xl bg-amber-500/10 p-3 text-sm text-amber-200">Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no ambiente do site para ativar o login.</p>}
+  return <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#030611] px-4 py-12 text-white sm:px-8">
+    {/* Ambient futuristic background: decorative only, never blocks form interactions. */}
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_55%_42%,rgba(16,35,113,.55),transparent_60%),linear-gradient(145deg,#02030b_0%,#060b24_56%,#02030a_100%)]" />
+      <div className="absolute left-1/2 top-1/2 h-[min(115vw,920px)] w-[min(115vw,920px)] -translate-x-1/2 -translate-y-1/2 rounded-full border-[10px] border-[#168cff] opacity-80 shadow-[0_0_40px_rgba(18,132,255,.55),inset_0_0_30px_rgba(18,132,255,.15)] sm:border-[14px]" />
+      <div className="absolute left-[-30%] top-[68%] h-px w-[160%] -rotate-[34deg] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.65)_100%)]" />
+      {/* Stylized robot inspired by the provided reference, drawn as SVG to avoid external assets. */}
+      <svg className="absolute bottom-[-35px] right-[-85px] h-[310px] w-[310px] rotate-[-8deg] opacity-25 blur-[.2px] sm:bottom-[-80px] sm:right-[3%] sm:h-[490px] sm:w-[490px] sm:opacity-45 lg:right-[8%]" viewBox="0 0 400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="zyonRobotMetal" x1="50" y1="40" x2="340" y2="390" gradientUnits="userSpaceOnUse"><stop stopColor="#F0F8FF"/><stop offset=".45" stopColor="#8295B4"/><stop offset="1" stopColor="#283E60"/></linearGradient>
+          <linearGradient id="zyonRobotBody" x1="160" y1="215" x2="250" y2="395" gradientUnits="userSpaceOnUse"><stop stopColor="#E2ECFF"/><stop offset="1" stopColor="#546B8B"/></linearGradient>
+          <filter id="zyonRobotGlow"><feGaussianBlur stdDeviation="5"/></filter>
+        </defs>
+        <ellipse cx="200" cy="402" rx="90" ry="11" fill="#008DFF" opacity=".25" filter="url(#zyonRobotGlow)"/>
+        <path d="M93 95C53 55 52 158 104 178L118 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
+        <path d="M307 95C347 55 348 158 296 178L282 129Z" fill="url(#zyonRobotMetal)" stroke="#94B6DA" strokeWidth="2"/>
+        <rect x="89" y="39" width="222" height="178" rx="83" fill="url(#zyonRobotMetal)" stroke="#C3D8EF" strokeWidth="3"/>
+        <path d="M113 123C113 88 140 75 171 75H230C265 75 288 89 288 124V150C288 181 268 193 235 193H165C133 193 113 177 113 150V123Z" fill="#030817" stroke="#78A9DA" strokeWidth="3"/>
+        <ellipse cx="161" cy="137" rx="21" ry="27" transform="rotate(-13 161 137)" fill="#62E8FF"/>
+        <ellipse cx="239" cy="137" rx="21" ry="27" transform="rotate(13 239 137)" fill="#62E8FF"/>
+        <ellipse cx="161" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/>
+        <ellipse cx="239" cy="137" rx="26" ry="32" fill="#36DFFF" opacity=".5" filter="url(#zyonRobotGlow)"/>
+        <path d="M143 226C159 212 240 212 257 226C274 241 277 322 255 362C239 392 217 403 200 403C183 403 161 392 145 362C123 322 126 241 143 226Z" fill="url(#zyonRobotBody)" stroke="#BCD2EC" strokeWidth="3"/>
+        <path d="M142 328C181 355 218 355 258 328" stroke="#60E6FF" strokeWidth="3" opacity=".9"/>
+        <rect x="77" y="239" width="57" height="100" rx="28" transform="rotate(17 77 239)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
+        <rect x="267" y="256" width="57" height="100" rx="28" transform="rotate(-17 267 256)" fill="url(#zyonRobotMetal)" stroke="#A3C4E3" strokeWidth="3"/>
+        <path d="M88 312L126 324M275 324L312 312" stroke="#6FEAFF" strokeWidth="3"/>
+      </svg>
+      <div className="absolute left-[8%] top-[12%] h-24 w-24 rounded-full bg-blue-500/15 blur-3xl" />
+    </div>
+    <div className="relative z-10 w-full max-w-[440px] rounded-[24px] border border-white/20 bg-[#070e2a]/65 px-6 py-8 shadow-[0_25px_90px_rgba(0,0,0,.65),0_0_60px_rgba(25,82,225,.16)] backdrop-blur-2xl sm:px-10 sm:py-10">
+      <div className="mb-6 flex items-center justify-center gap-3">
+        <span className="grid h-11 w-11 place-items-center rounded-2xl border border-sky-300/40 bg-sky-400/10 text-sky-300 shadow-[0_0_25px_rgba(56,189,248,.18)]"><Bot className="h-6 w-6" /></span>
+        <span className="font-display text-2xl font-bold tracking-tight">ZYON <span className="text-sky-300">CHAT</span></span>
+      </div>
+      <h1 className="text-center font-display text-[28px] font-bold tracking-tight">{mode === "login" ? "Login" : titulo}</h1>
+      <p className="mb-7 mt-2 text-center text-sm text-slate-300">{mode === "cadastro" ? "Comece a transformar seu atendimento." : mode === "recuperar" ? "Enviaremos um link para seu e-mail." : "Bem-vindo de volta ao futuro do atendimento."}</p>
+      {!authConfigured && <p role="alert" className="mb-4 rounded-xl bg-amber-500/10 p-3 text-sm text-amber-200">Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY para ativar o login.</p>}
       <form onSubmit={enviar} className="space-y-4">
-        {mode === "cadastro" && <label className="block text-sm font-medium">Nome completo<div className="relative mt-2"><UserRound className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input autoComplete="name" required minLength={3} value={nome} onChange={e=>setNome(e.target.value)} placeholder="Seu nome completo" className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-3 outline-none focus:border-sky-400"/></div></label>}
-        <label className="block text-sm font-medium">E-mail<div className="relative mt-2"><Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@empresa.com" className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-3 outline-none focus:border-emerald-400"/></div></label>
-        {mode !== "recuperar" && <label className="block text-sm font-medium">Senha<div className="relative mt-2"><LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-slate-400"/><input type={mostrar ? "text" : "password"} autoComplete={mode === "cadastro" ? "new-password" : "current-password"} required minLength={mode === "cadastro" ? 6 : undefined} value={senha} onChange={e=>setSenha(e.target.value)} placeholder={mode === "cadastro" ? "Mínimo 6, minúscula e símbolo" : "Sua senha"} className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-11 pr-12 outline-none focus:border-emerald-400"/><button type="button" onClick={()=>setMostrar(!mostrar)} aria-label={mostrar?"Ocultar senha":"Mostrar senha"} className="absolute right-3 top-3 text-slate-400">{mostrar?<EyeOff className="h-5 w-5"/>:<Eye className="h-5 w-5"/>}</button></div></label>}
-        {mode === "cadastro" && <p className="text-xs text-slate-400">Use pelo menos 6 caracteres, uma letra minúscula (a-z) e um símbolo (ex.: @, # ou !).</p>}
-        {mode === "cadastro" && <label className="block text-sm font-medium">Confirmar senha<input type={mostrar?"text":"password"} autoComplete="new-password" required minLength={6} value={confirmacao} onChange={e=>setConfirmacao(e.target.value)} placeholder="Repita sua senha" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 outline-none focus:border-emerald-400"/></label>}
+        {mode === "cadastro" && <label className="block text-sm font-medium text-slate-200">Nome completo<div className="relative mt-2"><UserRound className="absolute left-4 top-3.5 h-5 w-5 text-slate-400"/><input autoComplete="name" required minLength={3} value={nome} onChange={e=>setNome(e.target.value)} placeholder="Seu nome completo" className="w-full rounded-full border border-blue-300/30 bg-blue-950/25 py-3 pl-12 pr-4 text-white outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-400/20"/></div></label>}
+        <label className="block text-sm font-medium text-slate-200">E-mail<div className="relative mt-2"><Mail className="absolute left-4 top-3.5 h-5 w-5 text-slate-400"/><input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@empresa.com" className="w-full rounded-full border border-blue-300/30 bg-blue-950/25 py-3 pl-12 pr-4 text-white outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-400/20"/></div></label>
+        {mode !== "recuperar" && <label className="block text-sm font-medium text-slate-200">Senha<div className="relative mt-2"><LockKeyhole className="absolute left-4 top-3.5 h-5 w-5 text-slate-400"/><input type={mostrar ? "text" : "password"} autoComplete={mode === "cadastro" ? "new-password" : "current-password"} required minLength={mode === "cadastro" ? 6 : undefined} value={senha} onChange={e=>setSenha(e.target.value)} placeholder={mode === "cadastro" ? "Mínimo 6, minúscula e símbolo" : "Sua senha"} className="w-full rounded-full border border-blue-300/30 bg-blue-950/25 py-3 pl-12 pr-12 text-white outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-400/20"/><button type="button" onClick={()=>setMostrar(!mostrar)} aria-label={mostrar?"Ocultar senha":"Mostrar senha"} className="absolute right-4 top-3.5 text-slate-300 hover:text-sky-300">{mostrar?<EyeOff className="h-5 w-5"/>:<Eye className="h-5 w-5"/>}</button></div></label>}
+        {mode === "cadastro" && <p className="text-xs text-slate-300">Use pelo menos 6 caracteres, uma letra minúscula e um símbolo.</p>}
+        {mode === "cadastro" && <label className="block text-sm font-medium text-slate-200">Confirmar senha<input type={mostrar?"text":"password"} autoComplete="new-password" required minLength={6} value={confirmacao} onChange={e=>setConfirmacao(e.target.value)} placeholder="Repita sua senha" className="mt-2 w-full rounded-full border border-blue-300/30 bg-blue-950/25 px-4 py-3 text-white outline-none focus:border-sky-300 focus:ring-2 focus:ring-sky-400/20"/></label>}
         {erro && <p role="alert" className="rounded-xl bg-red-500/10 p-3 text-sm text-red-300">{erro}</p>}
         {sucesso && <p role="status" className="rounded-xl bg-sky-500/10 p-3 text-sm text-sky-300">{sucesso}</p>}
-        {mode === "cadastro" && (sucesso || erro.toLowerCase().includes("já ter uma conta")) && <div className="flex flex-wrap gap-4 text-sm"><Link to="/login" className="font-semibold text-emerald-300 underline">Fazer login</Link><Link to="/recuperar-senha" className="text-emerald-300 underline">Esqueci minha senha</Link></div>}
-        <button disabled={enviando || !authConfigured} className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 font-bold text-[#061525] transition hover:bg-sky-300 disabled:opacity-50">{enviando?"Aguarde...":mode==="cadastro"?"Criar conta":mode==="recuperar"?"Enviar link":"Entrar"}<ArrowRight className="h-4 w-4"/></button>
+        {mode === "cadastro" && (sucesso || erro.toLowerCase().includes("já ter uma conta")) && <div className="flex flex-wrap gap-4 text-sm"><Link to="/login" className="font-semibold text-sky-300 underline">Fazer login</Link><Link to="/recuperar-senha" className="text-sky-300 underline">Esqueci minha senha</Link></div>}
+        <button disabled={enviando || !authConfigured} className="flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-3 font-bold text-[#071124] shadow-[0_8px_30px_rgba(255,255,255,.12)] transition hover:bg-sky-100 disabled:opacity-50">{enviando?"Aguarde...":mode==="cadastro"?"Criar conta":mode==="recuperar"?"Enviar link":"Entrar"}<ArrowRight className="h-4 w-4"/></button>
       </form>
-      <div className="mt-6 space-y-3 text-center text-sm text-slate-400">
-        {mode==="login" && <><Link to="/recuperar-senha" className="block text-emerald-300 hover:underline">Esqueci minha senha</Link><p>Não tem conta? <Link to="/cadastro" className="font-semibold text-emerald-300 hover:underline">Criar uma conta</Link></p></>}
-        {mode==="cadastro" && <p>Já tem uma conta? <Link to="/login" className="font-semibold text-emerald-300 hover:underline">Entrar</Link></p>}
-        {mode==="recuperar" && <Link to="/login" className="text-emerald-300 hover:underline">Voltar ao login</Link>}
+      <div className="mt-6 space-y-3 text-center text-sm text-slate-300">
+        {mode==="login" && <><Link to="/recuperar-senha" className="block text-sky-300 hover:underline">Esqueci minha senha?</Link><p>Não tem uma conta? <Link to="/cadastro" className="font-semibold text-white hover:text-sky-300">Cadastre-se</Link></p></>}
+        {mode==="cadastro" && <p>Já tem uma conta? <Link to="/login" className="font-semibold text-sky-300 hover:underline">Entrar</Link></p>}
+        {mode==="recuperar" && <Link to="/login" className="text-sky-300 hover:underline">Voltar ao login</Link>}
       </div>
     </div>
   </main>;
