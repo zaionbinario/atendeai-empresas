@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { Btn, Card, Input, PageHeader, QuickAccess, Toggle } from "@/components/app/ui";
 import { useStore } from "@/lib/store";
 
@@ -11,7 +10,7 @@ function Horarios() {
   const { horarios, setHorarios } = useStore();
   const upd = (i: number, v: Partial<(typeof horarios)[number]>) => setHorarios(horarios.map((h, j) => (i === j ? { ...h, ...v } : h)));
   return (<>
-    <PageHeader title="Horários de funcionamento" desc="O atendente informa aos clientes quando a loja está aberta." action={<Btn onClick={() => toast.success("Horários salvos!")}>Salvar horários</Btn>} />
+    <PageHeader title="Horários de funcionamento" desc="O atendente informa aos clientes quando a loja está aberta."  />
     <Card className="max-w-2xl p-0"><ul className="divide-y">{horarios.map((h, i) => (
       <li key={h.dia} className="flex flex-wrap items-center gap-4 p-4">
         <Toggle label={h.dia} on={h.aberto} onChange={(v) => upd(i, { aberto: v })} />
