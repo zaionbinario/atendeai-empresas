@@ -54,7 +54,7 @@ function Simulador() {
       let transferidoPelaIa = false;
       if (iaAtivaAqui) {
         const resposta = responder(pergunta, contexto, historico.slice(-8).map((m) => m.texto));
-        transferidoPelaIa = instrucoes.transferirHumano && respostaSolicitaHumano(resposta);
+        transferidoPelaIa = instrucoes.transferirHumano && respostaSolicitaHumano(resposta) && /\\b(?:humano|atendente|equipe|pessoa)\\b/i.test(resposta);
         novasMensagens.push({
           id: novoId(),
           de: "bot",
@@ -76,7 +76,7 @@ function Simulador() {
         ultimaMensagem: pergunta,
         atualizadaEm: agora(),
         ultimaAtividadeEm: instante,
-        status: iaAtivaAqui && !transferidoPelaIa ? "ia" as const : "humano" as const,
+        status: transferidoPelaIa || atual?.status === "humano" ? "humano" as const : "ia" as const,
         aguardandoHumano: transferidoPelaIa || (atual?.aguardandoHumano ?? false),
         mensagens: novasMensagens,
       };
