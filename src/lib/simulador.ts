@@ -410,6 +410,12 @@ function responderBase(
     }
   }
 
+  // Pedidos sociais e de ajuda não dependem de FAQ nem exigem transferência.
+  const social = norm(texto);
+  const pedidoAjuda = /\\b(?:preciso|queria|gostaria|pode|consegue|poderia)\\b.*\\b(?:ajuda|ajudar|orientacao|orientar)\\b|\\b(?:me ajuda|me ajudar|pode ajudar|consegue ajudar)\\b/.test(social);
+  const pedidoGenerico = pedidoAjuda && !/\\b(?:preco|valor|custa|horario|abre|fecha|endereco|entrega|frete|pedido|produto|servico|agendar|marcar|pix|pagamento)\\b/.test(social);
+  if (pedidoGenerico) return "Claro! Me conte em que você precisa de ajuda e vou orientar você.";
+  
   const cumprimento = saudacao(texto, { instrucoes: ctx.instrucoes, ...(ctx.empresas?.[0] ? { nomeEmpresa: ctx.empresas[0].nome } : {}) });
   if (cumprimento) return cumprimento;
 
@@ -536,9 +542,9 @@ export function responder(
 ): string {
   let resposta = responderBase(texto, ctx, historico);
   if (ctx.instrucoes.tom === "formal") {
-    resposta = resposta.replace(/ 😊| 🙋/g, "").replace("Claro!", "Certamente,").replace("Sim!", "Sim,").replace("Tudo ótimo por aqui!", "Estou bem, obrigado(a).");
+    resposta = resposta.replace(/ 😊| 🙋| 😄| 😎/g, "").replace("Claro!", "Certamente.").replace("Sim!", "Sim,").replace("Olá, tudo bem?", "Olá! Espero que esteja bem.").replace("Me conte em que você precisa de ajuda e vou orientar você.", "Por gentileza, informe em que necessita de assistência.");
   } else if (ctx.instrucoes.tom === "descontraido") {
-    resposta = resposta.replace("Claro!", "Opa!").replace("Sim!", "Siiim!").replace("Não abrimos", "Poxa, não abrimos");
+    resposta = resposta.replace("Claro!", "Opa! 😄").replace("Sim!", "Siiim!").replace("Não abrimos", "Poxa, não abrimos").replace("Olá, tudo bem?", "Opa, tudo certo?").replace("Me conte em que você precisa de ajuda e vou orientar você.", "Me conta aí no que você precisa de uma força!");
   }
   return resposta;
 }
