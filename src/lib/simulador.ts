@@ -540,13 +540,15 @@ export function responder(
   ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
   historico: string[] = [],
 ): string {
-  // Prioridade absoluta a interações sociais: nunca consultar FAQ nem acionar fallback.
-  const social = norm(texto);
-  const somenteSaudacao = /^(?:(?:oi|ola|opa|alo|hey|bom dia|boa tarde|boa noite|e ai|fala|salve)\\s*){1,3}(?:(?:tudo bem|tudo bom|tudo certo|como vai|como voce esta|beleza)\\s*)?$|^(?:tudo bem|tudo bom|tudo certo|como vai|como voce esta|beleza)$/.test(social);
+  // Interações sociais gerais, antes de consultar FAQ/produtos.
+  // Remove pontuação, acentos e repetições informais sem alterar perguntas comerciais.
+  const social = norm(texto).replace(/\\b(oi+)\\b/g, "oi").trim();
+  const cumprimentos = /^(?:(?:oi|ola|opa|alo|hey|e ai|fala|salve|bom dia|boa tarde|boa noite|tudo bem|tudo bom|tudo certo|tudo tranquilo|tudo certinho|beleza|como vai|como voce esta|suave|de boa|na paz|tranquilo|tranquila|blz)(?:\\s+|$)){1,7}(?:(?:por ai|com voce|contigo|pessoal|amigo|amiga|mano|cara)(?:\\s+|$))*$/;
+  const somenteSaudacao = cumprimentos.test(social);
   const ajudaGenerica = /\\b(?:ajuda|ajudar|orientacao|orientar)\\b/.test(social) &&
     !/\\b(?:preco|valor|custa|horario|abre|fecha|endereco|entrega|frete|pedido|produto|servico|agendar|marcar|pix|pagamento)\\b/.test(social);
   let resposta = somenteSaudacao
-    ? "Olá! Tudo bem, obrigado por perguntar. Como posso ajudar você?"
+    ? "Olá! Tudo certo por aqui! Como posso ajudar você?"
     : ajudaGenerica
       ? "Claro! Me conte em que você precisa de ajuda."
       : responderBase(texto, ctx, historico);
