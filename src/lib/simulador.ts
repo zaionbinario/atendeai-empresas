@@ -540,7 +540,16 @@ export function responder(
   ctx: { produtos: Produto[]; faqs: Faq[]; horarios: Horario[]; instrucoes: Instrucoes; empresas?: { nome: string; segmento?: string }[] },
   historico: string[] = [],
 ): string {
-  let resposta = responderBase(texto, ctx, historico);
+  // Prioridade absoluta a interações sociais: nunca consultar FAQ nem acionar fallback.
+  const social = norm(texto);
+  const somenteSaudacao = /^(?:(?:oi|ola|opa|alo|hey|bom dia|boa tarde|boa noite|e ai|fala|salve)\\s*){1,3}(?:(?:tudo bem|tudo bom|tudo certo|como vai|como voce esta|beleza)\\s*)?$|^(?:tudo bem|tudo bom|tudo certo|como vai|como voce esta|beleza)$/.test(social);
+  const ajudaGenerica = /\\b(?:ajuda|ajudar|orientacao|orientar)\\b/.test(social) &&
+    !/\\b(?:preco|valor|custa|horario|abre|fecha|endereco|entrega|frete|pedido|produto|servico|agendar|marcar|pix|pagamento)\\b/.test(social);
+  let resposta = somenteSaudacao
+    ? "Olá! Tudo bem, obrigado por perguntar. Como posso ajudar você?"
+    : ajudaGenerica
+      ? "Claro! Me conte em que você precisa de ajuda."
+      : responderBase(texto, ctx, historico);
   if (ctx.instrucoes.tom === "formal") {
     resposta = resposta.replace(/ 😊| 🙋| 😄| 😎/g, "").replace("Claro!", "Certamente.").replace("Sim!", "Sim,").replace("Olá, tudo bem?", "Olá! Espero que esteja bem.").replace("Me conte em que você precisa de ajuda e vou orientar você.", "Por gentileza, informe em que necessita de assistência.");
   } else if (ctx.instrucoes.tom === "descontraido") {
