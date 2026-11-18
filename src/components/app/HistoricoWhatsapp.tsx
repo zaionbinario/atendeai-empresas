@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/auth-client";
 import { useStore } from "@/lib/store";
 
-type ConversaReal = { id: string; empresa_id: string; contato_whatsapp: string; status: string; atendimento_humano: boolean; atualizado_em: string };
+type ConversaReal = { id: string; empresa_id: string; contato_whatsapp: string; status: string; atendimento_humano: boolean; atualizado_em: string; nome_contato?: string | null };
 type MensagemReal = { id: string; conversa_id: string; conteudo: string | null; tipo: string; enviada_por_mim: boolean; criado_em: string };
 const formatar = (data: string) => new Date(data).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
 
@@ -29,7 +29,14 @@ export function HistoricoWhatsapp() {
   const [erroEnvio, setErroEnvio] = useState("");
   const carregarConversas = useCallback(async () => {
     if (!supabase || !empresaSelecionadaId) { setConversas([]); setCarregando(false); return; }
-    const { data, error } = await supabase.from("conversas").select("id,empresa_id,contato_whatsapp,status,atendimento_humano,atualizado_em").eq("empresa_id", empresaSelecionadaId).order("atualizado_em", { ascending: false }).limit(200);
+    const baseQuery = () => supabase.from("conversas").select("id,empresa_id,contato_whatsapp,status,atendimento_humano,atualizado_em,nome_contato").eq("empresa_id", empresaSelecionadaId).order("atualizado_em", { ascending: false }).limit(200);
+    let { data, error } = await baseQuery();
+    // Projetos antigos podem ainda não ter a coluna de nome.
+    if (error?.code === "42703" || error?.code === "PGRST204") {
+      const fallback = await supabase.from("conversas").select("id,empresa_id,contato_whatsapp,status,atendimento_humano,atualizado_em").eq("empresa_id", empresaSelecionadaId).order("atualizado_em", { ascending: false }).limit(200);
+      data = fallback.data;
+      error = fallback.error;
+    }
     if (error) setErro("Não foi possível carregar conversas: " + error.message);
     else {
       setConversas((data ?? []) as ConversaReal[]);
@@ -92,7 +99,7 @@ export function HistoricoWhatsapp() {
   );
   const atual = conversas.find(c => c.id === selecionada);
   // A tabela de conversas não fornece nome de contato; use o número estável quando disponível.
-  const rotuloContato = (c: ConversaReal) => contatoLegivel(c.contato_whatsapp) ?? `Contato ${c.id.slice(0, 8)}`;
+  const rotuloContato = (c: ConversaReal) => c.nome_contato?.trim() || contatoLegivel(c.contato_whatsapp) || `Contato ${c.id.slice(0, 8)}`;
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
