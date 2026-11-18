@@ -59,7 +59,8 @@ export function HistoricoWhatsapp() {
     <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <div className="max-h-[65vh] space-y-2 overflow-y-auto">
         {conversas.map(c => <button key={c.id} type="button" onClick={() => setSelecionada(c.id)} className={`w-full min-w-0 rounded-xl border p-3 text-left hover:bg-muted/50 ${selecionada === c.id ? "border-primary bg-muted/30" : ""}`}>
-          <span className="block truncate font-medium">{rotuloContato(c)}</span>\n          <span className="block truncate text-xs text-muted-foreground">{contatoLegivel(c.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</span>
+          <span className="block truncate font-medium">{rotuloContato(c)}</span>
+          <span className="block truncate text-xs text-muted-foreground">{contatoLegivel(c.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</span>
           <span className="block text-xs text-muted-foreground">{formatar(c.atualizado_em)} · {c.atendimento_humano ? "Atendimento humano" : c.status}</span>
         </button>)}
       </div>
