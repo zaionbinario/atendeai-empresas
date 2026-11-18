@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Trash2, Send } from "lucide-react";
 import { supabase } from "@/lib/auth-client";
 import { useStore } from "@/lib/store";
 
@@ -22,6 +23,8 @@ export function HistoricoWhatsapp() {
   const [mensagens, setMensagens] = useState<MensagemReal[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [apagando, setApagando] = useState(false);
+  const [rascunho, setRascunho] = useState("");
   const [carregandoMensagens, setCarregandoMensagens] = useState(false);
   const carregarConversas = useCallback(async () => {
     if (!supabase || !empresaSelecionadaId) { setConversas([]); setCarregando(false); return; }
@@ -46,11 +49,28 @@ export function HistoricoWhatsapp() {
     return () => window.clearInterval(intervalo);
   }, [empresaSelecionadaId, selecionada, carregarConversas, carregarMensagens]);
   const atual = conversas.find(c => c.id === selecionada);
-  const rotuloContato = (c: ConversaReal) => `Cliente ${conversas.findIndex(item => item.id === c.id) + 1}`;
+  const rotuloContato = (c: ConversaReal) => contatoLegivel(c.contato_whatsapp) ?? "Contato sem identificação";
+  const apagarHistorico = async () => {
+    if (!supabase || !empresaSelecionadaId || !atual || apagando) return;
+    if (!window.confirm("Excluir permanentemente esta conversa e seu histórico do Zyon Chat? Isso não apaga mensagens no WhatsApp.")) return;
+    setApagando(true);
+    setErro("");
+    try {
+      const { error: erroMensagens } = await supabase.from("mensagens").delete().eq("empresa_id", empresaSelecionadaId).eq("conversa_id", atual.id);
+      if (erroMensagens) throw erroMensagens;
+      const { error: erroConversa } = await supabase.from("conversas").delete().eq("empresa_id", empresaSelecionadaId).eq("id", atual.id);
+      if (erroConversa) throw erroConversa;
+      setSelecionada(null);
+      setMensagens([]);
+      await carregarConversas();
+    } catch (e) {
+      setErro("Não foi possível excluir o histórico. Verifique as permissões no Supabase. " + (e instanceof Error ? e.message : ""));
+    } finally { setApagando(false); }
+  };
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
-      <p className="text-sm text-muted-foreground">Somente leitura nesta etapa. Atualização automática a cada 10 segundos. Dados separados do simulador.</p>
+      <p className="text-sm text-muted-foreground">Mensagens recebidas em tempo real por atualização a cada 10 segundos. O envio requer integração segura com a Evolution API.</p>
     </div>
     {erro && <div role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{erro}</div>}
     {!empresaSelecionadaId && <p className="text-sm">Aguardando seleção da empresa...</p>}
@@ -66,7 +86,7 @@ export function HistoricoWhatsapp() {
       </div>
       <div className="min-w-0 rounded-xl border bg-card p-4">
         {!atual ? <p className="text-sm text-muted-foreground">Selecione uma conversa para ver as mensagens.</p> : <>
-          <h3 className="font-semibold">{rotuloContato(atual)}</h3>\n          <p className="mb-3 text-xs text-muted-foreground">{contatoLegivel(atual.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</p>
+          <div className="flex items-center justify-between gap-2"><h3 className="font-semibold">{rotuloContato(atual)}</h3><button type="button" onClick={() => void apagarHistorico()} disabled={apagando} title="Excluir histórico" aria-label="Excluir histórico da conversa" className="rounded-lg border p-2 text-destructive hover:bg-destructive/10 disabled:opacity-50"><Trash2 size={16} /></button></div>\n          <p className="mb-3 text-xs text-muted-foreground">{contatoLegivel(atual.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</p>
           {carregandoMensagens && <p className="text-sm">Carregando mensagens...</p>}
           <div className="max-h-[60vh] space-y-3 overflow-y-auto" aria-live="polite">
             {mensagens.map(m => <div key={m.id} className={`flex ${m.enviada_por_mim ? "justify-end" : "justify-start"}`}>
@@ -77,6 +97,11 @@ export function HistoricoWhatsapp() {
             </div>)}
             {!carregandoMensagens && mensagens.length === 0 && !erro && <p className="text-sm text-muted-foreground">Nenhuma mensagem nesta conversa.</p>}
           </div>
+          <div className="mt-4 flex items-center gap-2 border-t pt-3">
+            <input aria-label="Escrever resposta" value={rascunho} onChange={e => setRascunho(e.target.value)} placeholder="Envio manual aguardando conexão segura..." disabled className="min-w-0 flex-1 rounded-lg border bg-muted/40 px-3 py-2 text-sm" />
+            <button type="button" disabled title="Aguardando integração de envio" className="rounded-lg border p-2 opacity-50"><Send size={18} /></button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">O envio será habilitado após configurar uma Edge Function autenticada e o acesso seguro à Evolution API. Nenhuma mensagem é enviada nesta etapa.</p>
         </>}
       </div>
     </div>
