@@ -23,6 +23,9 @@ export function HistoricoWhatsapp() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [carregandoMensagens, setCarregandoMensagens] = useState(false);
+  const [rascunho, setRascunho] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState("");
   const carregarConversas = useCallback(async () => {
     if (!supabase || !empresaSelecionadaId) { setConversas([]); setCarregando(false); return; }
     const { data, error } = await supabase.from("conversas").select("id,empresa_id,contato_whatsapp,status,atendimento_humano,atualizado_em").eq("empresa_id", empresaSelecionadaId).order("atualizado_em", { ascending: false }).limit(200);
@@ -38,19 +41,39 @@ export function HistoricoWhatsapp() {
     setCarregandoMensagens(false);
   }, [empresaSelecionadaId, selecionada]);
   useEffect(() => { setCarregando(true); setSelecionada(null); setMensagens([]); void carregarConversas(); }, [carregarConversas]);
-  useEffect(() => { setCarregandoMensagens(Boolean(selecionada)); void carregarMensagens(); }, [carregarMensagens, selecionada]);
+  useEffect(() => { setCarregandoMensagens(Boolean(selecionada)); setRascunho(""); setErroEnvio(""); void carregarMensagens(); }, [carregarMensagens, selecionada]);
   useEffect(() => {
     if (!empresaSelecionadaId || !supabase) return;
     // Polling funciona mesmo quando a publicação Realtime não está configurada.
     const intervalo = window.setInterval(() => { void carregarConversas(); if (selecionada) void carregarMensagens(); }, 10000);
     return () => window.clearInterval(intervalo);
   }, [empresaSelecionadaId, selecionada, carregarConversas, carregarMensagens]);
+  const enviarMensagem = async () => {
+    const conteudo = rascunho.trim();
+    if (!supabase || !empresaSelecionadaId || !selecionada || !conteudo || enviando) return;
+    setEnviando(true);
+    setErroEnvio("");
+    try {
+      // A Edge Function deve validar o JWT, a associação à empresa e a conversa.
+      // Nunca expor a chave da Evolution API no navegador.
+      const { data, error } = await supabase.functions.invoke("zyon-whatsapp-enviar", {
+        body: { empresa_id: empresaSelecionadaId, conversa_id: selecionada, conteudo },
+      });
+      if (error || !data?.sucesso) throw new Error(error?.message || data?.erro || "O servidor não confirmou o envio.");
+      setRascunho("");
+      await Promise.all([carregarMensagens(), carregarConversas()]);
+    } catch (e) {
+      setErroEnvio(e instanceof Error ? e.message : "Não foi possível enviar a mensagem.");
+    } finally {
+      setEnviando(false);
+    }
+  };
   const atual = conversas.find(c => c.id === selecionada);
   const rotuloContato = (c: ConversaReal) => `Cliente ${conversas.findIndex(item => item.id === c.id) + 1}`;
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
-      <p className="text-sm text-muted-foreground">Somente leitura nesta etapa. Atualização automática a cada 10 segundos. Dados separados do simulador.</p>
+      <p className="text-sm text-muted-foreground">Atualização automática a cada 10 segundos. O envio depende da função segura zyon-whatsapp-enviar estar configurada no Supabase.</p>
     </div>
     {erro && <div role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{erro}</div>}
     {!empresaSelecionadaId && <p className="text-sm">Aguardando seleção da empresa...</p>}
@@ -77,6 +100,21 @@ export function HistoricoWhatsapp() {
             </div>)}
             {!carregandoMensagens && mensagens.length === 0 && !erro && <p className="text-sm text-muted-foreground">Nenhuma mensagem nesta conversa.</p>}
           </div>
+          <form className="mt-4 space-y-2 border-t pt-3" onSubmit={e => { e.preventDefault(); void enviarMensagem(); }}>
+            <label htmlFor="resposta-whatsapp" className="block text-sm font-medium">Responder pelo WhatsApp</label>
+            <textarea id="resposta-whatsapp" value={rascunho} onChange={e => setRascunho(e.target.value)}
+              placeholder="Digite sua mensagem..." rows={3} maxLength={4000}
+              className="w-full resize-y rounded-lg border bg-background p-3 text-sm text-foreground"
+              disabled={enviando} />
+            {erroEnvio && <p role="alert" className="text-sm text-destructive">Mensagem não enviada: {erroEnvio}</p>}
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">Só aparece como enviada após confirmação do servidor.</p>
+              <button type="submit" disabled={enviando || !rascunho.trim()}
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">
+                {enviando ? "Enviando..." : "Enviar"}
+              </button>
+            </div>
+          </form>
         </>}
       </div>
     </div>
