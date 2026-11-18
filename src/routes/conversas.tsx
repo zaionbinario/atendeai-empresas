@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HistoricoWhatsapp } from "@/components/app/HistoricoWhatsapp";
 import { useState, type FormEvent } from "react";
-import { Bot, ChevronDown, Clock3, MessageCircle, Send, UserRound } from "lucide-react";
+import { Bot, ChevronDown, Clock3, MessageCircle, Send, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Btn, Card, PageHeader } from "@/components/app/ui";
 import { novoId, useStore } from "@/lib/store";
@@ -120,6 +120,7 @@ function Conversas() {
   const [aba, setAba] = useState<"reais" | "demo">("reais");
   const [limite, setLimite] = useState(POR_PAGINA);
   const [somentePendentes, setSomentePendentes] = useState(false);
+  const [confirmarLimpeza, setConfirmarLimpeza] = useState(false);
   const lista = conversas.filter((c) => !somentePendentes || c.aguardandoHumano);
 
   const assumir = (id: string) => {
@@ -150,6 +151,18 @@ function Conversas() {
         <Card><p className="text-sm text-muted-foreground">Com atendimento humano</p><p className="mt-1 text-3xl font-bold">{conversas.filter((c) => c.status === "humano").length}</p></Card>
         <Card><p className="text-sm text-muted-foreground">Atendidas pela IA</p><p className="mt-1 text-3xl font-bold">{conversas.filter((c) => c.status === "ia").length}</p></Card>
       </div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Estas conversas são apenas testes salvos neste navegador.</p>
+        {conversas.length > 0 && <Btn type="button" variant="ghost" onClick={() => setConfirmarLimpeza(true)}><Trash2 className="h-4 w-4" /> Limpar histórico do simulador</Btn>}
+      </div>
+      {confirmarLimpeza && <div role="alertdialog" aria-modal="true" aria-label="Confirmar limpeza do simulador" className="mb-4 rounded-xl border border-destructive/40 bg-card p-4">
+        <p className="font-semibold">Apagar todas as {conversas.length} conversas do simulador?</p>
+        <p className="mt-1 text-sm text-muted-foreground">Esta ação não pode ser desfeita. As conversas reais do WhatsApp no Supabase não serão afetadas.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Btn type="button" variant="ghost" onClick={() => setConfirmarLimpeza(false)}>Cancelar</Btn>
+          <Btn type="button" onClick={() => { setConversas([]); setLimite(POR_PAGINA); setSomentePendentes(false); setConfirmarLimpeza(false); toast.success("Histórico do simulador apagado neste navegador."); }}><Trash2 className="h-4 w-4" /> Confirmar exclusão</Btn>
+        </div>
+      </div>}
       <div className="mb-3 flex items-center gap-2"><input id="filtrar-pendentes" type="checkbox" checked={somentePendentes} onChange={(e) => setSomentePendentes(e.target.checked)} /><label htmlFor="filtrar-pendentes" className="text-sm">Mostrar somente conversas aguardando atendente</label></div>
       <Card className="space-y-3">
         {lista.length === 0
