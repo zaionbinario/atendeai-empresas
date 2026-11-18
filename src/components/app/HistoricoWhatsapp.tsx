@@ -6,6 +6,15 @@ type ConversaReal = { id: string; empresa_id: string; contato_whatsapp: string; 
 type MensagemReal = { id: string; conversa_id: string; conteudo: string | null; tipo: string; enviada_por_mim: boolean; criado_em: string };
 const formatar = (data: string) => new Date(data).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 
+const contatoLegivel = (jid: string) => {
+  const [identificador, dominio] = jid.split("@");
+  if (dominio !== "s.whatsapp.net" || !/^\\d+$/.test(identificador)) return null;
+  const numero = identificador.startsWith("55") ? identificador.slice(2) : identificador;
+  if (identificador.startsWith("55") && numero.length === 11) return `+55 (${numero.slice(0, 2)}) ${numero.slice(2, 7)}-${numero.slice(7)}`;
+  if (identificador.startsWith("55") && numero.length === 10) return `+55 (${numero.slice(0, 2)}) ${numero.slice(2, 6)}-${numero.slice(6)}`;
+  return `+${identificador}`;
+};
+
 export function HistoricoWhatsapp() {
   const { empresaSelecionadaId } = useStore();
   const [conversas, setConversas] = useState<ConversaReal[]>([]);
@@ -37,6 +46,7 @@ export function HistoricoWhatsapp() {
     return () => window.clearInterval(intervalo);
   }, [empresaSelecionadaId, selecionada, carregarConversas, carregarMensagens]);
   const atual = conversas.find(c => c.id === selecionada);
+  const rotuloContato = (c: ConversaReal) => `Cliente ${conversas.findIndex(item => item.id === c.id) + 1}`;
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
@@ -49,13 +59,13 @@ export function HistoricoWhatsapp() {
     <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <div className="max-h-[65vh] space-y-2 overflow-y-auto">
         {conversas.map(c => <button key={c.id} type="button" onClick={() => setSelecionada(c.id)} className={`w-full min-w-0 rounded-xl border p-3 text-left hover:bg-muted/50 ${selecionada === c.id ? "border-primary bg-muted/30" : ""}`}>
-          <span className="block truncate font-medium">{c.contato_whatsapp}</span>
+          <span className="block truncate font-medium">{rotuloContato(c)}</span>\n          <span className="block truncate text-xs text-muted-foreground">{contatoLegivel(c.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</span>
           <span className="block text-xs text-muted-foreground">{formatar(c.atualizado_em)} · {c.atendimento_humano ? "Atendimento humano" : c.status}</span>
         </button>)}
       </div>
       <div className="min-w-0 rounded-xl border bg-card p-4">
         {!atual ? <p className="text-sm text-muted-foreground">Selecione uma conversa para ver as mensagens.</p> : <>
-          <h3 className="mb-3 break-all font-semibold">{atual.contato_whatsapp}</h3>
+          <h3 className="font-semibold">{rotuloContato(atual)}</h3>\n          <p className="mb-3 text-xs text-muted-foreground">{contatoLegivel(atual.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</p>
           {carregandoMensagens && <p className="text-sm">Carregando mensagens...</p>}
           <div className="max-h-[60vh] space-y-3 overflow-y-auto" aria-live="polite">
             {mensagens.map(m => <div key={m.id} className={`flex ${m.enviada_por_mim ? "justify-end" : "justify-start"}`}>
