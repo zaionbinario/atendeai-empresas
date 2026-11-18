@@ -18,6 +18,7 @@ const contatoLegivel = (jid: string) => {
 export function HistoricoWhatsapp() {
   const { empresaSelecionadaId } = useStore();
   const [conversas, setConversas] = useState<ConversaReal[]>([]);
+  const [ultimaMensagemPorConversa, setUltimaMensagemPorConversa] = useState<Record<string, string>>({});
   const [selecionada, setSelecionada] = useState<string | null>(null);
   const [mensagens, setMensagens] = useState<MensagemReal[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -30,7 +31,24 @@ export function HistoricoWhatsapp() {
     if (!supabase || !empresaSelecionadaId) { setConversas([]); setCarregando(false); return; }
     const { data, error } = await supabase.from("conversas").select("id,empresa_id,contato_whatsapp,status,atendimento_humano,atualizado_em").eq("empresa_id", empresaSelecionadaId).order("atualizado_em", { ascending: false }).limit(200);
     if (error) setErro("Não foi possível carregar conversas: " + error.message);
-    else { setConversas((data ?? []) as ConversaReal[]); setErro(""); }
+    else {
+      setConversas((data ?? []) as ConversaReal[]);
+      const ids = (data ?? []).map(c => c.id);
+      if (ids.length) {
+        const { data: recentes } = await supabase.from("mensagens")
+          .select("conversa_id,criado_em")
+          .eq("empresa_id", empresaSelecionadaId)
+          .in("conversa_id", ids)
+          .order("criado_em", { ascending: false })
+          .limit(2000);
+        if (recentes) {
+          const datas: Record<string, string> = {};
+          for (const msg of recentes) if (!datas[msg.conversa_id]) datas[msg.conversa_id] = msg.criado_em;
+          setUltimaMensagemPorConversa(datas);
+        }
+      } else setUltimaMensagemPorConversa({});
+      setErro("");
+    }
     setCarregando(false);
   }, [empresaSelecionadaId]);
   const carregarMensagens = useCallback(async () => {
@@ -68,8 +86,12 @@ export function HistoricoWhatsapp() {
       setEnviando(false);
     }
   };
+  const conversasOrdenadas = [...conversas].sort((a, b) =>
+    new Date(ultimaMensagemPorConversa[b.id] ?? b.atualizado_em).getTime() -
+    new Date(ultimaMensagemPorConversa[a.id] ?? a.atualizado_em).getTime()
+  );
   const atual = conversas.find(c => c.id === selecionada);
-  const rotuloContato = (c: ConversaReal) => `Cliente ${conversas.findIndex(item => item.id === c.id) + 1}`;
+  const rotuloContato = (c: ConversaReal) => `Cliente ${conversasOrdenadas.findIndex(item => item.id === c.id) + 1}`;
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
@@ -81,10 +103,10 @@ export function HistoricoWhatsapp() {
     {!carregando && empresaSelecionadaId && conversas.length === 0 && !erro && <p className="rounded-xl border p-6 text-sm">Nenhuma conversa real encontrada para esta empresa.</p>}
     <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <div className="max-h-[65vh] space-y-2 overflow-y-auto">
-        {conversas.map(c => <button key={c.id} type="button" onClick={() => setSelecionada(c.id)} className={`w-full min-w-0 rounded-xl border p-3 text-left hover:bg-muted/50 ${selecionada === c.id ? "border-primary bg-muted/30" : ""}`}>
+        {conversasOrdenadas.map(c => <button key={c.id} type="button" onClick={() => setSelecionada(c.id)} className={`w-full min-w-0 rounded-xl border p-3 text-left hover:bg-muted/50 ${selecionada === c.id ? "border-primary bg-muted/30" : ""}`}>
           <span className="block truncate font-medium">{rotuloContato(c)}</span>
           <span className="block truncate text-xs text-muted-foreground">{contatoLegivel(c.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</span>
-          <span className="block text-xs text-muted-foreground">{formatar(c.atualizado_em)} · {c.atendimento_humano ? "Atendimento humano" : c.status}</span>
+          <span className="block text-xs text-muted-foreground">{formatar(ultimaMensagemPorConversa[c.id] ?? c.atualizado_em)} · {c.atendimento_humano ? "Atendimento humano" : c.status}</span>
         </button>)}
       </div>
       <div className="min-w-0 rounded-xl border bg-card p-4">
