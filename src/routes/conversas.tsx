@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { HistoricoWhatsapp } from "@/components/app/HistoricoWhatsapp";
 import { useState, type FormEvent } from "react";
 import { Bot, ChevronDown, Clock3, MessageCircle, Send, UserRound } from "lucide-react";
 import { toast } from "sonner";
@@ -116,6 +117,7 @@ function ItemConversa({
 
 function Conversas() {
   const { conversas, setConversas } = useStore();
+  const [aba, setAba] = useState<"reais" | "demo">("reais");
   const [limite, setLimite] = useState(POR_PAGINA);
   const [somentePendentes, setSomentePendentes] = useState(false);
   const lista = conversas.filter((c) => !somentePendentes || c.aguardandoHumano);
@@ -138,6 +140,11 @@ function Conversas() {
   return (
     <>
       <PageHeader title="Histórico de conversas" desc="Assuma um atendimento e registre respostas pelo painel (modo demonstração)." />
+      <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipo de histórico">
+        <Btn type="button" variant={aba === "reais" ? "default" : "ghost"} onClick={() => setAba("reais")}>WhatsApp real</Btn>
+        <Btn type="button" variant={aba === "demo" ? "default" : "ghost"} onClick={() => setAba("demo")}>Simulador (histórico antigo)</Btn>
+      </div>
+      {aba === "reais" ? <HistoricoWhatsapp /> : <>
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         <Card><p className="text-sm text-muted-foreground">Total de conversas</p><p className="mt-1 text-3xl font-bold">{conversas.length}</p></Card>
         <Card><p className="text-sm text-muted-foreground">Com atendimento humano</p><p className="mt-1 text-3xl font-bold">{conversas.filter((c) => c.status === "humano").length}</p></Card>
@@ -170,6 +177,7 @@ function Conversas() {
               )}
             </>}
       </Card>
+      </>}
     </>
   );
 }
