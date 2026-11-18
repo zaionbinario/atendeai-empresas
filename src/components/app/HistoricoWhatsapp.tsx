@@ -4,11 +4,11 @@ import { useStore } from "@/lib/store";
 
 type ConversaReal = { id: string; empresa_id: string; contato_whatsapp: string; status: string; atendimento_humano: boolean; atualizado_em: string };
 type MensagemReal = { id: string; conversa_id: string; conteudo: string | null; tipo: string; enviada_por_mim: boolean; criado_em: string };
-const formatar = (data: string) => new Date(data).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+const formatar = (data: string) => new Date(data).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
 
 const contatoLegivel = (jid: string) => {
   const [identificador, dominio] = jid.split("@");
-  if (dominio !== "s.whatsapp.net" || !/^\\d+$/.test(identificador)) return null;
+  if (dominio !== "s.whatsapp.net" || !/^\d+$/.test(identificador)) return null;
   const numero = identificador.startsWith("55") ? identificador.slice(2) : identificador;
   if (identificador.startsWith("55") && numero.length === 11) return `+55 (${numero.slice(0, 2)}) ${numero.slice(2, 7)}-${numero.slice(7)}`;
   if (identificador.startsWith("55") && numero.length === 10) return `+55 (${numero.slice(0, 2)}) ${numero.slice(2, 6)}-${numero.slice(6)}`;
@@ -91,7 +91,8 @@ export function HistoricoWhatsapp() {
     new Date(ultimaMensagemPorConversa[a.id] ?? a.atualizado_em).getTime()
   );
   const atual = conversas.find(c => c.id === selecionada);
-  const rotuloContato = (c: ConversaReal) => `Cliente ${conversasOrdenadas.findIndex(item => item.id === c.id) + 1}`;
+  // A tabela de conversas não fornece nome de contato; use o número estável quando disponível.
+  const rotuloContato = (c: ConversaReal) => contatoLegivel(c.contato_whatsapp) ?? `Contato ${c.id.slice(0, 8)}`;
   return <section className="space-y-4">
     <div className="rounded-xl border bg-card p-4">
       <h2 className="font-semibold">Conversas reais do WhatsApp</h2>
@@ -111,7 +112,8 @@ export function HistoricoWhatsapp() {
       </div>
       <div className="min-w-0 rounded-xl border bg-card p-4">
         {!atual ? <p className="text-sm text-muted-foreground">Selecione uma conversa para ver as mensagens.</p> : <>
-          <h3 className="font-semibold">{rotuloContato(atual)}</h3>\n          <p className="mb-3 text-xs text-muted-foreground">{contatoLegivel(atual.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</p>
+          <h3 className="font-semibold">{rotuloContato(atual)}</h3>
+          <p className="mb-3 text-xs text-muted-foreground">{contatoLegivel(atual.contato_whatsapp) ?? "Identificador do WhatsApp indisponível"}</p>
           {carregandoMensagens && <p className="text-sm">Carregando mensagens...</p>}
           <div className="max-h-[60vh] space-y-3 overflow-y-auto" aria-live="polite">
             {mensagens.map(m => <div key={m.id} className={`flex ${m.enviada_por_mim ? "justify-end" : "justify-start"}`}>
